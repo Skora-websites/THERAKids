@@ -1,0 +1,177 @@
+.inline-cta-container {
+  width: 100%;
+  padding: 2rem 2rem;
+  background-color: transparent;
+  position: relative;
+  overflow: hidden;
+  margin: 3rem 0 1.5rem 0;
+  display: flex;
+  justify-content: center;
+  border-radius: 24px;
+}
+
+/* Gradient border using mask */
+.inline-cta-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 3px; /* border thickness */
+  background: linear-gradient(135deg, #d3d4ff, #ffe0b2); /* pastel purple to pastel peach */
+  -webkit-mask: 
+     linear-gradient(#fff 0 0) content-box, 
+     linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.inline-cta-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 950px;
+  gap: 1.5rem;
+}
+
+.inline-cta-text-side {
+  flex: 1;
+  max-width: 450px;
+}
+
+.inline-cta-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.sparkles-icon {
+  font-size: 1rem;
+  color: #ffb74d; /* Soft orange/yellow */
+}
+
+.badge-text {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #7c83cd; /* Muted blue-purple */
+  text-transform: uppercase;
+}
+
+.inline-cta-title {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: #2b3366; /* Deep navy */
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.inline-cta-desc {
+  font-size: 14px;
+  color: #636b9e;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  max-width: 400px;
+}
+
+.inline-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #7677ec;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(118, 119, 236, 0.4);
+}
+
+.inline-cta-btn:hover {
+  background-color: #6162d6;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(118, 119, 236, 0.5);
+}
+
+.inline-cta-image-side {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inline-cta-illustration {
+  max-width: 250px;
+  width: 100%;
+  mix-blend-mode: multiply; /* Blends the white background of the image into the purple section */
+}
+
+/* Handwritten text styles */
+.handwritten-text {
+  position: absolute;
+  font-family: 'Caveat', 'Comic Sans MS', cursive;
+  font-size: 15px;
+  color: #5c6bc0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.text-left {
+  left: 0px;
+  bottom: 25%;
+  align-items: flex-end;
+  transform: rotate(-8deg);
+}
+
+.text-right {
+  right: 10px;
+  top: 35%;
+  align-items: center;
+  text-align: center;
+  transform: rotate(5deg);
+}
+
+.heart-icon {
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+@media (max-width: 992px) {
+  .inline-cta-container {
+    padding: 2rem 1.5rem;
+    border-radius: 24px;
+  }
+  
+  .inline-cta-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  .inline-cta-text-side {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .inline-cta-desc {
+    margin: 0 auto 1.5rem auto;
+  }
+  
+  .handwritten-text {
+    display: none; /* Hide decorative text on mobile to avoid clutter */
+  }
+}

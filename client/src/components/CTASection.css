@@ -1,0 +1,30 @@
+/* CTA Section Specific Styles */
+.cta-section-wrapper {
+  padding: 4rem 0;
+}
+
+.footer-transition-shapes {
+  position: absolute;
+  bottom: -20px;
+  right: 10%;
+  width: 300px;
+  height: 150px;
+  z-index: 0;
+}
+.ft-shape {
+  position: absolute;
+  border-radius: 100px;
+}
+.ft-shape-mint {
+  width: 100px; height: 180px; bottom: 0; right: 0; transform: rotate(15deg);
+  background-color: var(--pastel-peach);
+}
+.ft-shape-rose {
+  width: 120px; height: 140px; bottom: 0; right: 60px; transform: rotate(-10deg);
+  background-color: var(--pastel-lilac);
+}
+.ft-shape-peach {
+  width: 80px; height: 80px; bottom: 80px; right: 120px; border-radius: 50%;
+  background-color: white;
+  border: 1px solid var(--color-outline-variant);
+}

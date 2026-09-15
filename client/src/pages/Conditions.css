@@ -1,0 +1,57 @@
+.conditions-hero {
+  border-radius: 0 0 48px 48px;
+}
+
+.condition-icon-wrapper-small {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.condition-icon-wrapper-small svg {
+  width: 24px;
+  height: 24px;
+}
+
+.focus-pill {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: var(--color-surface-container-low);
+  color: var(--color-on-surface-variant);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.group:hover .focus-pill {
+  background-color: var(--pastel-peach);
+  color: var(--color-on-surface);
+}
+
+.condition-blob {
+  width: 100%;
+  max-width: 350px;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background-color: var(--color-surface-container-high);
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  animation: blobFloat 8s ease-in-out infinite alternate;
+}
+
+@keyframes blobFloat {
+  0% {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  }
+  33% {
+    border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+  }
+  66% {
+    border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+  }
+  100% {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  }
+}

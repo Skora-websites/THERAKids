@@ -1,0 +1,208 @@
+.about-hero {
+  padding: var(--spacing-xl) 0;
+  border-radius: 0 0 48px 48px;
+}
+
+.center-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.about-subtitle {
+  max-width: 700px;
+  margin-top: 1.5rem;
+  color: var(--color-on-surface-variant);
+}
+
+.about-philosophy {
+  padding: var(--spacing-xl) 0;
+}
+
+.philosophy-grid {
+  align-items: center;
+  gap: 4rem;
+}
+
+.philosophy-visual {
+  width: 100%;
+}
+
+.image-blob-mask {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 120px 24px 120px 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-resting);
+}
+
+.philosophy-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.philosophy-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.values-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.values-list li {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.value-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-primary-fixed);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .philosophy-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Meet the Founder Section */
+.founder-section {
+  padding: var(--spacing-xl) 0;
+}
+
+.fill-surface-lowest {
+  fill: var(--color-surface-container-lowest);
+}
+
+.fill-pastel-peach {
+  fill: var(--color-pastel-peach);
+}
+
+.founder-flex-container {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  justify-content: space-between;
+}
+
+.founder-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.founder-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.founder-image-wrapper {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  aspect-ratio: 3/4;
+  width: 100%;
+  max-width: 400px;
+}
+
+.founder-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 992px) {
+  .founder-flex-container {
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 3rem;
+  }
+  
+  .founder-visual {
+    width: 100%;
+  }
+}
+
+/* Meet Our Specialists */
+.specialists-section {
+  padding: var(--spacing-xl) 0;
+  background-color: var(--color-surface-container-lowest);
+}
+
+.specialists-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.specialist-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.specialist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.specialist-img-wrapper {
+  width: 100%;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+}
+
+.specialist-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.specialist-card:hover .specialist-img-wrapper img {
+  transform: scale(1.05);
+}
+
+.specialist-info {
+  padding: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .specialists-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .specialists-grid {
+    grid-template-columns: 1fr;
+  }
+}

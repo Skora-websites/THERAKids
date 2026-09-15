@@ -1,0 +1,100 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(36, 46, 61, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.modal-container {
+  background-color: var(--color-surface-container-lowest);
+  border-radius: 24px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  box-shadow: var(--shadow-modal);
+  margin: auto;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-on-surface-variant);
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--color-error);
+}
+
+.modal-title {
+  margin-bottom: 0.5rem;
+  color: var(--color-on-background);
+}
+
+.modal-subtitle {
+  color: var(--color-on-surface-variant);
+  margin-bottom: 2rem;
+}
+
+.appointment-form {
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+
+.submit-container {
+  margin-top: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.modal-error {
+  background-color: var(--color-error-container);
+  color: var(--color-on-error-container);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .modal-container {
+    padding: 1.5rem;
+  }
+  
+  .col-span-2 {
+    grid-column: span 1;
+  }
+  
+  .appointment-form {
+    grid-template-columns: 1fr;
+  }
+}
