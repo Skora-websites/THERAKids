@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5005; // 5000 is reserved by Windows on some machines
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
 // Middleware

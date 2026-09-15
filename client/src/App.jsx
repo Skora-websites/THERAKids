@@ -11,11 +11,13 @@ import Contact from './pages/Contact';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { AppProvider } from './context/AppContext';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <AppProvider>
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Public Pages */}
           <Route element={<Layout />}>

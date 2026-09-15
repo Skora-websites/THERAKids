@@ -15,7 +15,7 @@ const Conditions = () => {
       short_name: 'Autism',
       description: 'A neurodevelopmental condition affecting communication, social interaction, and behavior. We focus on enhancing social skills, sensory processing, and promoting independence.',
       focus_areas: ['Social Skills', 'Sensory Regulation', 'Communication'],
-      image: 'https://images.unsplash.com/photo-1587654780228-6a31c510a7bc?auto=format&fit=crop&w=800&q=80',
+      image: 'https://images.unsplash.com/photo-1544396821-4dd40b938ad3?auto=format&fit=crop&w=800&q=80',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
@@ -73,7 +73,7 @@ const Conditions = () => {
       short_name: 'GDD',
       description: 'When a child is significantly delayed in multiple developmental areas (motor, speech, cognitive). We provide comprehensive, multidisciplinary intervention to bridge the gaps.',
       focus_areas: ['Multidisciplinary Care', 'Milestone Tracking', 'Early Intervention'],
-      image: 'https://images.unsplash.com/photo-1576765608532-0739fb78f309?auto=format&fit=crop&w=800&q=80',
+      image: 'https://images.unsplash.com/photo-1594608661623-aa0bd3a69d98?auto=format&fit=crop&w=800&q=80',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 2v20"></path>
@@ -101,7 +101,7 @@ const Conditions = () => {
       short_name: 'Speech Delay',
       description: 'When a child’s language development is slower than typical milestones. Our speech pathologists work to improve articulation, comprehension, and expressive communication.',
       focus_areas: ['Articulation', 'Comprehension', 'Expressive Language'],
-      image: 'https://images.unsplash.com/photo-1587654780228-6a31c510a7bc?auto=format&fit=crop&w=800&q=80',
+      image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -156,7 +156,7 @@ const Conditions = () => {
       short_name: 'SCD',
       description: 'Difficulties with the use of verbal and nonverbal language for social purposes. We facilitate social groups to practice pragmatic language and peer interactions.',
       focus_areas: ['Pragmatic Language', 'Peer Interaction', 'Group Sessions'],
-      image: 'https://images.unsplash.com/photo-1576765608532-0739fb78f309?auto=format&fit=crop&w=800&q=80',
+      image: 'https://images.unsplash.com/photo-1602080858428-57174f9431cf?auto=format&fit=crop&w=800&q=80',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>

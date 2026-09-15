@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import API_URL from '../config';
 import InlineCTA from '../components/InlineCTA';
 import './Services.css';
 
@@ -68,7 +69,7 @@ const Services = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch('http://localhost:5005/api/services');
+        const response = await fetch(`${API_URL}/api/services`);
         if (response.ok) {
           const data = await response.json();
           setServices(data.length ? data : fallbackServices);

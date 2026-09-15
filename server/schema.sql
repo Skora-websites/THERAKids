@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS appointments (
 
 -- Seed initial admin (password: admin123)
 -- Hash generated from bcrypt.hashSync('admin123', 10)
-INSERT IGNORE INTO admins (username, password_hash) VALUES ('admin', '$2b$10$O01iVnUSI7q3L7C2K5aJueJ8.r131yTzGjLqCg1hQ1qHj9E.N1h.C');
+INSERT IGNORE INTO admins (username, password_hash) VALUES ('admin', '$2b$10$KzDv2GDsDgnkliJdercDNOTrWviU4tOrHnAjxdmi16vTIYXQMMPE2');
 
 -- Seed settings
 INSERT IGNORE INTO site_settings (setting_key, setting_value) VALUES 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import API_URL from '../config';
 import './AppointmentModal.css';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '919899338813';
@@ -30,7 +31,7 @@ const AppointmentModal = ({ onClose }) => {
     try {
     try {
       // API call to store in DB
-      const response = await fetch('http://localhost:5005/api/appointments', {
+      const response = await fetch(`${API_URL}/api/appointments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
