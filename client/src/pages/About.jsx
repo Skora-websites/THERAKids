@@ -1,25 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Heart } from 'lucide-react';
+import API_URL from '../config';
 import InlineCTA from '../components/InlineCTA';
+import PageHero from '../components/PageHero';
+import { motion } from 'framer-motion';
+import TiltCard from '../components/TiltCard';
 import './About.css';
 
+const fallbackSpecialists = [
+  { id: 1, name: 'Dr. Priya Sharma', specialisation: 'Lead Occupational Therapist', profile_image: '/images/dr_priya.jpg' },
+  { id: 2, name: 'Dr. Rahul Verma', specialisation: 'Speech Pathologist', profile_image: '/images/dr_rahul.jpg' },
+  { id: 3, name: 'Dr. Neha Kapoor', specialisation: 'Child Psychologist', profile_image: '/images/dr_neha.jpg' },
+  { id: 4, name: 'Dr. Vikram Singh', specialisation: 'Occupational Therapist', profile_image: '/images/dr_vikram.jpg' }
+];
+
 const About = () => {
+  const [specialists, setSpecialists] = useState(fallbackSpecialists);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/doctors`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length) setSpecialists(data);
+        }
+      } catch {
+        // API unreachable — fallback stays in place
+      }
+    };
+    load();
+  }, []);
   return (
     <div className="about-page">
-      <section className="about-hero bg-pastel-lilac relative overflow-hidden" style={{ height: '450px', display: 'flex', alignItems: 'flex-start', width: '100%', paddingTop: 'calc(4rem + 104px)' }}>
-        <div className="container center-text z-10 relative">
-          <h1 className="headline-2xl text-black">A community of care, built for your family.</h1>
-          <p className="body-lg about-subtitle text-black">
-            We believe that every child deserves a nurturing environment to discover their potential. Our clinic was founded to bridge the gap between clinical excellence and warm, family-centered support.
-          </p>
-        </div>
-        
-        {/* Cloud Divider to White */}
-        <div className="cloud-divider cloud-bottom fill-white">
-          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-          </svg>
-        </div>
-      </section>
+      <PageHero
+        bg="bg-pastel-lilac"
+        eyebrow="Our Story"
+        title="A place where children blossom."
+        subtitle="THERAKids Foundation is a multidisciplinary team dedicated to helping children aged 0-18 reach their fullest potential — through early intervention, structured therapy, and true family partnership."
+        image="/images/hero-about.jpg"
+        imageAlt="Child playing and learning in a bright therapy space"
+        imagePosition="0% 100%"
+        notePosition="bottom-right"
+        scriptNote={
+          <>
+            <span>Family first</span>
+            <Heart className="script-heart" size={16} fill="currentColor" />
+          </>
+        }
+      />
 
       <section className="about-philosophy section-padding">
         <div className="container grid grid-cols-2 philosophy-grid">
@@ -117,45 +146,27 @@ const About = () => {
           </div>
           
           <div className="specialists-grid">
-            <div className="specialist-card">
-              <div className="specialist-img-wrapper">
-                <img src="/images/dr_priya.jpg" alt="Dr. Priya Sharma" />
-              </div>
-              <div className="specialist-info">
-                <h3 className="headline-sm text-black mb-1">Dr. Priya Sharma</h3>
-                <p className="body-sm text-black font-semibold">Lead Occupational Therapist</p>
-              </div>
-            </div>
-            
-            <div className="specialist-card">
-              <div className="specialist-img-wrapper">
-                <img src="/images/dr_rahul.jpg" alt="Dr. Rahul Verma" />
-              </div>
-              <div className="specialist-info">
-                <h3 className="headline-sm text-black mb-1">Dr. Rahul Verma</h3>
-                <p className="body-sm text-black font-semibold">Speech Pathologist</p>
-              </div>
-            </div>
-
-            <div className="specialist-card">
-              <div className="specialist-img-wrapper">
-                <img src="/images/dr_neha.jpg" alt="Dr. Neha Kapoor" />
-              </div>
-              <div className="specialist-info">
-                <h3 className="headline-sm text-black mb-1">Dr. Neha Kapoor</h3>
-                <p className="body-sm text-black font-semibold">Child Psychologist</p>
-              </div>
-            </div>
-
-            <div className="specialist-card">
-              <div className="specialist-img-wrapper">
-                <img src="/images/dr_vikram.jpg" alt="Dr. Vikram Singh" />
-              </div>
-              <div className="specialist-info">
-                <h3 className="headline-sm text-black mb-1">Dr. Vikram Singh</h3>
-                <p className="body-sm text-black font-semibold">Occupational Therapist</p>
-              </div>
-            </div>
+            {specialists.map((specialist, index) => (
+              <motion.div
+                key={specialist.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.45, delay: (index % 4) * 0.08 }}
+              >
+                <TiltCard maxTilt={8}>
+                  <div className="specialist-card">
+                    <div className="specialist-img-wrapper">
+                      <img src={specialist.profile_image} alt={specialist.name} />
+                    </div>
+                    <div className="specialist-info">
+                      <h3 className="headline-sm text-black mb-1">{specialist.name}</h3>
+                      <p className="body-sm text-black font-semibold">{specialist.specialisation}</p>
+                    </div>
+                  </div>
+                </TiltCard>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

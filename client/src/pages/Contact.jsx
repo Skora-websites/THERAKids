@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PageHero from '../components/PageHero';
 import './Contact.css';
 
 const Contact = () => {
@@ -14,19 +15,18 @@ const Contact = () => {
 
   return (
     <div className="contact-page">
-      <section className="contact-hero bg-pastel-peach relative overflow-hidden" style={{ height: '450px', display: 'flex', alignItems: 'flex-start', width: '100%', paddingTop: 'calc(4rem + 104px)' }}>
-        <div className="container center-text z-10 relative">
-          <h1 className="headline-2xl">Let's connect.</h1>
-          <p className="body-lg contact-subtitle">Whether you have a quick question or want to discuss your child's needs in detail, our doors are open.</p>
-        </div>
-        
-        {/* Cloud Divider to White */}
-        <div className="cloud-divider cloud-bottom fill-white">
-          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-          </svg>
-        </div>
-      </section>
+      <PageHero
+        bg="bg-pastel-peach"
+        blob={1}
+        eyebrow="Get in touch"
+        title="Let's connect."
+        subtitle="Whether you have a quick question or want to discuss your child's needs in detail, our doors are open."
+        image="/images/hero-contact.jpg"
+        imageAlt="Welcoming consultation at our centre"
+        imagePosition="100% 44%"
+        notePosition="bottom-right"
+        scriptNote="We're here"
+      />
 
       <section className="contact-content-section section-padding">
         <div className="container grid grid-cols-2 contact-grid">

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import InlineCTA from '../components/InlineCTA';
+import PageHero from '../components/PageHero';
 import './Conditions.css';
 
 const Conditions = () => {
@@ -185,21 +186,17 @@ const Conditions = () => {
 
   return (
     <div className="conditions-page">
-      <section className="conditions-hero bg-pastel-lilac relative overflow-hidden" style={{ height: '450px', display: 'flex', alignItems: 'flex-start', width: '100%', paddingTop: 'calc(4rem + 104px)' }}>
-        <div className="container center-text z-10 relative">
-          <h1 className="headline-2xl text-black">Who We Help</h1>
-          <p className="body-lg conditions-subtitle text-black mx-auto max-w-2xl mt-4">
-            We provide specialized, multidisciplinary care tailored to your child’s unique developmental profile.
-          </p>
-        </div>
-        
-        {/* Cloud Divider to White */}
-        <div className="cloud-divider cloud-bottom fill-white">
-          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-          </svg>
-        </div>
-      </section>
+      <PageHero
+        bg="bg-pastel-lilac"
+        blob={3}
+        eyebrow="Who We Help"
+        title="Every child's journey is unique."
+        subtitle="We provide specialized, multidisciplinary care tailored to your child's unique developmental profile."
+        image="/images/hero-conditions.jpg"
+        imageAlt="Therapist supporting a child during an activity"
+        imagePosition="27% 0%"
+        scriptNote="Every step counts"
+      />
 
       <div className="container py-12 z-10 relative bg-white" style={{ maxWidth: '100%' }}>
         <div className="container max-w-5xl mx-auto">

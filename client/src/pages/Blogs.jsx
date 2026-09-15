@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import API_URL from '../config';
 import InlineCTA from '../components/InlineCTA';
+import PageHero from '../components/PageHero';
+import { motion } from 'framer-motion';
+import TiltCard from '../components/TiltCard';
 import './Blogs.css';
 
 const fallbackBlogs = [
@@ -25,23 +29,37 @@ const fallbackBlogs = [
 ];
 
 const Blogs = () => {
-  const [blogs] = useState(fallbackBlogs);
+  const [blogs, setBlogs] = useState(fallbackBlogs);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/blogs`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length) setBlogs(data);
+        }
+      } catch {
+        // API unreachable — fallback stays in place
+      }
+    };
+    load();
+  }, []);
 
   return (
     <div className="blogs-page">
-      <section className="blogs-header bg-pastel-lilac relative overflow-hidden" style={{ height: '450px', display: 'flex', alignItems: 'flex-start', width: '100%', paddingTop: 'calc(4rem + 104px)' }}>
-        <div className="container center-text z-10 relative">
-          <h1 className="headline-2xl">Resources & Insights</h1>
-          <p className="body-lg blogs-subtitle">Guidance and strategies from our developmental experts.</p>
-        </div>
-        
-        {/* Cloud Divider to White */}
-        <div className="cloud-divider cloud-bottom fill-white">
-          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-          </svg>
-        </div>
-      </section>
+      <PageHero
+        bg="bg-pastel-lilac"
+        blob={5}
+        eyebrow="Resources & Insights"
+        title="Grow together, learn together."
+        subtitle="Guidance and strategies from our developmental experts."
+        image="/images/hero-blogs.jpg"
+        imageAlt="Parent reading with a child"
+        imagePosition="41% 0%"
+        notePosition="bottom-left"
+        scriptNote="Tips & stories"
+      />
 
       <div className="container py-12 z-10 relative bg-white" style={{ maxWidth: '100%' }}>
         <div className="container max-w-5xl mx-auto">
@@ -51,18 +69,28 @@ const Blogs = () => {
 
       <section className="standard-blogs-section section-padding pt-4">
         <div className="container grid grid-cols-3 blogs-grid">
-          {blogs.map(blog => (
-            <Link to={`/blogs/${blog.slug}`} key={blog.id} className="card blog-card">
-              <div className="blog-card-image">
-                <img src={blog.featured_image} alt={blog.title} />
-              </div>
-              <div className="blog-card-content">
-                <span className="badge badge-sensory">{blog.category}</span>
-                <h3 className="headline-sm">{blog.title}</h3>
-                <p className="body-sm">{blog.excerpt}</p>
-                <span className="label-sm date-label">{new Date(blog.published_at).toLocaleDateString()}</span>
-              </div>
-            </Link>
+          {blogs.map((blog, index) => (
+            <motion.div
+              key={blog.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: (index % 3) * 0.08 }}
+            >
+              <TiltCard className="h-full">
+                <Link to={`/blogs/${blog.slug}`} className="card blog-card h-full">
+                  <div className="blog-card-image">
+                    <img src={blog.featured_image} alt={blog.title} />
+                  </div>
+                  <div className="blog-card-content">
+                    <span className="badge badge-sensory">{blog.category}</span>
+                    <h3 className="headline-sm">{blog.title}</h3>
+                    <p className="body-sm">{blog.excerpt}</p>
+                    <span className="label-sm date-label">{new Date(blog.published_at).toLocaleDateString()}</span>
+                  </div>
+                </Link>
+              </TiltCard>
+            </motion.div>
           ))}
         </div>
       </section>

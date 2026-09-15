@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import API_URL from '../config';
 import InlineCTA from '../components/InlineCTA';
+import PageHero from '../components/PageHero';
 import './Gallery.css';
 
 const fallbackImages = [
@@ -10,9 +12,24 @@ const fallbackImages = [
 ];
 
 const Gallery = () => {
-  const [images] = useState(fallbackImages);
+  const [images, setImages] = useState(fallbackImages);
   const [activeCategory, setActiveCategory] = useState('All');
   const [lightboxImg, setLightboxImg] = useState(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/gallery`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length) setImages(data);
+        }
+      } catch {
+        // API unreachable — fallback stays in place
+      }
+    };
+    load();
+  }, []);
 
   const categories = ['All', ...new Set(images.map(img => img.category))];
   
@@ -22,31 +39,30 @@ const Gallery = () => {
 
   return (
     <div className="gallery-page">
-      <section className="gallery-header bg-pastel-peach relative overflow-hidden" style={{ height: '450px', display: 'flex', alignItems: 'flex-start', width: '100%', paddingTop: 'calc(4rem + 104px)' }}>
-        <div className="container center-text z-10 relative">
-          <h1 className="headline-2xl">Our Gallery</h1>
-          <p className="body-lg gallery-subtitle">Take a peek inside our nurturing environment.</p>
-          
-          <div className="gallery-filters">
-            {categories.map(cat => (
-              <button 
-                key={cat} 
-                className={`filter-btn ${activeCategory === cat ? 'active' : ''}`}
-                onClick={() => setActiveCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+      <PageHero
+        bg="bg-pastel-peach"
+        blob={4}
+        eyebrow="Inside THERAKids"
+        title="Moments that matter."
+        subtitle="Take a peek inside our nurturing environment."
+        image="/images/hero-gallery.jpg"
+        imageAlt="Children learning together through play"
+        imagePosition="0% 100%"
+        notePosition="bottom-right"
+        scriptNote="Smiles daily"
+      >
+        <div className="gallery-filters">
+          {categories.map(cat => (
+            <button 
+              key={cat} 
+              className={`filter-btn ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
-        
-        {/* Cloud Divider to White */}
-        <div className="cloud-divider cloud-bottom fill-white">
-          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-          </svg>
-        </div>
-      </section>
+      </PageHero>
 
       <div className="container py-12 z-10 relative bg-white" style={{ maxWidth: '100%' }}>
         <div className="container max-w-5xl mx-auto">

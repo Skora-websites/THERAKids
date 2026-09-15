@@ -1,12 +1,27 @@
 .services-hero {
-  padding: var(--spacing-xl) 0;
-  border-radius: 0 0 48px 48px;
+  min-height: 520px;
 }
 
-.services-subtitle {
-  max-width: 600px;
-  margin-top: 1.5rem;
-  color: var(--color-on-surface-variant);
+/* Sparkle accent above "care," */
+.accent-host {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-accent {
+  position: absolute;
+  width: 2.4rem;
+  top: -0.45em;
+  right: -2.4rem;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .hero-accent {
+    width: 1.8rem;
+    right: -1.9rem;
+  }
 }
 
 .services-list-section {

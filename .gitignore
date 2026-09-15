@@ -8,3 +8,9 @@ node_modules/
 
 # Logs
 *.log
+
+# Browser audit screenshots
+client/screenshots/
+
+# Uploaded images (user content, not source)
+server/uploads/

@@ -17,6 +17,7 @@
 
 /* Utilities */
 .relative { position: relative; }
+.h-full { height: 100%; }
 .overflow-hidden { overflow: hidden; }
 .z-10 { z-index: 10; }
 .flex { display: flex; }
@@ -158,6 +159,290 @@
   z-index: 1;
 }
 
+/* -----------------------------
+   Home Hero (mockup: split layout, doodles, trust badges)
+------------------------------ */
+.home-hero {
+  position: relative;
+  /* extra bottom room so content & photo stay inside the peach, above the 150px wave */
+  padding-bottom: 12rem;
+}
+
+.home-hero::after {
+  /* soft blob glow behind the photo, like the mockup's warm halo */
+  content: '';
+  position: absolute;
+  right: -5%;
+  bottom: 6%;
+  width: 55%;
+  height: 70%;
+  background: radial-gradient(ellipse at center, rgba(214, 121, 130, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+.home-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.home-hero-script {
+  font-family: 'Caveat', cursive;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #1a237e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.script-sparkle {
+  width: 1.6rem;
+}
+
+.home-hero-title {
+  line-height: 1.08;
+  margin-bottom: 1.25rem;
+}
+
+.home-hero-highlight {
+  color: #E8836B;
+  position: relative;
+  display: inline-block;
+}
+
+.highlight-sparkle {
+  position: absolute;
+  width: 1.9rem;
+  top: -0.5em;
+  right: -2.1rem;
+  transform: rotate(10deg);
+  pointer-events: none;
+}
+
+/* Sparkle sitting after "Tomorrow" — kept inside the line box so it can't collide with other lines */
+.title-end-sparkle {
+  display: inline-block;
+  width: 1.8rem;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  transform: translateY(-5px) rotate(8deg);
+  pointer-events: none;
+}
+
+.home-hero-subtitle {
+  max-width: 30rem;
+}
+
+.home-hero-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #E9407A;
+}
+
+.home-hero-badges {
+  display: flex;
+  gap: 1.75rem;
+  margin-top: 2.25rem;
+  flex-wrap: wrap;
+}
+
+.hero-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 9rem;
+}
+
+.hero-badge-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a237e;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hero-badge-item:hover .hero-badge-icon {
+  transform: translateY(-4px) scale(1.12) rotate(-6deg);
+}
+
+/* Specialists arch photos: gentle lift on hover */
+.about-arch-img-wrapper {
+  transition: transform 0.35s ease;
+}
+
+.about-arch-img-wrapper:hover {
+  transform: translateY(-8px);
+}
+
+.about-arch-img-wrapper:hover .about-arch-img {
+  box-shadow: 0 18px 36px rgba(26, 35, 126, 0.16);
+}
+
+.hero-badge-label {
+  font-weight: 700;
+  color: #1a237e;
+  line-height: 1.3;
+}
+
+/* Photo fills the right half, bleeding to the section's bottom edge */
+.home-hero-visual {
+  position: relative;
+  align-self: end;
+}
+
+/* Hero photo: organic blob mask, no hard edges against the peach */
+.home-hero-img {
+  width: 100%;
+  aspect-ratio: 10 / 9;
+  object-fit: cover;
+  object-position: 62% 30%;
+  display: block;
+}
+
+.home-hero-visual {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='14'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M228 46c56 16 110 52 120 104 11 53-18 110-62 142-45 33-108 42-157 18-50-25-88-76-90-130C37 126 70 70 120 48c34-15 72-14 108-2Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='14'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M228 46c56 16 110 52 120 104 11 53-18 110-62 142-45 33-108 42-157 18-50-25-88-76-90-130C37 126 70 70 120 48c34-15 72-14 108-2Z'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Doodles */
+.doodle {
+  position: absolute;
+  pointer-events: none;
+}
+.doodle-rainbow {
+  width: 76px;
+  top: -3%;
+  left: 0%;
+  transform: rotate(-8deg);
+  animation: doodle-bob 5s ease-in-out infinite;
+}
+
+.doodle-heart {
+  width: 50px;
+  top: auto;
+  bottom: 5%;
+  right: 3%;
+  transform: rotate(10deg);
+  animation: doodle-bob 6s ease-in-out 1.2s infinite;
+}
+
+@keyframes doodle-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -9px; }
+}
+
+/* Script note — floats on the peach field left of the photo, clear of the headline block */
+.home-hero-note {
+  position: absolute;
+  right: 3%;
+  top: -12%;
+  font-family: 'Caveat', cursive;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.15;
+  color: #A66BD8;
+  text-align: center;
+  transform: rotate(4deg);
+  transform-origin: 50% 0;
+  pointer-events: none;
+  animation: note-sway 7s ease-in-out infinite;
+}
+
+@keyframes note-sway {
+  0%, 100% { transform: rotate(2.5deg); }
+  50% { transform: rotate(5.5deg); }
+}
+
+.home-hero-note .note-line-2 {
+  display: block;
+}
+
+.home-hero-note .note-heart {
+  width: 18px;
+  margin: 0.25rem auto 0;
+}
+
+@media (max-width: 1024px) {
+  .home-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero-content {
+    text-align: center;
+  }
+
+  .home-hero-script {
+    justify-content: center;
+  }
+
+  .home-hero-subtitle {
+    margin: 0 auto;
+  }
+
+  .home-hero-actions,
+  .home-hero-badges {
+    justify-content: center;
+  }
+
+  .home-hero-img {
+    aspect-ratio: 4 / 3;
+    object-position: center 30%;
+  }
+
+  .home-hero {
+    padding-bottom: 7rem;
+  }
+
+  .doodle-rainbow {
+    left: 0%;
+    width: 64px;
+  }
+
+  .doodle-heart {
+    display: none;
+  }
+
+  .home-hero-note {
+    display: none;
+  }
+}
+
+/* Home hero: taller, softer wave into the white section below */
+.home-hero .cloud-divider svg {
+  height: 80px;
+}
+
+@media (min-width: 992px) {
+  .home-hero .cloud-divider svg {
+    height: 150px;
+  }
+}
+
+/* Reduced motion: still the floating hero doodles and note */
+@media (prefers-reduced-motion: reduce) {
+  .doodle-rainbow,
+  .doodle-heart,
+  .home-hero-note,
+  .float-anim,
+  .float-anim-delayed-1,
+  .float-anim-delayed-2,
+  .float-anim-delayed-3 {
+    animation: none;
+  }
+}
+
 /* Services / Offers Grid */
 .services-grid-expanded {
   margin-top: 2rem;
@@ -271,4 +556,28 @@
   
   .about-arch-img-wrapper { display: none; }
   .about-arch-img-wrapper:first-child { display: block; width: 100%; margin: 0 auto; max-width: 300px; }
+}
+
+/* -----------------------------
+   Testimonials Section
+------------------------------ */
+.testimonials-grid { margin-top: 2rem; }
+.testimonial-card {
+  height: 100%;
+  padding: 2rem;
+}
+.testimonial-quote-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.testimonial-card .body-md {
+  line-height: 1.7;
+}
+.testimonial-author {
+  margin-top: auto;
+}
+
+@media (max-width: 1024px) {
+  .testimonials-grid { grid-template-columns: 1fr !important; }
 }

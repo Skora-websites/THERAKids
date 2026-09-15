@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Heart } from 'lucide-react';
 import API_URL from '../config';
 import InlineCTA from '../components/InlineCTA';
+import PageHero from '../components/PageHero';
 import './Services.css';
 
 const fallbackServices = [
@@ -90,21 +92,26 @@ const Services = () => {
 
   return (
     <div className="services-page">
-      <section className="services-hero bg-pastel-peach relative overflow-hidden" style={{ height: '450px', display: 'flex', alignItems: 'flex-start', width: '100%', paddingTop: 'calc(4rem + 104px)' }}>
-        <div className="container center-text z-10 relative">
-          <h1 className="headline-2xl">Comprehensive care tailored to your child.</h1>
-          <p className="body-lg services-subtitle">
-            Every child’s developmental path is unique. We offer a range of specialized therapies designed to support their individual goals and strengths.
-          </p>
-        </div>
-        
-        {/* Cloud Divider to White */}
-        <div className="cloud-divider cloud-bottom fill-white">
-          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-          </svg>
-        </div>
-      </section>
+      <PageHero
+        bg="bg-pastel-peach"
+        blob={2}
+        eyebrow="More Than Therapy"
+        title="A community of "
+        accent="care,"
+        titleAfter="built for your family."
+        subtitle="We believe that every child deserves a nurturing environment to discover their potential. Our clinic was founded to bridge the gap between clinical excellence and warm, family-centered support."
+        image="/images/hero_doctor_kid.jpg"
+        imageAlt="Therapist building blocks with a child"
+        imagePosition="100% 63%"
+        notePosition="top-left"
+        scriptNote={
+          <>
+            <span>Brighter Futures</span>
+            <span className="script-line-2">Together</span>
+            <Heart className="script-heart" size={16} fill="currentColor" />
+          </>
+        }
+      />
 
       <section className="services-list-section section-padding">
         <div className="container">

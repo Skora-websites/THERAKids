@@ -1,25 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import API_URL from '../config';
 import './Blogs.css';
 
 const BlogPost = () => {
   const { slug } = useParams();
-  
-  // In a real app we fetch by slug from backend
-  // Mocking for now based on the slug
-  const blog = {
-    id: 1,
-    title: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    slug: slug,
-    content: `<p>This is a detailed mock article about ${slug.replace(/-/g, ' ')}. It covers various strategies, insights, and developmental milestones.</p><p>We believe in a neurodiversity-affirming approach, providing sensory-friendly techniques to support every child's unique needs.</p>`,
-    featured_image: 'https://images.unsplash.com/photo-1544396821-4dd40b938ad3?auto=format&fit=crop&w=1200&q=80',
-    category: 'Therapy Insights',
-    published_at: '2026-08-10',
-    seo_title: 'Therapy Insights | TheraKids',
-    meta_description: 'Read the latest insights from our developmental experts.'
-  };
+  const [blog, setBlog] = useState(null);
+  const [status, setStatus] = useState('loading');
 
-  if (!blog) return <div className="container" style={{padding: '6rem 0', textAlign: 'center'}}>Loading...</div>;
+  useEffect(() => {
+    const load = async () => {
+      setStatus('loading');
+      try {
+        const response = await fetch(`${API_URL}/api/blogs/${slug}`);
+        if (response.ok) {
+          setBlog(await response.json());
+          setStatus('ok');
+        } else {
+          setStatus('notfound');
+        }
+      } catch {
+        setStatus('error');
+      }
+    };
+    load();
+  }, [slug]);
+
+  if (status === 'loading') {
+    return <div className="container" style={{padding: '6rem 0', textAlign: 'center'}}>Loading...</div>;
+  }
+
+  if (status !== 'ok') {
+    return (
+      <div className="container" style={{padding: '8rem 0 6rem', textAlign: 'center'}}>
+        <h1 className="headline-xl">Post not found</h1>
+        <p className="body-lg" style={{marginBottom: '2rem'}}>
+          {status === 'error'
+            ? 'We could not reach the server. Please try again in a moment.'
+            : 'This article does not exist or is not published yet.'}
+        </p>
+        <Link to="/blogs" className="btn btn-primary">Back to all blogs</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="blog-post-page">
@@ -31,6 +54,7 @@ const BlogPost = () => {
         <span className="badge badge-sensory" style={{marginBottom: '1rem'}}>{blog.category}</span>
         <h1 className="headline-2xl" style={{marginBottom: '1rem'}}>{blog.title}</h1>
         <div style={{color: 'var(--color-outline)', marginBottom: '2rem'}} className="label-sm">
+          {blog.author && <span>By {blog.author} &middot; </span>}
           Published on {new Date(blog.published_at).toLocaleDateString()}
         </div>
         
