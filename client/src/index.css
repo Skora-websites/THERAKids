@@ -16,10 +16,10 @@
   --color-inverse-on-surface: #ebf1ff;
   --color-outline: #777584;
   --color-outline-variant: #c7c5d5;
-  --color-surface-tint: #4f4fc3;
-  --color-primary: #4d4dc0;
+  --color-surface-tint: #3B3BCA;
+  --color-primary: #3B3BCA;
   --color-on-primary: #ffffff;
-  --color-primary-container: #6667db;
+  --color-primary-container: #5555DF;
   --color-on-primary-container: #fffbff;
   --color-inverse-primary: #c1c1ff;
   --color-secondary: #246a55;
@@ -51,20 +51,20 @@
   --color-surface-variant: #d9e3f7;
 
   /* Custom App Overrides & Enhancements based on Design Doc */
-  --color-cta-primary: #ee8169; /* Dusty Peach */
-  --color-cta-hover: #d76a53;
+  --color-cta-primary: #FF3385; /* Dusty Peach */
+  --color-cta-hover: #D81B60;
   
-  --color-accent-soft: #ede9fe; /* Lavender */
-  --color-accent-vibrant: #7677ec; /* Periwinkle */
+  --color-accent-soft: #D4B5FF; /* Lavender */
+  --color-accent-vibrant: #7B3EF5; /* Periwinkle */
   
-  --color-pastel-peach: #ffd6c9; /* Soft Pastel Peach Background */
-  --color-pastel-lilac: #ede9fe; /* Soft Lavender Background */
+  --color-pastel-peach: #FFCBA4; /* Soft Pastel Peach Background */
+  --color-pastel-lilac: #D4B5FF; /* Soft Lavender Background */
   --color-pastel-pink: #ffc4d4; /* Unused now */
   --color-pastel-mint: #8fd8c8; /* Unused now */
-  --color-pastel-rose: #ee8169; /* Reusing primary peach for accents */
+  --color-pastel-rose: #FF3385; /* Reusing primary peach for accents */
   --color-pastel-white: #ffffff;
   
-  --color-cta-secondary-text: #7677ec; /* Periwinkle */
+  --color-cta-secondary-text: #5C24D0; /* Periwinkle */
 
   /* Typography */
   --font-heading: 'Lora', serif;
