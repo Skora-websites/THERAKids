@@ -13,7 +13,7 @@ import './PageHero.css';
  * - scriptNote: optional React node rendered in the handwriting font near the image
  */
 const PageHero = ({ eyebrow, title, accent, titleAfter, subtitle, image, imageAlt = '', imagePosition, imageZoom = 1, bg = 'bg-pastel-lilac', blob = 1, scriptNote, notePosition = 'top-right', children }) => (
-  <section className={`page-hero ${bg} relative overflow-hidden`} style={{ paddingTop: 'calc(4rem + 104px)', paddingBottom: '6rem' }}>
+  <section className={`page-hero ${bg} relative overflow-hidden`} style={{ paddingTop: 'calc(2.5rem + 104px)', paddingBottom: '6rem' }}>
     <div className="container page-hero-grid z-10 relative">
       <motion.div
         className="page-hero-content"

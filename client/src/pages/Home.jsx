@@ -30,6 +30,12 @@ const fallbackDoctors = [
   { id: 2, name: 'Dr. Rahul Verma', specialisation: 'Speech Pathologist', profile_image: '/images/dr_rahul.jpg' }
 ];
 
+const fallbackTestimonials = [
+  { id: 1, name: 'Priya M.', designation: 'Parent of a 6-year-old', testimonial: 'The team at THERAkids has been wonderful with our son. His communication has grown so much since we started, and he genuinely looks forward to every session.' },
+  { id: 2, name: 'Arun K.', designation: 'Parent of an 8-year-old', testimonial: 'We finally feel heard. The therapists took the time to understand our daughter and built a plan that works for her — and for our whole family.' },
+  { id: 3, name: 'Sneha R.', designation: 'Parent of a 4-year-old', testimonial: 'From the first assessment to every milestone since, the care and professionalism here have been exceptional. Our child is more confident every day.' }
+];
+
 const fallbackProcess = [
   { id: 1, step: '1', title: 'Contact us', desc: 'to make a referral.', img: 'https://images.unsplash.com/photo-1544396821-4dd40b938ad3?auto=format&fit=crop&w=300&q=80', color: 'peach' },
   { id: 2, step: '2', title: 'Assessment', desc: 'Provision of a customized, comprehensive assessment.', img: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=300&q=80', color: 'lilac' },
@@ -49,7 +55,7 @@ const decorateService = (service, index) => {
 const Home = () => {
   const [services, setServices] = useState(fallbackServices);
   const [doctors, setDoctors] = useState(fallbackDoctors);
-  const [testimonials, setTestimonials] = useState([]);
+  const [testimonials, setTestimonials] = useState(fallbackTestimonials);
   const [process] = useState(fallbackProcess);
   const [features] = useState(trustBadges);
 
@@ -86,7 +92,7 @@ const Home = () => {
   return (
     <div className="home-page">
       {/* Hero Section (Peach) */}
-      <section className="bg-pastel-peach home-hero relative overflow-hidden" style={{ paddingTop: 'calc(4rem + 104px)' }}>
+      <section className="bg-pastel-peach home-hero relative overflow-hidden" style={{ paddingTop: 'calc(2.5rem + 104px)' }}>
         <div className="container home-hero-grid z-10 relative">
           <motion.div
             className="home-hero-content"
@@ -112,7 +118,7 @@ const Home = () => {
             <p className="body-lg home-hero-subtitle text-navy-light">
               We provide specialized, compassionate, and evidence-based therapy and support to help children overcome challenges and reach their unique potential.
             </p>
-            <div className="home-hero-actions" style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
+            <div className="home-hero-actions">
               <button className="btn btn-primary home-hero-book" onClick={() => setIsModalOpen(true)}>
                 Book an Appointment <ArrowRight size={18} />
               </button>

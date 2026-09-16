@@ -234,6 +234,8 @@
 
 .home-hero-subtitle {
   max-width: 30rem;
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .home-hero-book {
@@ -255,9 +257,7 @@
   align-items: center;
   gap: 0.6rem;
   max-width: 9rem;
-}
-
-.hero-badge-icon {
+}  .hero-badge-icon {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -268,6 +268,8 @@
   flex-shrink: 0;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+
 
 .hero-badge-item:hover .hero-badge-icon {
   transform: translateY(-4px) scale(1.12) rotate(-6deg);
@@ -374,9 +376,19 @@
   margin: 0.25rem auto 0;
 }
 
+/* Hero action buttons — layout moved out of inline styles so it can respond */
+.home-hero-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Tablet & below: stack the hero */
 @media (max-width: 1024px) {
   .home-hero-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 
   .home-hero-content {
@@ -387,6 +399,12 @@
     justify-content: center;
   }
 
+  /* 56px base is oversized between 769–1024px — scale with the viewport */
+  .home-hero-title {
+    font-size: clamp(1.75rem, 1rem + 4vw, 3rem);
+    line-height: 1.15;
+  }
+
   .home-hero-subtitle {
     margin: 0 auto;
   }
@@ -394,11 +412,20 @@
   .home-hero-actions,
   .home-hero-badges {
     justify-content: center;
+    gap: 1rem;
   }
 
   .home-hero-img {
     aspect-ratio: 4 / 3;
     object-position: center 30%;
+  }
+
+  /* Soften the blob mask when the photo is wide, so faces aren't cropped */
+  .home-hero-visual {
+    -webkit-mask-size: 115% 115%;
+    mask-size: 115% 115%;
+    -webkit-mask-position: center;
+    mask-position: center;
   }
 
   .home-hero {
@@ -416,6 +443,72 @@
 
   .home-hero-note {
     display: none;
+  }
+}
+
+/* Phones: tighten type, spacing, and paddings */
+@media (max-width: 480px) {
+  .home-hero {
+    padding-bottom: 5.5rem;
+  }
+
+  .home-hero-script {
+    font-size: 1.35rem;
+  }
+
+  .home-hero-title {
+    margin-bottom: 1rem;
+  }
+
+  /* Buttons stack full-width and are easy to tap */
+  .home-hero-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 0.75rem;
+  }
+
+  .home-hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Badges: 2-up rows on phones when they fit, stacking on very narrow screens */
+  .home-hero-badges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1.75rem;
+    justify-items: start;
+  }
+
+  .hero-badge-item {
+    max-width: none;
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
+  .hero-badge-item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  /* Slight full-bleed: the photo grows past the text column edges */
+  .home-hero-visual {
+    width: calc(100% + 1.5rem);
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+  }
+
+  .home-hero-visual {
+    -webkit-mask-size: 118% 118%;
+    mask-size: 118% 118%;
+  }
+
+  .home-hero-img {
+    aspect-ratio: 1 / 1;
   }
 }
 
