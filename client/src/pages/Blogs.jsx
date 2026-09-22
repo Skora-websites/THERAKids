@@ -5,28 +5,8 @@ import InlineCTA from '../components/InlineCTA';
 import PageHero from '../components/PageHero';
 import TiltCard from '../components/TiltCard';
 import { initScrollReveals } from '../lib/motion';
+import fallbackBlogs from '../data/fallbackBlogs';
 import './Blogs.css';
-
-const fallbackBlogs = [
-  {
-    id: 1,
-    title: 'Understanding Sensory Processing Disorder',
-    slug: 'understanding-sensory-processing',
-    excerpt: 'Learn about the signs of SPD and how occupational therapy can provide strategies for self-regulation.',
-    featured_image: 'https://images.unsplash.com/photo-1544396821-4dd40b938ad3?auto=format&fit=crop&w=1200&q=80',
-    category: 'Occupational Therapy',
-    published_at: '2026-08-10'
-  },
-  {
-    id: 2,
-    title: 'Speech Milestones for Toddlers',
-    slug: 'speech-milestones-toddlers',
-    excerpt: 'A quick guide for parents on what to expect as your toddler develops their communication skills.',
-    featured_image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80',
-    category: 'Speech Therapy',
-    published_at: '2026-08-22'
-  }
-];
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState(fallbackBlogs);

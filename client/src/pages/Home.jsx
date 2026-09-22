@@ -12,6 +12,7 @@ import {
 import { createHeroTimeline, createFloatLoop, initScrollReveals, createParallax } from '../lib/motion';
 import API_URL from '../config';
 import { useAppContext } from '../context/AppContext';
+import fallbackBlogs from '../data/fallbackBlogs';
 import './Home.css';
 
 const trustBadges = [
@@ -94,7 +95,7 @@ const Home = () => {
   const [openFaq, setOpenFaq] = useState(null);
   const faqRef = useRef(null);
   const blogRef = useRef(null);
-  const [blogs, setBlogs] = useState([]);
+  const [blogs, setBlogs] = useState(fallbackBlogs);
 
   const { setIsModalOpen } = useAppContext();
   const navigate = useNavigate();
@@ -136,7 +137,7 @@ const Home = () => {
           }
         }
       } catch {
-        // API unreachable — fallbacks stay in place; testimonials section stays hidden
+        // API unreachable — all fallbacks stay in place (services, testimonials, blogs)
       }
     };
     load();
@@ -226,7 +227,7 @@ const Home = () => {
         </div>
 
         {/* Trusted-by line under the hero grid */}
-        <div className="container hero-trusted" data-hero="badges">
+        <div className="container hero-trusted relative z-10" data-hero="badges">
           <span className="trusted-dash" aria-hidden="true" />
           Trusted by families. Supported by experts.
         </div>

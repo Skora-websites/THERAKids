@@ -30,12 +30,14 @@ const AdminLogin = () => {
         setError(data.error || 'Invalid credentials');
       }
     } catch {
-      // Allow fallback login for development without backend
-      if (username === 'admin' && password === 'admin123') {
+      // Dev-only fallback login so the dashboard is reachable without a backend.
+      // Never active in production builds — otherwise anyone could sign in with
+      // hardcoded credentials on the deployed static site.
+      if (import.meta.env.DEV && username === 'admin' && password === 'admin123') {
         localStorage.setItem('admin_token', 'mock_dev_token');
         navigate('/admin/dashboard');
       } else {
-        setError('Connection error and invalid dev credentials.');
+        setError('Cannot reach the server. Please try again later.');
       }
     } finally {
       setIsLoading(false);

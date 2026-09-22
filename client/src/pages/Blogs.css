@@ -154,3 +154,15 @@
     min-height: 200px;
   }
 }
+
+/* Mobile: tighten the under-hero whitespace (hero 4rem + CTA band 2rem top) */
+@media (max-width: 768px) {
+  .blogs-page > .container.py-12 {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .blogs-page .standard-blogs-section.section-padding.pt-4 {
+    padding-top: 1rem;
+  }
+}

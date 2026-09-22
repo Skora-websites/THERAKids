@@ -115,7 +115,7 @@ const PhysicalTherapy = () => {
         subtitle="Our pediatric physical therapists help children overcome physical challenges, developing strength, balance, and coordination for improved independence."
         image="/images/gallery/d6copy.webp"
         imageAlt="Physical therapy session with a child"
-        imagePosition="27% 0%"
+        imagePosition="50% 30%"
         notePosition="bottom-right"
         scriptNote={
           <>

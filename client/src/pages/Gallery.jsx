@@ -86,7 +86,12 @@ const Gallery = () => {
         imagePosition="0% 100%"
         notePosition="bottom-right"
         scriptNote="Smiles daily"
-      >
+      />
+
+      <div className="container py-12 z-10 relative bg-white" style={{ maxWidth: '100%' }}>
+        <div className="container max-w-5xl mx-auto">
+          <InlineCTA />
+        </div>
         <div className="gallery-filters">
           {categories.map(cat => (
             <button 
@@ -97,12 +102,6 @@ const Gallery = () => {
               {cat}
             </button>
           ))}
-        </div>
-      </PageHero>
-
-      <div className="container py-12 z-10 relative bg-white" style={{ maxWidth: '100%' }}>
-        <div className="container max-w-5xl mx-auto">
-          <InlineCTA />
         </div>
       </div>
 

@@ -46,7 +46,7 @@ const PageHero = ({
     <section
       ref={sectionRef}
       className={`page-hero ${bg} relative overflow-hidden`}
-      style={{ paddingTop: 'calc(2.5rem + 104px)', paddingBottom: '6rem' }}
+      style={{ paddingTop: 'calc(2.5rem + 104px)' }}
     >
       {/* Theme-aware background doodles */}
       <div className="page-hero-doodles" data-hero="doodles" aria-hidden="true">

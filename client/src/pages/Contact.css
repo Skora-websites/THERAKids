@@ -65,4 +65,9 @@
   .contact-form-wrapper {
     padding: 1.5rem;
   }
+
+  /* Tighten the gap between the hero and the contact section on phones */
+  .contact-page .contact-content-section.section-padding {
+    padding-top: 2rem;
+  }
 }

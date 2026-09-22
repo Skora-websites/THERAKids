@@ -525,10 +525,11 @@
     object-position: center 30%;
   }
 
-  /* Soften the blob mask when the photo is wide, so faces aren't cropped */
+  /* Blob mask fills the box exactly at every width — scaling it past 100%
+     truncates the organic shape and makes the photo look cut off */
   .hero-photo-window {
-    -webkit-mask-size: 108% 108%;
-    mask-size: 108% 108%;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
     -webkit-mask-position: center;
     mask-position: center;
   }
@@ -571,7 +572,9 @@
 
   .hero-trusted {
     justify-content: center;
-    margin-top: 2.25rem;
+    margin-top: 1.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
   }
 }
 
@@ -606,23 +609,23 @@
   }
 
   /* Badges: 2-up rows on phones when they fit, stacking on very narrow screens */
+  /* One tidy row per badge: identical alignment instead of a ragged 2+1 grid */
   .home-hero-badges {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
     margin-top: 1.75rem;
     justify-items: start;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .hero-badge-item {
     max-width: none;
-    width: 100%;
+    width: auto;
     min-width: 0;
     justify-content: flex-start;
-  }
-
-  .hero-badge-item:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
   }
 
   /* Slight full-bleed: the photo grows past the text column edges */
@@ -633,8 +636,8 @@
   }
 
   .hero-photo-window {
-    -webkit-mask-size: 110% 110%;
-    mask-size: 110% 110%;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
   }
 
   .home-hero-img {
@@ -648,6 +651,26 @@
 
   .hero-note-card p {
     font-size: 0.78rem;
+  }
+
+  /* Trusted line: smaller, tighter, and clear of the decorative blobs
+     (it sits above them now via the z-10 wrapper in the JSX) */
+  .hero-trusted {
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    gap: 0.55rem;
+    margin-top: 1.75rem;
+  }
+
+  .trusted-dash {
+    display: none;
+  }
+
+  .hero-sweep {
+    width: 70%;
+    height: 30%;
+    bottom: -6%;
+    opacity: 0.55;
   }
 
   .note-card-leaf {

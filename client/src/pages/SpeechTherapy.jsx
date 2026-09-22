@@ -140,7 +140,7 @@ const SpeechTherapy = () => {
         subtitle="Our speech-language pathologists support children in developing strong communication skills, addressing articulation, receptive/expressive language, and social pragmatic skills."
         image="/images/gallery/d2copy.webp"
         imageAlt="Speech therapy session with a child"
-        imagePosition="0% 100%"
+        imagePosition="50% 40%"
         notePosition="bottom-right"
         scriptNote={
           <>

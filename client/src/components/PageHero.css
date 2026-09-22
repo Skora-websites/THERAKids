@@ -1,5 +1,15 @@
 .page-hero {
   min-height: 520px;
+  /* Clear the bottom cloud wave (80px, 150px desktop) so photos aren't sliced */
+  padding-bottom: 6rem;
+}
+
+@media (min-width: 992px) {
+  .page-hero {
+    /* The desktop wave is 150px tall with crests touching its box top — 10rem
+       keeps photo + script note fully above it at every x-position */
+    padding-bottom: 10rem;
+  }
 }
 
 /* Hero-scale wave: matches the home hero's taller bottom divider, not the
@@ -178,13 +188,13 @@
   z-index: 1;
 }
 
-/* Larger photo: the visual grows 5rem wider than its grid column, and the negative
-   vertical margins (-1.875rem each) exactly cancel the extra height from the 4/3 ratio,
-   so the grid row — and the hero's height — stay untouched. Desktop only. */
+/* Larger photo: the visual grows 5rem wider than its grid column. Top margin is
+   negative to optically align with the text; bottom stays flush so the photo
+   never dips into the bottom cloud wave. Desktop only. */
 @media (min-width: 1025px) {
   .page-hero-visual {
     width: calc(100% + 5rem);
-    margin: -1.875rem -2.5rem;
+    margin: -1.875rem -2.5rem 0;
     min-width: 0;
   }
 }
@@ -209,8 +219,10 @@
    left-anchored note can't inherit `right: 0` and drift over the subtitle. */
 .hero-script-note {
   position: absolute;
-  top: 0.5rem;
-  right: 0.25rem;
+  /* 12% down from the top — blob masks curve away at the very corner, so a
+     corner-anchored note lands on the page background instead of the photo */
+  top: 12%;
+  right: 8%;
   font-family: 'Caveat', cursive;
   font-size: 1.5rem;
   font-weight: 600;
@@ -218,6 +230,12 @@
   color: var(--color-navy, #1a237e);
   text-align: center;
   transform: rotate(6deg);
+  /* Soft light halo so the script stays legible whether it sits on the photo
+     or on the tinted background — notes often straddle the blob's edge */
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 0 8px rgba(255, 255, 255, 0.9),
+    0 0 14px rgba(255, 255, 255, 0.7);
   pointer-events: none;
   animation: hero-note-float 6s ease-in-out infinite;
 }
@@ -235,7 +253,8 @@
 
 .hero-script-note.note-bottom-right {
   top: auto;
-  bottom: 0.75rem;
+  bottom: 16%;
+  right: 10%;
   transform: rotate(-5deg);
 }
 
@@ -245,9 +264,9 @@
 
 .hero-script-note.note-bottom-left {
   right: auto;
-  left: 0.25rem;
+  left: 10%;
   top: auto;
-  bottom: 0.75rem;
+  bottom: 16%;
   transform: rotate(5deg);
 }
 
@@ -282,6 +301,8 @@
 @media (max-width: 768px) {
   .page-hero {
     min-height: 0;
+    /* Tighter under-hero gap on phones (desktop keeps the roomier 6rem/10rem) */
+    padding-bottom: 4rem;
   }
 
   .hero-script-note {

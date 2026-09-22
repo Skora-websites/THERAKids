@@ -126,7 +126,7 @@ const OccupationalTherapy = () => {
         subtitle="Our occupational therapists help children develop the fine motor, sensory processing, and visual motor skills needed for everyday activities like dressing, writing, and playing."
         image="/images/gallery/d1copy.webp"
         imageAlt="Occupational therapy session with a child"
-        imagePosition="100% 63%"
+        imagePosition="50% 40%"
         notePosition="top-left"
         scriptNote={
           <>
