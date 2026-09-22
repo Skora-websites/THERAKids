@@ -219,23 +219,21 @@
    left-anchored note can't inherit `right: 0` and drift over the subtitle. */
 .hero-script-note {
   position: absolute;
-  /* 12% down from the top — blob masks curve away at the very corner, so a
-     corner-anchored note lands on the page background instead of the photo */
-  top: 12%;
-  right: 8%;
+  /* Anchored just OUTSIDE the blob photo's corner, in the blank background —
+     the blob masks always curve away at the corners, so the note never
+     overlaps the image at any breakpoint or blob shape */
+  top: -0.45rem;
+  right: -0.45rem;
   font-family: 'Caveat', cursive;
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   font-weight: 600;
   line-height: 1.1;
   color: var(--color-navy, #1a237e);
   text-align: center;
   transform: rotate(6deg);
-  /* Soft light halo so the script stays legible whether it sits on the photo
-     or on the tinted background — notes often straddle the blob's edge */
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85),
-    0 0 8px rgba(255, 255, 255, 0.9),
-    0 0 14px rgba(255, 255, 255, 0.7);
+  /* Topmost layer within the hero — above the photo window (z-index 1), whose
+     element box extends past the visible blob mask */
+  z-index: 2;
   pointer-events: none;
   animation: hero-note-float 6s ease-in-out infinite;
 }
@@ -243,7 +241,7 @@
 .hero-script-note.note-top-left,
 .hero-script-note.note-bottom-left {
   right: auto;
-  left: 0.25rem;
+  left: -0.45rem;
 }
 
 @keyframes hero-note-float {
@@ -253,8 +251,8 @@
 
 .hero-script-note.note-bottom-right {
   top: auto;
-  bottom: 16%;
-  right: 10%;
+  bottom: -0.45rem;
+  right: -0.45rem;
   transform: rotate(-5deg);
 }
 
@@ -264,9 +262,9 @@
 
 .hero-script-note.note-bottom-left {
   right: auto;
-  left: 10%;
+  left: -0.45rem;
   top: auto;
-  bottom: 16%;
+  bottom: -0.45rem;
   transform: rotate(5deg);
 }
 
@@ -306,13 +304,7 @@
   }
 
   .hero-script-note {
-    font-size: 1.2rem;
-  }
-
-  /* Keep handwritten notes inside the blob photo, clear of text above */
-  .hero-script-note.note-top-right,
-  .hero-script-note.note-top-left {
-    top: 1.25rem;
+    font-size: 1.3rem;
   }
 }
 
