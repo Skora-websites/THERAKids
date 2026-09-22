@@ -4,6 +4,7 @@ import Header from './Header';
 import Footer from './Footer';
 import AppointmentModal from './AppointmentModal';
 import CTASection from './CTASection';
+import ThemeSwitcher from './ThemeSwitcher';
 import { useAppContext } from '../context/AppContext';
 
 const Layout = () => {
@@ -18,6 +19,7 @@ const Layout = () => {
       <CTASection />
       <Footer />
       {isModalOpen && <AppointmentModal onClose={() => setIsModalOpen(false)} />}
+      <ThemeSwitcher />
     </>
   );
 };

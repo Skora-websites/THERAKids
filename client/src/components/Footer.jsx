@@ -26,6 +26,9 @@ const Footer = () => {
             <nav>
               <NavLink to="/about">About Us</NavLink>
               <NavLink to="/services">Our Services</NavLink>
+              <NavLink to="/services/speech-therapy">Speech Therapy</NavLink>
+              <NavLink to="/services/occupational-therapy">Occupational Therapy</NavLink>
+              <NavLink to="/services/physical-therapy">Physical Therapy</NavLink>
               <NavLink to="/conditions">Conditions We Treat</NavLink>
               <NavLink to="/gallery">Gallery</NavLink>
               <NavLink to="/blogs">Blogs</NavLink>

@@ -1,4 +1,6 @@
-/* Fonts are imported in index.html */
+/* Fonts are imported in index.html.
+   Color themes: :root holds the SIGNATURE palette; [data-theme="pastel"] and
+   [data-theme="bright"] (set on <html> by ThemeSwitcher) override the tokens. */
 
 :root {
   /* Colors */
@@ -66,9 +68,43 @@
   
   --color-cta-secondary-text: #5C24D0; /* Periwinkle */
 
-  /* Typography */
-  --font-heading: 'Lora', serif;
-  --font-body: 'Nunito', sans-serif;
+  /* ---- Semantic component tokens (re-themed per mode below) ---- */
+  --color-navy: #1a237e;            /* Headings & emphasized text on pastel sections */
+  --color-navy-light: #3949ab;      /* Secondary text on pastel sections */
+  --color-navy-deep: #2b3366;       /* InlineCTA title */
+  --color-warn-warm: #d32f2f;       /* Warm emphasis text */
+  --color-btn-lilac: #8b5cf6;       /* Hero secondary button */
+  --color-hero-highlight: #E8836B;  /* Coral emphasis word in hero title */
+  --color-note-purple: #A66BD8;     /* Handwritten notes */
+  --color-accent-warm: #ffb74d;     /* Sparkle icons */
+  --color-inline-badge: #7c83cd;    /* InlineCTA eyebrow */
+  --color-inline-muted: #636b9e;    /* InlineCTA description */
+  --color-inline-btn: #7677ec;      /* InlineCTA button */
+  --color-inline-btn-hover: #6162d6;
+  --color-cta-border-a: #d3d4ff;    /* InlineCTA gradient border, lilac stop */
+  --color-cta-border-b: #ffe0b2;    /* InlineCTA gradient border, peach stop */
+  --color-input-bg: #FAF8F5;
+  --color-input-border: rgba(36, 46, 61, 0.12);
+  --color-border-brand: rgba(118, 119, 236, 0.15); /* Soft brand-tinted hairlines */
+  --color-badge-peach-bg: #FAF0EB;
+  --color-badge-lilac-bg: #EDE9FE;
+  --color-service-grad-a: #f0ebff;  /* Service detail card gradient */
+  --color-service-grad-b: #fff0ea;
+  --color-assessment-bg: #fff0ea;
+  --color-surface-tinted: #f8f6ff;  /* Hover tint on pills/cards */
+  --color-header-bg: rgba(255, 255, 255, 0.85);
+  --color-header-bg-solid: rgba(255, 255, 255, 0.95);
+  --color-doodle-amber: #F6B73C;   /* Decorative sparkle/rainbow strokes */
+  --color-doodle-lilac: #B08AE8;
+  --color-doodle-mint: #7FC8A9;
+  --color-doodle-pink: #E8899E;
+  --color-doodle-lavender: #D9A0E8;
+
+  /* Typography
+     Display: Fraunces (stand-in for Grenette — warm, soft serif for headings & names)
+     Body/UI: Figtree (stand-in for Styrene — clean geometric sans for body, nav, buttons, forms) */
+  --font-heading: 'Fraunces', 'Lora', Georgia, serif;
+  --font-body: 'Figtree', 'Nunito', 'Segoe UI', sans-serif;
 
   /* Spacing */
   --spacing-xs: 0.375rem;
@@ -104,21 +140,37 @@ body, h1, h2, h3, h4, p, figure, blockquote, dl, dd {
   margin: 0;
 }
 
+/* Decorative hero elements use negative offsets (script blob at -3rem, etc.) —
+   clip horizontal overflow at the page level so mobile never gets a sideways scroll. */
+html, body {
+  overflow-x: clip;
+}
+
+/* Smooth cross-fade when the color theme changes */
+body,
+.card,
+.btn,
+.header-pill,
+.theme-switcher,
+.input-field {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.35s;
+  transition-timing-function: ease;
+}
+
 body {
   min-height: 100vh;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
   font-family: var(--font-body);
+  /* Lets Fraunces pick its sturdier text cuts at small sizes and display cuts at heading sizes */
+  font-optical-sizing: auto;
   background-color: var(--color-background);
   color: var(--color-on-background);
   -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-family: var(--font-body);
-}
-
-h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
 }
 
@@ -138,7 +190,7 @@ input, button, textarea, select {
 
 /* Typography Classes */
 .headline-2xl {
-  font-family: var(--font-body);
+  font-family: var(--font-heading);
   font-size: 56px;
   font-weight: 700;
   line-height: 68px;
@@ -212,6 +264,12 @@ input, button, textarea, select {
   font-weight: 600;
   line-height: 22px;
   letter-spacing: 0.01em;
+}
+
+/* Person names (testimonial authors, team members) carry the display font for warmth */
+.testimonial-author .label-lg {
+  font-family: var(--font-heading);
+  letter-spacing: 0;
 }
 
 .label-md {
@@ -295,13 +353,32 @@ input, button, textarea, select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   padding: 0.875rem 1.75rem;
   border-radius: var(--radius-full);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease,
+    background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
   border: none;
   font-family: var(--font-body);
+}
+
+.btn:focus-visible,
+.input-field:focus-visible,
+.theme-switcher-btn:focus-visible,
+.filter-btn:focus-visible {
+  outline: 3px solid var(--color-accent-vibrant);
+  outline-offset: 2px;
+}
+
+/* Microinteraction: gentle arrow nudge inside CTAs on hover */
+.btn svg {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn:hover svg {
+  transform: translateX(3px);
 }
 
 .btn-primary {
@@ -325,6 +402,18 @@ input, button, textarea, select {
   box-shadow: 0 4px 10px rgba(26, 35, 126, 0.12);
 }
 
+/* Respect users who prefer reduced motion everywhere */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn svg {
+    transition: none;
+  }
+
+  .btn:hover {
+    transform: none;
+  }
+}
+
 .btn-secondary {
   background-color: var(--color-cta-secondary);
   color: var(--color-cta-secondary-text);
@@ -346,19 +435,31 @@ input, button, textarea, select {
   border-radius: var(--radius-md); /* roughly 24px for card */
   padding: 2rem;
   box-shadow: var(--shadow-resting);
-  border: 1px solid rgba(118, 119, 236, 0.15);
-  transition: box-shadow 0.2s ease;
+  border: 1px solid var(--color-border-brand);
+  transition: box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease;
 }
 
 .card:hover {
   box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+  border-color: var(--color-accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: box-shadow 0.25s ease;
+  }
+
+  .card:hover {
+    transform: none;
+  }
 }
 
 /* Modals / Forms */
 .input-field {
   width: 100%;
-  background-color: #FAF8F5; /* Soft tinted */
-  border: 1.5px solid rgba(36, 46, 61, 0.12);
+  background-color: var(--color-input-bg);
+  border: 1.5px solid var(--color-input-border);
   border-radius: 16px;
   padding: 0.875rem 1.25rem;
   transition: all 0.2s ease;
@@ -383,17 +484,19 @@ input, button, textarea, select {
 }
 
 .badge-speech {
-  background-color: #FAF0EB;
+  background-color: var(--color-badge-peach-bg);
   color: var(--color-cta-primary);
 }
 
 .badge-sensory {
-  background-color: #EDE9FE;
+  background-color: var(--color-badge-lilac-bg);
   color: var(--color-primary);
 }
 
-/* Organic blob masks for hero images (soft-edged, irregular silhouettes).
-   Each is a blurred blob path in a 400x400 viewBox, stretched to the element box. */
+/* Organic blob masks for hero images (solid, crisp-edged irregular silhouettes —
+   the same format as the home hero's photo window).
+   Each is a blob path in a 400x400 viewBox, stretched to the element box.
+   blob-mask-1 is the home hero silhouette; 2-5 are variations of the same family. */
 .blob-mask-1, .blob-mask-2, .blob-mask-3, .blob-mask-4, .blob-mask-5 {
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
@@ -401,24 +504,118 @@ input, button, textarea, select {
   mask-repeat: no-repeat;
 }
 .blob-mask-1 {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M205 32c56-10 122 8 154 52 33 45 34 112 6 158-29 47-88 78-146 78-57 0-120-26-150-74C39 199 40 130 74 86 108 41 149 42 205 32Z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M205 32c56-10 122 8 154 52 33 45 34 112 6 158-29 47-88 78-146 78-57 0-120-26-150-74C39 199 40 130 74 86 108 41 149 42 205 32Z'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M212 16 C268 6 336 42 362 96 C384 142 370 188 388 230 C398 272 386 328 338 350 C296 368 258 350 214 370 C168 390 122 394 84 366 C48 340 58 296 34 260 C12 226 10 178 38 140 C64 105 106 96 130 64 C152 34 176 22 212 16 Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M212 16 C268 6 336 42 362 96 C384 142 370 188 388 230 C398 272 386 328 338 350 C296 368 258 350 214 370 C168 390 122 394 84 366 C48 340 58 296 34 260 C12 226 10 178 38 140 C64 105 106 96 130 64 C152 34 176 22 212 16 Z'/%3E%3C/svg%3E");
 }
 .blob-mask-2 {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M232 40c52 14 108 46 120 98 12 53-16 112-58 146-43 35-104 46-155 24C88 286 44 238 40 182 36 125 70 66 122 44c36-15 72-15 110-4Z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M232 40c52 14 108 46 120 98 12 53-16 112-58 146-43 35-104 46-155 24C88 286 44 238 40 182 36 125 70 66 122 44c36-15 72-15 110-4Z'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M232 26 C292 12 350 54 372 110 C390 158 380 196 382 238 C384 292 366 322 322 342 C282 360 240 356 198 378 C152 398 104 382 76 352 C48 324 62 286 42 248 C22 210 28 164 52 128 C78 90 112 64 142 48 C172 32 202 32 232 26 Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M232 26 C292 12 350 54 372 110 C390 158 380 196 382 238 C384 292 366 322 322 342 C282 360 240 356 198 378 C152 398 104 382 76 352 C48 324 62 286 42 248 C22 210 28 164 52 128 C78 90 112 64 142 48 C172 32 202 32 232 26 Z'/%3E%3C/svg%3E");
 }
 .blob-mask-3 {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M180 34c58-18 130-6 168 38 37 44 44 114 20 164-25 52-84 90-143 88-58-2-120-38-144-92C57 178 62 108 102 66c24-26 50-22 78-32Z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M180 34c58-18 130-6 168 38 37 44 44 114 20 164-25 52-84 90-143 88-58-2-120-38-144-92C57 178 62 108 102 66c24-26 50-22 78-32Z'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M208 24 C262 8 322 30 350 64 C382 102 380 162 390 210 C398 262 368 300 330 330 C292 358 250 352 206 372 C158 392 110 388 90 360 C66 328 44 296 28 250 C14 206 26 158 48 124 C72 88 158 38 208 24 Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M208 24 C262 8 322 30 350 64 C382 102 380 162 390 210 C398 262 368 300 330 330 C292 358 250 352 206 372 C158 392 110 388 90 360 C66 328 44 296 28 250 C14 206 26 158 48 124 C72 88 158 38 208 24 Z'/%3E%3C/svg%3E");
 }
 .blob-mask-4 {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M210 44c54-16 118 4 148 48 29 43 30 104 4 148-26 45-78 74-131 72-53-2-110-30-136-76C69 190 70 124 104 82c28-35 62-26 106-38Z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M210 44c54-16 118 4 148 48 29 43 30 104 4 148-26 45-78 74-131 72-53-2-110-30-136-76C69 190 70 124 104 82c28-35 62-26 106-38Z'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M200 22 C268 10 330 44 352 90 C376 138 376 176 384 220 C392 272 360 308 320 336 C280 362 238 358 196 376 C150 394 100 380 78 344 C56 308 36 276 22 232 C10 190 28 144 46 110 C66 74 148 32 200 22 Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M200 22 C268 10 330 44 352 90 C376 138 376 176 384 220 C392 272 360 308 320 336 C280 362 238 358 196 376 C150 394 100 380 78 344 C56 308 36 276 22 232 C10 190 28 144 46 110 C66 74 148 32 200 22 Z'/%3E%3C/svg%3E");
 }
 .blob-mask-5 {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M188 36c60-14 128 10 158 58 29 47 24 114-10 156-35 43-99 62-154 46-56-16-104-64-112-120C62 120 92 62 140 44c16-6 32-4 48-8Z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='16'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M188 36c60-14 128 10 158 58 29 47 24 114-10 156-35 43-99 62-154 46-56-16-104-64-112-120C62 120 92 62 140 44c16-6 32-4 48-8Z'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M220 18 C284 6 344 44 366 86 C388 128 374 182 380 226 C386 280 362 318 326 344 C290 368 244 352 202 374 C158 396 112 390 92 362 C70 332 50 288 36 244 C24 202 40 152 58 120 C78 86 172 28 220 18 Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M220 18 C284 6 344 44 366 86 C388 128 374 182 380 226 C386 280 362 318 326 344 C290 368 244 352 202 374 C158 396 112 390 92 362 C70 332 50 288 36 244 C24 202 40 152 58 120 C78 86 172 28 220 18 Z'/%3E%3C/svg%3E");
+}
+
+/* =============================================================
+   SHARED UTILITIES — page-agnostic helpers used across many pages.
+   These live here (not in a page CSS file) so every page renders
+   correctly on direct visit, not only after Home.css has loaded.
+   ============================================================= */
+.bg-pastel-mint { background-color: var(--color-pastel-mint); }
+.bg-pastel-lilac { background-color: var(--color-pastel-lilac); }
+.bg-pastel-pink { background-color: var(--color-pastel-pink); }
+.bg-pastel-peach { background-color: var(--color-pastel-peach); }
+.bg-pastel-rose { background-color: var(--color-pastel-rose); }
+.bg-pastel-surface { background-color: var(--color-surface-container-lowest); }
+.bg-white { background-color: white; }
+
+.fill-pastel-peach { fill: var(--color-pastel-peach); }
+.fill-pastel-lilac { fill: var(--color-pastel-lilac); }
+.fill-white { fill: white; }
+.fill-surface-lowest { fill: var(--color-surface-container-lowest); }
+
+.text-navy { color: var(--color-navy); font-weight: 700; }
+.text-navy-light { color: var(--color-navy-light); }
+.text-pastel-rose { color: var(--color-warn-warm); }
+
+/* Utilities */
+.relative { position: relative; }
+.h-full { height: 100%; }
+.overflow-hidden { overflow: hidden; }
+.z-10 { z-index: 10; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.gap-8 { gap: 2rem; }
+.gap-12 { gap: 3rem; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.w-full { width: 100%; }
+.object-cover { object-fit: cover; }
+.text-center { text-align: center; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mb-12 { margin-bottom: 3rem; }
+.mb-16 { margin-bottom: 4rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-12 { margin-top: 3rem; }
+.mt-16 { margin-top: 4rem; }
+.py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.gap-3 { gap: 0.75rem; }
+.max-w-5xl { max-width: 64rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.uppercase { text-transform: uppercase; }
+.tracking-widest { letter-spacing: 0.1em; }
+.max-w-2xl { max-width: 42rem; }
+.font-bold { font-weight: bold; }
+.font-semibold { font-weight: 600; }
+.px-8 { padding-left: 2rem; padding-right: 2rem; }
+/* --- Utilities added by responsive audit (were used in JSX but never defined) --- */
+.max-w-3xl { max-width: 48rem; }
+.max-w-4xl { max-width: 56rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.pt-4 { padding-top: 1rem; }
+.pt-8 { padding-top: 2rem; }
+.pb-12 { padding-bottom: 3rem; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.w-8 { width: 2rem; }
+.h-8 { height: 2rem; }
+.list-disc { list-style-type: disc; }
+.list-inside { list-style-position: inside; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.border-navy { border-color: var(--color-navy); }
+.text-white { color: #ffffff; }
+.center { text-align: center; }
+.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+.rounded-full { border-radius: 9999px; }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+
+/* Buttons */
+.btn-lilac {
+  background-color: var(--color-surface-container-lowest);
+  color: var(--color-navy);
+  border-radius: 999px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  box-shadow: 0 2px 12px rgba(26, 35, 126, 0.07);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+.btn-lilac:hover {
+  background-color: var(--color-surface-tinted);
 }
 
 /* Cloud Dividers */
@@ -451,4 +648,159 @@ input, button, textarea, select {
 @keyframes waveScroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+/* =============================================================
+   SOFT PASTEL MODE — airy, calm, low-saturation washes of the
+   signature palette. Text stays dark for readability.
+   ============================================================= */
+[data-theme="pastel"] {
+  --color-background: #fdfcfb;
+  --color-on-background: #2b2f38;
+  --color-surface: #fdfcfb;
+  --color-on-surface: #2b2f38;
+  --color-on-surface-variant: #5d5f6e;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #faf7f2;
+  --color-surface-container: #f4f0ea;
+  --color-surface-container-high: #efe9e4;
+  --color-surface-container-highest: #eae3de;
+  --color-surface-variant: #f0e9f6;
+  --color-surface-dim: #e8e4de;
+  --color-outline: #8a8794;
+  --color-outline-variant: #e3ddd8;
+  --color-primary: #6d5fb8;
+  --color-primary-container: #7d6fc6;
+  --color-primary-fixed: #f3eefb;
+  --color-primary-fixed-dim: #ddd2f2;
+  --color-on-primary-fixed: #4a3f85;
+  --color-on-primary-fixed-variant: #5a4c9e;
+  --color-secondary: #3f8570;
+  --color-secondary-container: #a8d8c8;
+  --color-secondary-fixed: #dcf1ea;
+  --color-secondary-fixed-dim: #bce2d4;
+  --color-tertiary: #b96a54;
+  --color-tertiary-container: #cf8f7a;
+  --color-tertiary-fixed: #fbe4dc;
+  --color-tertiary-fixed-dim: #f4cfc2;
+  --color-cta-primary: #e989a3;
+  --color-cta-hover: #dd7391;
+  --color-accent-soft: #dcc8f2;
+  --color-accent-vibrant: #9a7fd1;
+  --color-cta-secondary-text: #6d5fb8;
+  --color-pastel-peach: #f9ede2;
+  --color-pastel-lilac: #ece6f8;
+  --color-pastel-pink: #f8e3ea;
+  --color-pastel-mint: #bfe0d4;
+  --color-pastel-rose: #e989a3;
+  --color-pastel-white: #ffffff;
+  --color-navy: #47406e;
+  --color-navy-light: #6a6390;
+  --color-navy-deep: #47406e;
+  --color-warn-warm: #c25a4a;
+  --color-btn-lilac: #9a7fd1;
+  --color-hero-highlight: #d99a82;
+  --color-note-purple: #a98fd0;
+  --color-accent-warm: #eab86a;
+  --color-inline-badge: #948bc4;
+  --color-inline-muted: #6f6d85;
+  --color-inline-btn: #9a8ed4;
+  --color-inline-btn-hover: #8a7cc9;
+  --color-cta-border-a: #e6def6;
+  --color-cta-border-b: #f6e6d4;
+  --color-input-bg: #fdfcfb;
+  --color-input-border: rgba(71, 64, 110, 0.16);
+  --color-border-brand: rgba(140, 120, 190, 0.16);
+  --color-badge-peach-bg: #f9ede2;
+  --color-badge-lilac-bg: #ece6f8;
+  --color-service-grad-a: #f4f0fa;
+  --color-service-grad-b: #faf1e9;
+  --color-assessment-bg: #f9ede2;
+  --color-surface-tinted: #f4f0fa;
+  --color-doodle-amber: #e5c288;
+  --color-doodle-lilac: #c9b4e4;
+  --color-doodle-mint: #b3d8c9;
+  --color-doodle-pink: #eebfcd;
+  --color-doodle-lavender: #d2c0e8;
+  --shadow-resting: 0px 8px 24px -4px rgba(80, 70, 110, 0.06);
+  --shadow-hover: 0px 16px 36px -6px rgba(140, 120, 190, 0.14);
+  --shadow-modal: 0px 24px 48px -12px rgba(80, 70, 110, 0.18);
+}
+
+/* =============================================================
+   BRIGHT & PLAYFUL MODE — saturated, cheerful, energetic.
+   Sophisticated coral/lavender/teal/sun tones; still premium.
+   ============================================================= */
+[data-theme="bright"] {
+  --color-background: #fffbf5;
+  --color-on-background: #2f2854;
+  --color-surface: #fffbf5;
+  --color-on-surface: #2f2854;
+  --color-on-surface-variant: #4a4180;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fff2e3;
+  --color-surface-container: #ffe7f0;
+  --color-surface-container-high: #ffe9ec;
+  --color-surface-container-highest: #fbdce4;
+  --color-surface-variant: #f0e2ff;
+  --color-surface-dim: #f8e7d9;
+  --color-outline: #6e6584;
+  --color-outline-variant: #f0d9cf;
+  --color-primary: #7c3aed;
+  --color-primary-container: #8b4bf5;
+  --color-primary-fixed: #f0e5ff;
+  --color-primary-fixed-dim: #dfc8ff;
+  --color-on-primary-fixed: #4c1d95;
+  --color-on-primary-fixed-variant: #5b21b6;
+  --color-secondary: #0d9488;
+  --color-secondary-container: #33d6c3;
+  --color-secondary-fixed: #c8fbef;
+  --color-secondary-fixed-dim: #8ff4e2;
+  --color-tertiary: #ea580c;
+  --color-tertiary-container: #fb923c;
+  --color-tertiary-fixed: #ffedd5;
+  --color-tertiary-fixed-dim: #fed7aa;
+  --color-cta-primary: #ff2e63;
+  --color-cta-hover: #f01d55;
+  --color-accent-soft: #d8b4fe;
+  --color-accent-vibrant: #9333ea;
+  --color-cta-secondary-text: #7c3aed;
+  --color-pastel-peach: #f7c099; /* Deep peach, lightened — richer than Signature's #FADBBE, same hue family */
+  --color-pastel-lilac: #be95ff; /* FULL-HUE violet — feature sections */
+  --color-pastel-pink: #ff8fb8;
+  --color-pastel-mint: #2fd9be;
+  --color-pastel-rose: #ff2e63;
+  --color-pastel-white: #ffffff;
+  --color-navy: #5b21b6; /* vivid royal purple — lively but still ~5:1 on deep peach */
+  --color-navy-light: #4338ca; /* vivid indigo body text */
+  --color-navy-deep: #5b21b6;
+  --color-warn-warm: #d91e5b;
+  --color-btn-lilac: #8b3ff5;
+  --color-hero-highlight: #d6006c; /* vivid magenta — pops on deep peach */
+  --color-note-purple: #9333ea;
+  --color-accent-warm: #ffb020;
+  --color-inline-badge: #5b21b6;
+  --color-inline-muted: #4a4180;
+  --color-inline-btn: #7c3aed;
+  --color-inline-btn-hover: #6d28d9;
+  --color-cta-border-a: #d9beff;
+  --color-cta-border-b: #ffbe8a;
+  --color-input-bg: #fff8f0;
+  --color-input-border: rgba(36, 30, 56, 0.14);
+  --color-border-brand: rgba(124, 58, 237, 0.24);
+  --color-badge-peach-bg: #ffe3c2;
+  --color-badge-lilac-bg: #e9dbff;
+  --color-service-grad-a: #efe0ff;
+  --color-service-grad-b: #ffe3c4;
+  --color-assessment-bg: #ffe3c2;
+  --color-surface-tinted: #f3ebff;
+  --color-doodle-amber: #ffb020;
+  --color-doodle-lilac: #7c3aed;
+  --color-doodle-mint: #10b981;
+  --color-doodle-pink: #f43f7b;
+  --color-doodle-lavender: #a855f7;
+  --color-eyebrow: #4c1d95; /* eyebrow labels need extra depth on full-hue sections */
+  --shadow-resting: 0px 8px 24px -4px rgba(90, 40, 90, 0.08);
+  --shadow-hover: 0px 16px 36px -6px rgba(124, 58, 237, 0.2);
+  --shadow-modal: 0px 24px 48px -12px rgba(90, 40, 90, 0.22);
 }

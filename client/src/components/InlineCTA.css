@@ -17,7 +17,7 @@
   inset: 0;
   border-radius: inherit;
   padding: 3px; /* border thickness */
-  background: linear-gradient(135deg, #d3d4ff, #ffe0b2); /* pastel purple to pastel peach */
+  background: linear-gradient(135deg, var(--color-cta-border-a), var(--color-cta-border-b)); /* pastel purple to pastel peach */
   -webkit-mask: 
      linear-gradient(#fff 0 0) content-box, 
      linear-gradient(#fff 0 0);
@@ -52,7 +52,7 @@
 
 .sparkles-icon {
   font-size: 1rem;
-  color: #ffb74d; /* Soft orange/yellow */
+  color: var(--color-accent-warm); /* Soft orange/yellow */
 }
 
 .badge-text {
@@ -60,7 +60,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: #7c83cd; /* Muted blue-purple */
+  color: var(--color-inline-badge); /* Muted blue-purple */
   text-transform: uppercase;
 }
 
@@ -68,14 +68,14 @@
   font-family: var(--font-heading);
   font-size: 28px;
   font-weight: 700;
-  color: #2b3366; /* Deep navy */
+  color: var(--color-navy-deep); /* Deep navy */
   margin-bottom: 0.75rem;
   line-height: 1.2;
 }
 
 .inline-cta-desc {
   font-size: 14px;
-  color: #636b9e;
+  color: var(--color-inline-muted);
   line-height: 1.5;
   margin-bottom: 1.25rem;
   max-width: 400px;
@@ -85,7 +85,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #7677ec;
+  background-color: var(--color-inline-btn);
   color: white;
   font-weight: 600;
   font-size: 14px;
@@ -94,13 +94,13 @@
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(118, 119, 236, 0.4);
+  box-shadow: 0 4px 14px var(--color-border-brand);
 }
 
 .inline-cta-btn:hover {
-  background-color: #6162d6;
+  background-color: var(--color-inline-btn-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(118, 119, 236, 0.5);
+  box-shadow: 0 6px 20px var(--color-border-brand);
 }
 
 .inline-cta-image-side {
@@ -122,7 +122,7 @@
   position: absolute;
   font-family: 'Caveat', 'Comic Sans MS', cursive;
   font-size: 15px;
-  color: #5c6bc0;
+  color: var(--color-note-purple);
   display: flex;
   flex-direction: column;
   line-height: 1.2;

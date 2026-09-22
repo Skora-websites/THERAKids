@@ -1,0 +1,55 @@
+.breadcrumb-nav {
+  padding: 1rem 0;
+  /* Placement (header clearance etc.) is the host page's concern — the therapy
+     pages render this inside PageHero, which positions it under the fixed header. */
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.breadcrumb-separator {
+  color: var(--color-navy-light);
+  opacity: 0.5;
+}
+
+.breadcrumb-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-navy-light);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-primary);
+}
+
+.breadcrumb-current {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-navy);
+}
+
+@media (max-width: 768px) {
+  .breadcrumb-nav {
+    padding: 0.75rem 0;
+  }
+  
+  .breadcrumb-link,
+  .breadcrumb-current {
+    font-size: 0.8rem;
+  }
+}

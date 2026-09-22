@@ -336,6 +336,38 @@ const cleanupUploads = async (paths) => {
   }
 };
 
+// Appointments list for the admin view: JOINs the requested service name, supports an
+// optional ?status= filter, and returns per-status counts for the filter tabs.
+// Registered BEFORE the generic /api/admin/:resource list route, which it overrides for GET.
+app.get('/api/admin/appointments', authenticateToken, async (req, res) => {
+  const status = req.query.status;
+  const params = [];
+  let where = '';
+  if (status && status !== 'all') {
+    where = 'WHERE a.status = ?';
+    params.push(status);
+  }
+  try {
+    const [appointments] = await pool.query(
+      `SELECT a.*, s.name AS service_name
+         FROM appointments a
+         LEFT JOIN services s ON s.id = a.service_id
+         ${where}
+        ORDER BY a.created_at DESC`,
+      params
+    );
+    const [statusRows] = await pool.query('SELECT status, COUNT(*) AS n FROM appointments GROUP BY status');
+    const counts = { all: 0 };
+    for (const r of statusRows) {
+      counts[r.status] = r.n;
+      counts.all += r.n;
+    }
+    res.json({ appointments, counts });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // List (includes inactive/draft records, unlike the public endpoints)
 app.get('/api/admin/:resource', authenticateToken, async (req, res) => {
   const cfg = RESOURCES[req.params.resource];

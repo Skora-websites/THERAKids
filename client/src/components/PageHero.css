@@ -2,6 +2,104 @@
   min-height: 520px;
 }
 
+/* Hero-scale wave: matches the home hero's taller bottom divider, not the
+   smaller 60/90px wave used between content sections. Bottom-only — heroes
+   blend downward into the next section and stay flush under the header. */
+.page-hero .cloud-divider svg {
+  height: 80px;
+}
+
+@media (min-width: 992px) {
+  .page-hero .cloud-divider svg {
+    height: 150px;
+  }
+}
+
+/* Theme-aware background doodles */
+.page-hero-doodles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-hero-doodle {
+  position: absolute;
+  opacity: 0.85;
+}
+
+.page-hero-blob-1 {
+  width: 340px;
+  top: -120px;
+  left: -110px;
+  opacity: 0.5;
+}
+
+.page-hero-blob-2 {
+  width: 260px;
+  bottom: -60px;
+  right: -70px;
+  opacity: 0.45;
+}
+
+.page-hero-sparkle-1 {
+  width: 26px;
+  top: 22%;
+  left: 46%;
+  animation: hero-doodle-bob 5.5s ease-in-out infinite;
+}
+
+.page-hero-heart {
+  width: 22px;
+  bottom: 26%;
+  left: 4%;
+  transform: rotate(-10deg);
+  animation: hero-doodle-bob 6.5s ease-in-out 1s infinite;
+}
+
+.page-hero-curve {
+  width: 130px;
+  height: 26px;
+  top: 12%;
+  right: 30%;
+  opacity: 0.6;
+}
+
+@keyframes hero-doodle-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+/* Subtle parallax on the photo as the page scrolls */
+.page-hero-img-parallax {
+  will-change: transform;
+}
+
+@media (max-width: 768px) {
+  /* Reduce decorative clutter on small screens */
+  .page-hero-heart,
+  .page-hero-curve {
+    display: none;
+  }
+
+  .page-hero-blob-1 {
+    width: 220px;
+    top: -90px;
+    left: -90px;
+  }
+
+  .page-hero-blob-2 {
+    width: 170px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-hero-sparkle-1,
+  .page-hero-heart {
+    animation: none;
+  }
+}
+
 .page-hero-grid {
   display: grid;
   grid-template-columns: 1.05fr 1fr;
@@ -9,10 +107,27 @@
   align-items: center;
 }
 
+/* Grid children default to min-width:auto — let them shrink below content size
+   so long titles can't force horizontal overflow on narrow screens */
+.page-hero-content {
+  min-width: 0;
+}
+
+/* Breadcrumb strip at the top of the colored hero — neutralize the standalone
+   component's white-page offsets so it hugs the top of the section */
+.page-hero-breadcrumb {
+  margin-bottom: 1.25rem;
+}
+
+.page-hero-breadcrumb .breadcrumb-nav {
+  margin-top: 0;
+  padding: 0;
+}
+
 .page-hero-eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--color-primary);
+  color: var(--color-eyebrow, var(--color-primary));
   font-weight: 700;
   margin-bottom: 1rem;
 }
@@ -36,9 +151,31 @@
   aspect-ratio: 4 / 3;
 }
 
+/* Layer the photo above the background doodles */
+.page-hero-grid {
+  position: relative;
+  z-index: 1;
+}
+
+/* Peach-pink under-blob peeking from the photo's bottom-left edge — the same
+   solid-blob accent the home hero pairs with its masked photo. */
+.page-hero-sweep {
+  position: absolute;
+  left: -10%;
+  bottom: -8%;
+  width: 55%;
+  height: 40%;
+  background: color-mix(in srgb, var(--color-pastel-peach) 62%, var(--color-doodle-pink) 38%);
+  opacity: 0.9;
+  border-radius: 62% 38% 71% 29% / 74% 36% 64% 26%;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .page-hero-img-window {
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 
 /* Larger photo: the visual grows 5rem wider than its grid column, and the negative

@@ -17,12 +17,13 @@
   height: 64px;
   width: calc(100% - 40px);
   max-width: 1280px;
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: var(--color-header-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(118, 119, 236, 0.15);
+  border: 1px solid var(--color-border-brand);
   border-radius: 9999px;
-  padding: 0 1rem 0 2rem;
+  /* Left inset matches .container so the logo shares the page's content edge */
+  padding: 0 1rem 0 3rem;
   box-shadow: 0px 8px 24px -4px rgba(36, 46, 61, 0.05);
 }
 
@@ -34,7 +35,8 @@
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  /* Fluid on desktop: logo + 7 links + CTA must share one line from 993px up. */
+  gap: clamp(1rem, -2rem + 4.9vw, 2rem);
 }
 
 .nav-links a {
@@ -52,23 +54,93 @@
   color: var(--color-primary);
 }
 
-/* Micro pastel dot indicator */
+/* Animated underline indicator: grows from the center on hover/active */
 .nav-links a::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: 2px;
   left: 50%;
+  width: 0;
+  height: 2.5px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent-vibrant));
   transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: var(--color-primary-fixed-dim);
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .nav-links a.active::after, .nav-links a:hover::after {
+  width: 55%;
+}
+
+/* Dropdown Navigation */
+.nav-item-wrapper {
+  position: relative;
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-header-bg-solid);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-brand);
+  border-radius: 12px;
+  padding: 0.75rem;
+  min-width: 180px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(8px);
+  transition: all 0.2s ease;
+  box-shadow: 0 12px 32px rgba(26, 35, 126, 0.12);
+  z-index: 1001;
+}
+
+/* Hover opens the dropdown; keyboard focus-within keeps it accessible */
+.nav-item-wrapper:hover .nav-dropdown,
+.nav-item-wrapper:focus-within .nav-dropdown {
   opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.nav-dropdown a {
+  display: block;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.nav-dropdown a:hover {
+  background: var(--color-surface);
+}
+
+.nav-dropdown a::after {
+  display: none;
+}
+
+@media (max-width: 992px) {
+  .nav-item-wrapper {
+    width: 100%;
+  }
+  .nav-dropdown {
+    position: static;
+    transform: none;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--color-surface);
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    opacity: 1;
+    visibility: visible;
+  }
+  .nav-item-wrapper:hover .nav-dropdown {
+    transform: none;
+  }
 }
 
 .cta-container {
@@ -91,16 +163,65 @@
   padding: 0.5rem;
 }
 
+/* Hamburger-to-X morph */
+.hamburger-box {
+  display: block;
+  width: 24px;
+  height: 18px;
+  position: relative;
+}
+
+.hamburger-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  border-radius: 2px;
+  background-color: currentColor;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+}
+
+.hamburger-line:nth-child(1) { top: 0; }
+.hamburger-line:nth-child(2) { top: 7.75px; }
+.hamburger-line:nth-child(3) { top: 15.5px; }
+
+.hamburger.open .hamburger-line:nth-child(1) {
+  transform: translateY(7.75px) rotate(45deg);
+}
+.hamburger.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0.4);
+}
+.hamburger.open .hamburger-line:nth-child(3) {
+  transform: translateY(-7.75px) rotate(-45deg);
+}
+
+/* Booking CTA inside the mobile menu (hidden on desktop) */
+.nav-booking-cta {
+  display: none;
+  margin-top: 0.5rem;
+}
+
+.nav-links.open .nav-booking-cta {
+  display: inline-flex;
+}
+
+@media (min-width: 993px) {
+  .nav-booking-cta {
+    display: none !important;
+  }
+}
+
 @media (max-width: 992px) {
   .nav-links {
     position: absolute;
     top: 74px;
     left: 20px;
     right: 20px;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: var(--color-header-bg-solid);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(118, 119, 236, 0.15);
+    border: 1px solid var(--color-border-brand);
     border-radius: 1.5rem;
     flex-direction: column;
     padding: 2rem;
@@ -118,8 +239,36 @@
     transform: translateY(0);
   }
 
+  /* Comfortable tap targets: bare text links are only ~31px tall — pad them
+     up to the ~44px touch-target minimum */
+  .nav-links a {
+    display: block;
+    padding: 0.75rem 0;
+  }
+
+  /* Staggered link entrance when the menu opens (targets item wrappers, not bare <a>) */
+  .nav-item-wrapper > a {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease;
+  }
+
+  .nav-links.open .nav-item-wrapper > a {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .nav-links.open .nav-item-wrapper:nth-child(1) > a { transition-delay: 0.04s; }
+  .nav-links.open .nav-item-wrapper:nth-child(2) > a { transition-delay: 0.08s; }
+  .nav-links.open .nav-item-wrapper:nth-child(3) > a { transition-delay: 0.12s; }
+  .nav-links.open .nav-item-wrapper:nth-child(4) > a { transition-delay: 0.16s; }
+  .nav-links.open .nav-item-wrapper:nth-child(5) > a { transition-delay: 0.2s; }
+  .nav-links.open .nav-item-wrapper:nth-child(6) > a { transition-delay: 0.24s; }
+  .nav-links.open .nav-item-wrapper:nth-child(7) > a { transition-delay: 0.28s; }
+  .nav-links.open .nav-booking-cta { transition-delay: 0.32s; }
+
   .cta-container .btn {
-    display: none; /* Hide main CTA on smaller screens, put it in menu if needed, or keep smaller icon */
+    display: none; /* Booking moves into the menu below */
   }
 
   .hamburger {
@@ -131,10 +280,21 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .nav-links a,
+  .nav-links a::after,
+  .hamburger-line {
+    transition: none;
+  }
+}
+
+/* The 500×500 source carries transparent padding around the artwork (≈392×91, inset 48px
+   from the left), so the box is deliberately bigger than what you see. Rendering the image at
+   its display size instead of scaling a 40px box keeps it sharp and makes the layout box match
+   the painted logo, so the nav can no longer slide underneath it. */
 .header-logo {
-  height: 40px;
+  height: 140px; /* the old 40px box × the old 3.5 scale, drawn from the source pixels */
   width: auto;
-  transform: scale(3.5);
-  transform-origin: left center;
+  margin-left: -13px; /* 48/500 × 140 — pull the artwork back onto the header's left edge */
 }
 

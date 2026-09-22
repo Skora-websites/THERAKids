@@ -3,6 +3,40 @@
   padding: 4rem 0;
 }
 
+/* Floating theme-aware doodles */
+.cta-doodle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.9;
+}
+
+.cta-doodle-sparkle {
+  width: 30px;
+  top: 22%;
+  left: 12%;
+}
+
+.cta-doodle-heart {
+  width: 26px;
+  top: 30%;
+  right: 14%;
+  transform: rotate(12deg);
+}
+
+.cta-doodle-star {
+  width: 22px;
+  bottom: 24%;
+  left: 20%;
+  transform: rotate(-10deg);
+}
+
+@media (max-width: 768px) {
+  .cta-doodle {
+    display: none;
+  }
+}
+
 .footer-transition-shapes {
   position: absolute;
   bottom: -20px;
@@ -17,14 +51,20 @@
 }
 .ft-shape-mint {
   width: 100px; height: 180px; bottom: 0; right: 0; transform: rotate(15deg);
-  background-color: var(--pastel-peach);
+  background-color: var(--color-pastel-peach);
 }
 .ft-shape-rose {
   width: 120px; height: 140px; bottom: 0; right: 60px; transform: rotate(-10deg);
-  background-color: var(--pastel-lilac);
+  background-color: var(--color-pastel-lilac);
 }
 .ft-shape-peach {
   width: 80px; height: 80px; bottom: 80px; right: 120px; border-radius: 50%;
   background-color: white;
   border: 1px solid var(--color-outline-variant);
+}
+
+@media (max-width: 768px) {
+  .footer-transition-shapes {
+    display: none;
+  }
 }

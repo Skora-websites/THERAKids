@@ -407,13 +407,27 @@ const CrudManager = ({ resource }) => {
 
 const APPOINTMENT_STATUSES = ['New', 'Contacted', 'Completed', 'Cancelled'];
 
-const AppointmentsManager = () => {
-  const [rows, setRows] = useState(null);
-  const [error, setError] = useState(null);
+const formatDateTime = (value) => {
+  if (!value) return '—';
+  const d = new Date(value);
+  return isNaN(d) ? String(value) : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+};
 
-  const load = useCallback(() => {
-    adminFetch('/appointments').then(setRows).catch(e => setError(e.message));
-  }, []);
+const AppointmentsManager = () => {
+  const [data, setData] = useState(null); // { appointments, counts }
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
+  const [expandedId, setExpandedId] = useState(null);
+
+  const load = useCallback(async () => {
+    try {
+      const qs = filter !== 'all' ? `?status=${encodeURIComponent(filter)}` : '';
+      setData(await adminFetch(`/appointments${qs}`));
+    } catch (err) {
+      setError(err.message);
+    }
+  }, [filter]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -421,60 +435,159 @@ const AppointmentsManager = () => {
     setError(null);
     try {
       await adminFetch(`/appointments/${row.id}`, { method: 'PUT', body: JSON.stringify({ status }) });
-      load();
+      await load();
     } catch (err) {
       setError(err.message);
     }
   };
 
   const handleDelete = async (row) => {
-    if (!window.confirm(`Delete appointment for "${row.child_name}"? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete appointment request for "${row.child_name}"? This cannot be undone.`)) return;
     setError(null);
     try {
       await adminFetch(`/appointments/${row.id}`, { method: 'DELETE' });
-      load();
+      setExpandedId(null);
+      await load();
     } catch (err) {
       setError(err.message);
     }
   };
 
-  if (rows === null && !error) return <div className="admin-loading">Loading...</div>;
+  if (data === null && !error) return <div className="admin-loading">Loading...</div>;
+
+  const rows = data?.appointments ?? [];
+  const counts = data?.counts ?? {};
+  const q = search.trim().toLowerCase();
+  const visible = q
+    ? rows.filter(r => [r.parent_name, r.child_name, r.phone, r.email, r.service_name]
+        .some(v => String(v || '').toLowerCase().includes(q)))
+    : rows;
+
+  const exportCsv = () => {
+    const header = ['ID', 'Received', 'Parent', 'Email', 'Phone', 'Child', 'Age', 'Service', 'Preferred Date', 'Preferred Time', 'Status', 'Notes'];
+    const escape = (v) => {
+      const s = String(v ?? '');
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const lines = visible.map(r => [
+      r.id, r.created_at, r.parent_name, r.email, r.phone, r.child_name, r.child_age,
+      r.service_name || '', r.preferred_date, r.preferred_time, r.status,
+      (r.additional_info || '').replace(/\r?\n/g, ' ')
+    ].map(escape).join(','));
+    const blob = new Blob([[header.join(','), ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `appointments-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="admin-crud">
-      <div className="crud-header"><h2>Manage Appointments</h2></div>
+      <div className="crud-header">
+        <h2>Appointment Requests</h2>
+        <button className="btn btn-outline btn-sm" onClick={exportCsv} disabled={visible.length === 0}>
+          Export CSV ({visible.length})
+        </button>
+      </div>
+
       {error && <div className="admin-error">{error}</div>}
+
+      <div className="appt-toolbar">
+        <div className="appt-filters" role="tablist">
+          {['all', ...APPOINTMENT_STATUSES].map(s => (
+            <button
+              key={s}
+              className={`appt-tab ${filter === s ? 'active' : ''}`}
+              onClick={() => { setFilter(s); setExpandedId(null); }}
+            >
+              {s === 'all' ? 'All' : s}
+              <span className="appt-tab-count">{counts[s] ?? 0}</span>
+            </button>
+          ))}
+        </div>
+        <input
+          className="appt-search"
+          type="search"
+          placeholder="Search parent, child, phone, email…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
+
       <div className="crud-table-wrapper">
         <table className="crud-table">
           <thead>
             <tr>
-              <th>ID</th><th>Parent</th><th>Child</th><th>Phone</th><th>Preferred</th><th>Status</th><th>Actions</th>
+              <th>Received</th><th>Parent</th><th>Child</th><th>Service</th><th>Preferred</th><th>Status</th><th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {rows && rows.length === 0 && (
-              <tr><td colSpan="7" className="empty-row">No appointment requests yet.</td></tr>
+            {visible.length === 0 && (
+              <tr><td colSpan="7" className="empty-row">
+                {q ? `No requests match “${search}”.` : `No ${filter !== 'all' ? filter.toLowerCase() + ' ' : ''}appointment requests yet.`}
+              </td></tr>
             )}
-            {rows && rows.map(row => (
-              <tr key={row.id}>
-                <td>{row.id}</td>
-                <td>{row.parent_name}<br /><span className="cell-sub">{row.email}</span></td>
-                <td>{row.child_name} ({row.child_age})</td>
-                <td>{row.phone}</td>
-                <td>{formatDate(row.preferred_date)}<br /><span className="cell-sub">{row.preferred_time}</span></td>
-                <td>
-                  <select
-                    className={`status-select status-${String(row.status).toLowerCase()}`}
-                    value={row.status}
-                    onChange={e => setStatus(row, e.target.value)}
-                  >
-                    {APPOINTMENT_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </td>
-                <td className="actions-cell">
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(row)}>Delete</button>
-                </td>
-              </tr>
+            {visible.map(row => (
+              <React.Fragment key={row.id}>
+                <tr className={expandedId === row.id ? 'appt-row-expanded' : ''}>
+                  <td>
+                    {formatDateTime(row.created_at)}
+                    {row.additional_info && (
+                      <button
+                        className="appt-expand-btn"
+                        title="Show parent's notes"
+                        onClick={() => setExpandedId(expandedId === row.id ? null : row.id)}
+                      >
+                        📝 {expandedId === row.id ? 'Hide notes' : 'Notes'}
+                      </button>
+                    )}
+                  </td>
+                  <td>
+                    {row.parent_name}<br /><span className="cell-sub">{row.email}</span>
+                  </td>
+                  <td>{row.child_name} <span className="cell-sub">({row.child_age})</span></td>
+                  <td>{row.service_name || '—'}</td>
+                  <td>{formatDate(row.preferred_date)}<br /><span className="cell-sub">{row.preferred_time}</span></td>
+                  <td>
+                    <select
+                      className={`status-select status-${String(row.status).toLowerCase()}`}
+                      value={row.status}
+                      onChange={e => setStatus(row, e.target.value)}
+                    >
+                      {APPOINTMENT_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </td>
+                  <td className="actions-cell">
+                    <a className="btn btn-outline btn-sm" href={`tel:${row.phone}`}>Call</a>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(row)}>Delete</button>
+                  </td>
+                </tr>
+                {expandedId === row.id && (
+                  <tr className="appt-detail-row">
+                    <td colSpan="7">
+                      <div className="appt-detail">
+                        <div className="appt-detail-block">
+                          <h4>Parent's notes</h4>
+                          <p>{row.additional_info || '—'}</p>
+                        </div>
+                        <div className="appt-detail-block">
+                          <h4>Contact</h4>
+                          <p>
+                            <a href={`tel:${row.phone}`}>{row.phone}</a><br />
+                            <a href={`mailto:${row.email}?subject=${encodeURIComponent(`TheraKids appointment #${row.id}`)}`}>{row.email}</a>
+                          </p>
+                        </div>
+                        <div className="appt-detail-block">
+                          <h4>Request ID</h4>
+                          <p>#{row.id} · received {formatDateTime(row.created_at)}</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>

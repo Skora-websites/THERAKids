@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PageHero from '../components/PageHero';
+import { initScrollReveals } from '../lib/motion';
 import './Contact.css';
 
 const Contact = () => {
   // const { settings } = useAppContext(); // Not used currently
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const pageRef = useRef(null);
+
+  /* GSAP scroll reveals for the contact cards & form */
+  useEffect(() => {
+    const cleanupReveals = initScrollReveals(pageRef.current);
+    return () => cleanupReveals?.();
+  }, []);
   
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,7 +22,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="contact-page">
+    <div className="contact-page" ref={pageRef}>
       <PageHero
         bg="bg-pastel-peach"
         blob={1}
@@ -30,7 +38,7 @@ const Contact = () => {
 
       <section className="contact-content-section section-padding">
         <div className="container grid grid-cols-2 contact-grid">
-          <div className="contact-details card">
+          <div className="contact-details card" data-reveal>
             <h2 className="headline-lg mb-4">Contact Information</h2>
             
             <div className="contact-item">
@@ -58,7 +66,7 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="contact-form-wrapper">
+          <div className="contact-form-wrapper" data-reveal>
             <h2 className="headline-lg mb-4">Send a Message</h2>
             <form id="contact-form" onSubmit={handleSubmit} className="contact-form">
               <div className="form-group">

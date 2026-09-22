@@ -14,3 +14,6 @@ client/screenshots/
 
 # Uploaded images (user content, not source)
 server/uploads/
+
+# Dev audit screenshots (large, not source)
+client/scripts/hero-shots/

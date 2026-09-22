@@ -35,11 +35,11 @@
 }
 
 .service-detail-card {
-  background: linear-gradient(135deg, #f0ebff 0%, #fff0ea 100%);
+  background: linear-gradient(135deg, var(--color-service-grad-a) 0%, var(--color-service-grad-b) 100%);
   border-radius: var(--radius-lg);
   padding: 3rem;
-  box-shadow: 0 8px 32px rgba(118, 119, 236, 0.08);
-  border: 1px solid rgba(118, 119, 236, 0.2);
+  box-shadow: 0 8px 32px var(--color-border-brand);
+  border: 1px solid var(--color-border-brand);
 }
 
 .service-detail-content {
@@ -63,6 +63,23 @@
   flex: 1;
   display: flex;
   justify-content: center;
+  position: relative;
+}
+
+/* Sparkle accent beside the morphing service blob */
+.service-card-sparkle {
+  position: absolute;
+  width: 28px;
+  top: 4%;
+  right: 12%;
+  color: var(--color-doodle-amber);
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .service-card-sparkle {
+    display: none;
+  }
 }
 
 .service-blob {
@@ -120,6 +137,17 @@
   }
 }
 
+/* Assessments two-up grid: 2 columns from 769px, stacked below (shared with Conditions page) */
+.assessments-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 768px) {
+  .assessments-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .service-detail-card {
     padding: 1.5rem;
@@ -132,7 +160,7 @@
   padding: 1rem;
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(118, 119, 236, 0.1);
+  border: 1px solid var(--color-border-brand);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -143,14 +171,14 @@
 .condition-pill:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: var(--pastel-lilac);
-  background-color: #f8f6ff;
+  border-color: var(--color-pastel-lilac);
+  background-color: var(--color-surface-tinted);
 }
 
 .assessment-card {
   padding: 2.5rem;
   border-radius: var(--radius-lg);
-  background: #fff0ea; /* Lighter peach shade */
+  background: var(--color-assessment-bg); /* Lighter peach shade */
   border-top: 4px solid var(--color-pastel-lilac);
   box-shadow: var(--shadow-md);
 }

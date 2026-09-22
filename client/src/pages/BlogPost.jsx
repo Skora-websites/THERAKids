@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import API_URL from '../config';
+import { initScrollReveals } from '../lib/motion';
 import './Blogs.css';
 
 // Must match the slugs in the fallback blog list in Blogs.jsx — when the API
@@ -56,6 +57,13 @@ const BlogPost = () => {
   const { slug } = useParams();
   const [blog, setBlog] = useState(null);
   const [status, setStatus] = useState('loading');
+  const pageRef = useRef(null);
+
+  /* GSAP scroll reveal for the article body */
+  useEffect(() => {
+    const cleanupReveals = initScrollReveals(pageRef.current);
+    return () => cleanupReveals?.();
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -98,7 +106,7 @@ const BlogPost = () => {
   }
 
   return (
-    <div className="blog-post-page">
+    <div className="blog-post-page" ref={pageRef}>
       <div className="container" style={{paddingTop: 'calc(2rem + 104px)'}}>
         <Link to="/blogs" className="label-md" style={{color: 'var(--color-primary)'}}>&larr; Back to all blogs</Link>
       </div>
@@ -111,11 +119,11 @@ const BlogPost = () => {
           Published on {new Date(effectiveBlog.published_at).toLocaleDateString()}
         </div>
         
-        <div className="blog-post-hero-image" style={{borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '3rem'}}>
+        <div className="blog-post-hero-image" style={{borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '3rem'}} data-reveal>
           <img src={effectiveBlog.featured_image} alt={effectiveBlog.title} style={{width: '100%', height: 'auto', aspectRatio: '16/9', objectFit: 'cover'}} />
         </div>
         
-        <div className="blog-body body-lg" dangerouslySetInnerHTML={{ __html: effectiveBlog.content }}></div>
+        <div className="blog-body body-lg" data-reveal dangerouslySetInnerHTML={{ __html: effectiveBlog.content }}></div>
       </article>
     </div>
   );

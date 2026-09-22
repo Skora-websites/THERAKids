@@ -1,0 +1,84 @@
+.related-services-grid {
+  margin-top: 2rem;
+}
+
+.related-service-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.related-service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(26, 35, 126, 0.15);
+}
+
+.related-service-image {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.related-service-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.related-service-card:hover .related-service-image img {
+  transform: scale(1.05);
+}
+
+.related-service-icon {
+  position: absolute;
+  bottom: -20px;
+  left: 20px;
+  width: 48px;
+  height: 48px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.related-service-content {
+  padding: 1.75rem;
+  padding-top: 2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.related-service-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: auto;
+  transition: gap 0.2s ease;
+}
+
+.related-service-card:hover .related-service-link {
+  gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .related-services-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .related-service-image {
+    height: 150px;
+  }
+}

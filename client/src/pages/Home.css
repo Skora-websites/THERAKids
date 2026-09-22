@@ -1,66 +1,6 @@
-/* Base styles & Colors */
-.bg-pastel-mint { background-color: var(--color-pastel-mint); }
-.bg-pastel-lilac { background-color: var(--color-pastel-lilac); }
-.bg-pastel-pink { background-color: var(--color-pastel-pink); }
-.bg-pastel-peach { background-color: var(--color-pastel-peach); }
-.bg-pastel-rose { background-color: var(--color-pastel-rose); }
-.bg-white { background-color: white; }
-
-.fill-pastel-peach { fill: var(--color-pastel-peach); }
-.fill-pastel-lilac { fill: var(--color-pastel-lilac); }
-.fill-white { fill: white; }
-
-.text-navy { color: #1a237e; font-weight: 800; }
-.text-navy-light { color: #3949ab; }
-.text-pastel-rose { color: #d32f2f; }
-
-
-/* Utilities */
-.relative { position: relative; }
-.h-full { height: 100%; }
-.overflow-hidden { overflow: hidden; }
-.z-10 { z-index: 10; }
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.gap-4 { gap: 1rem; }
-.gap-6 { gap: 1.5rem; }
-.gap-8 { gap: 2rem; }
-.gap-12 { gap: 3rem; }
-.items-center { align-items: center; }
-.items-end { align-items: flex-end; }
-.w-full { width: 100%; }
-.object-cover { object-fit: cover; }
-.text-center { text-align: center; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.mb-8 { margin-bottom: 2rem; }
-.mb-12 { margin-bottom: 3rem; }
-.mb-16 { margin-bottom: 4rem; }
-.mt-12 { margin-top: 3rem; }
-.mx-auto { margin-left: auto; margin-right: auto; }
-.uppercase { text-transform: uppercase; }
-.tracking-widest { letter-spacing: 0.1em; }
-.max-w-2xl { max-width: 42rem; }
-.font-bold { font-weight: bold; }
-.font-semibold { font-weight: 600; }
-.px-8 { padding-left: 2rem; padding-right: 2rem; }
-.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-.rounded-full { border-radius: 9999px; }
-.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-
-/* Buttons */
-.btn-lilac {
-  background-color: #8b5cf6;
-  color: white;
-  border-radius: 999px;
-  padding: 0.75rem 2rem;
-  font-weight: 600;
-  transition: opacity 0.2s;
-}
-.btn-lilac:hover { opacity: 0.9; }
-
+/* Shared utilities (bg-*, fill-*, text-navy, spacing, flex helpers) moved to
+   src/index.css so every page gets them — they were previously here and only
+   applied when Home.css happened to be loaded. */
 
 /* Hero Section */
 .hero-content {
@@ -169,14 +109,17 @@
 }
 
 .home-hero::after {
-  /* soft blob glow behind the photo, like the mockup's warm halo */
+  /* broad pale-peach sweep across the bottom-left, per the reference */
   content: '';
   position: absolute;
-  right: -5%;
-  bottom: 6%;
-  width: 55%;
-  height: 70%;
-  background: radial-gradient(ellipse at center, rgba(214, 121, 130, 0.18), transparent 70%);
+  left: -14%;
+  bottom: -22%;
+  width: 68%;
+  height: 85%;
+  background: var(--color-pastel-peach);
+  background: color-mix(in srgb, var(--color-pastel-peach) 70%, var(--color-doodle-pink) 30%);
+  opacity: 0.45;
+  border-radius: 58% 42% 55% 45% / 55% 48% 52% 45%;
   pointer-events: none;
 }
 
@@ -188,18 +131,22 @@
 }
 
 .home-hero-script {
-  font-family: 'Caveat', cursive;
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #1a237e;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-navy);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
 }
 
-.script-sparkle {
-  width: 1.6rem;
+.eyebrow-petals {
+  width: 1.9rem;
+  flex-shrink: 0;
+  transform: translateY(-3px) rotate(4deg);
 }
 
 .home-hero-title {
@@ -208,7 +155,8 @@
 }
 
 .home-hero-highlight {
-  color: #E8836B;
+  color: var(--color-hero-highlight);
+  font-style: italic;
   position: relative;
   display: inline-block;
 }
@@ -222,13 +170,13 @@
   pointer-events: none;
 }
 
-/* Sparkle sitting after "Tomorrow" — kept inside the line box so it can't collide with other lines */
-.title-end-sparkle {
+/* Hand-drawn heart after "Tomorrow" — kept inside the line box so it can't collide with other lines */
+.title-end-heart {
   display: inline-block;
-  width: 1.8rem;
-  margin-left: 0.5rem;
-  vertical-align: middle;
-  transform: translateY(-5px) rotate(8deg);
+  width: 1.9rem;
+  margin-left: 0.6rem;
+  vertical-align: baseline;
+  transform: translateY(-2px) rotate(-10deg);
   pointer-events: none;
 }
 
@@ -242,22 +190,32 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #E9407A;
+  background-color: var(--color-cta-primary);
 }
 
 .home-hero-badges {
   display: flex;
-  gap: 1.75rem;
+  /* Top-aligned so every icon shares one line, even when labels wrap to different depths */
+  align-items: flex-start;
+  gap: 1.5rem 1.75rem;
   margin-top: 2.25rem;
   flex-wrap: wrap;
 }
 
 .hero-badge-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.6rem;
   max-width: 9rem;
-}  .hero-badge-icon {
+}
+
+/* "Better, Brighter Futures" needs a wider allowance to wrap to two lines like the
+   other badges — at 9rem it broke onto three and made the badge row uneven. */
+.hero-badge-item:nth-child(3) {
+  max-width: 11.5rem;
+}
+
+.hero-badge-icon {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -290,32 +248,88 @@
 
 .hero-badge-label {
   font-weight: 700;
-  color: #1a237e;
-  line-height: 1.3;
+  color: var(--color-navy);
+  line-height: 1.25;
+  /* Optical centring of the first line against the 44px icon */
+  padding-top: 0.7rem;
 }
 
-/* Photo fills the right half, bleeding to the section's bottom edge */
+/* Photo composition wrapper: holds the masked photo + unmasked decorations */
 .home-hero-visual {
   position: relative;
   align-self: end;
 }
 
-/* Hero photo: organic blob mask, no hard edges against the peach */
-.home-hero-img {
-  width: 100%;
-  aspect-ratio: 10 / 9;
-  object-fit: cover;
-  object-position: 62% 30%;
-  display: block;
+/* Peach-pink under-blob tucked under the photo's bottom-left edge */
+.hero-sweep {
+  position: absolute;
+  left: -12%;
+  bottom: -16%;
+  width: 58%;
+  height: 42%;
+  background: var(--color-pastel-peach);
+  background: color-mix(in srgb, var(--color-pastel-peach) 62%, var(--color-doodle-pink) 38%);
+  opacity: 0.9;
+  border-radius: 62% 38% 71% 29% / 74% 36% 64% 26%;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.home-hero-visual {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='14'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M228 46c56 16 110 52 120 104 11 53-18 110-62 142-45 33-108 42-157 18-50-25-88-76-90-130C37 126 70 70 120 48c34-15 72-14 108-2Z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='14'/%3E%3C/filter%3E%3Cpath filter='url(%23b)' d='M228 46c56 16 110 52 120 104 11 53-18 110-62 142-45 33-108 42-157 18-50-25-88-76-90-130C37 126 70 70 120 48c34-15 72-14 108-2Z'/%3E%3C/svg%3E");
+/* Organic blob mask lives on the photo window, so cards & doodles stay unmasked.
+   Asymmetric multi-lobe silhouette — crisp hard edge, no fade-out at the rim. */
+.hero-photo-window {
+  position: relative;
+  z-index: 1;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M212 16 C268 6 336 42 362 96 C384 142 370 188 388 230 C398 272 386 328 338 350 C296 368 258 350 214 370 C168 390 122 394 84 366 C48 340 58 296 34 260 C12 226 10 178 38 140 C64 105 106 96 130 64 C152 34 176 22 212 16 Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M212 16 C268 6 336 42 362 96 C384 142 370 188 388 230 C398 272 386 328 338 350 C296 368 258 350 214 370 C168 390 122 394 84 366 C48 340 58 296 34 260 C12 226 10 178 38 140 C64 105 106 96 130 64 C152 34 176 22 212 16 Z'/%3E%3C/svg%3E");
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+}
+
+.home-hero-img {
+  width: 100%;
+  aspect-ratio: 10 / 8.6;
+  object-fit: cover;
+  /* Source is 3:2, window is 10/8.6 — cover crops ~22.5% of the width. Weighting the
+     crop 72/28 (instead of 60/40) keeps the therapist's face clear of the window's
+     right rim, where the blob mask also pulls in; the extra left crop only trims
+     background greenery away from the child. */
+  object-position: 72% 25%;
+  display: block;
+}
+
+/* Desktop: photo sits high in the hero, clear of the fixed header pill.
+   Anchoring the column to the *top* of the row (not the bottom) keeps it at every
+   desktop width: the photo is sized by its column's width, so between 1025–1400px it is
+   shorter than the copy column, and bottom-anchoring would drop it down the row until it
+   cleared the copy — leaving a gap above the photo instead. */
+@media (min-width: 1025px) {
+  .home-hero-visual {
+    align-self: start;
+    /* Photo composition pulled ~4.5rem in from the right edge. The -104px top bleed was
+       reduced so the blob cluster (photo + script blob + note card) lands below the fixed
+       header pill (20px top + 64px height = 84px) instead of sliding under it:
+       104px clearance - 48px = top edge at ~96px, a 12px gap under the pill.
+       The whole wrapper moves, so the note card keeps its alignment relative to the photo. */
+    margin-top: -48px;
+    margin-right: calc(1.5rem - max(0px, (100vw - 1280px) / 2));
+  }
+
+  /* With the photo no longer bleeding under the header, the copy needs only a small
+     lift so the two columns still read as one balanced composition. */
+  .home-hero-content {
+    position: relative;
+    top: -1rem;
+  }
+
+  .hero-photo-window {
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-position: left top;
+    mask-position: left top;
+  }
 }
 
 /* Doodles */
@@ -323,21 +337,49 @@
   position: absolute;
   pointer-events: none;
 }
-.doodle-rainbow {
-  width: 76px;
-  top: -3%;
-  left: 0%;
-  transform: rotate(-8deg);
-  animation: doodle-bob 5s ease-in-out infinite;
+.petal-top {
+  width: 70px;
+  top: 14%;
+  left: -3%;
+  transform: rotate(-14deg);
+  animation: doodle-bob 6s ease-in-out infinite;
+  z-index: 2;
 }
 
-.doodle-heart {
-  width: 50px;
-  top: auto;
-  bottom: 5%;
-  right: 3%;
+/* Soft peach dot resting on the photo's left rim */
+.hero-dot {
+  position: absolute;
+  left: -2.5%;
+  top: 40%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-pastel-peach) 60%, var(--color-doodle-pink) 40%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Coral heart outline floating above the note card.
+   Only shown where there's a real gap: once the script blob dropped below the header,
+   the space between it and the note card is too tight below ~1240px viewports. */
+.note-float-heart {
+  width: 44px;
+  right: 4%;
+  bottom: 30%;
   transform: rotate(10deg);
-  animation: doodle-bob 6s ease-in-out 1.2s infinite;
+  z-index: 2;
+}
+
+@media (min-width: 1025px) and (max-width: 1240px) {
+  .note-float-heart {
+    display: none;
+  }
+
+  /* Below ~1240px the photo column is short enough that the repositioned script
+     blob would collide with the note card — drop the decorative blob there. */
+  .hero-script-blob {
+    display: none;
+  }
 }
 
 @keyframes doodle-bob {
@@ -345,35 +387,98 @@
   50% { translate: 0 -9px; }
 }
 
-/* Script note — floats on the peach field left of the photo, clear of the headline block */
-.home-hero-note {
+/* Lavender script blob — top-right, overlapping only the photo's outer rim.
+   Positioned relative to the photo wrapper (which now starts just below the fixed
+   header pill), hugging the photo's curved rim without covering the therapist's head. */
+.hero-script-blob {
   position: absolute;
-  right: 3%;
-  top: -12%;
+  top: calc(104px - 2.25rem);
+  right: -3rem;
+  width: 214px;
+  height: 210px;
+  background: var(--color-accent-soft);
+  border-radius: 54% 46% 47% 53% / 52% 50% 50% 48%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.05rem;
+  padding: 1.9rem 1.6rem;
   font-family: 'Caveat', cursive;
   font-size: 1.35rem;
   font-weight: 600;
-  line-height: 1.15;
-  color: #A66BD8;
-  text-align: center;
-  transform: rotate(4deg);
-  transform-origin: 50% 0;
+  line-height: 1.1;
+  color: #8577b8;
+  color: color-mix(in srgb, var(--color-navy) 55%, var(--color-accent-soft));
+  z-index: 3;
   pointer-events: none;
-  animation: note-sway 7s ease-in-out infinite;
 }
 
-@keyframes note-sway {
-  0%, 100% { transform: rotate(2.5deg); }
-  50% { transform: rotate(5.5deg); }
+/* Lines centered within the blob (no staircase indent) */
+
+.script-blob-heart {
+  width: 22px;
+  margin: 0.6rem 0 0;
 }
 
-.home-hero-note .note-line-2 {
-  display: block;
+/* White note card — bottom-right of the photo */
+.hero-note-card {
+  position: absolute;
+  bottom: 5%;
+  right: 3.5%;
+  width: 250px;
+  padding: 1.35rem 1.6rem;
+  background: var(--color-surface-container-lowest);
+  border-radius: 46% 54% 48% 52% / 50% 46% 54% 50%;
+  box-shadow: 0 18px 40px rgba(26, 35, 126, 0.12);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.home-hero-note .note-heart {
-  width: 18px;
-  margin: 0.25rem auto 0;
+.hero-note-card p {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--color-navy);
+  transform: rotate(-2deg);
+}
+
+.note-card-leaf {
+  width: 26px;
+  margin-bottom: 0.5rem;
+  margin-left: 0;
+}
+
+/* Sprout icon on the third trust badge */
+.badge-doodle {
+  width: 22px;
+  height: 22px;
+}
+
+/* "Trusted by families" credibility line */
+.hero-trusted {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 3.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-navy-light);
+}
+
+.trusted-dash {
+  width: 34px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.55;
 }
 
 /* Hero action buttons — layout moved out of inline styles so it can respond */
@@ -421,9 +526,9 @@
   }
 
   /* Soften the blob mask when the photo is wide, so faces aren't cropped */
-  .home-hero-visual {
-    -webkit-mask-size: 115% 115%;
-    mask-size: 115% 115%;
+  .hero-photo-window {
+    -webkit-mask-size: 108% 108%;
+    mask-size: 108% 108%;
     -webkit-mask-position: center;
     mask-position: center;
   }
@@ -432,17 +537,41 @@
     padding-bottom: 7rem;
   }
 
-  .doodle-rainbow {
-    left: 0%;
-    width: 64px;
+  .petal-top {
+    width: 42px;
+    top: 0;
+    left: 0;
   }
 
-  .doodle-heart {
+  .hero-dot {
+    width: 18px;
+    height: 18px;
+    left: 0;
+  }
+
+  .note-float-heart {
     display: none;
   }
 
-  .home-hero-note {
+  .hero-script-blob {
     display: none;
+  }
+
+  /* Keep the note card fully inside the photo on stacked layouts */
+  .hero-note-card {
+    width: 190px;
+    padding: 1.1rem 1.25rem 1.25rem;
+    right: 2%;
+    bottom: 2%;
+  }
+
+  .hero-note-card p {
+    font-size: 0.85rem;
+  }
+
+  .hero-trusted {
+    justify-content: center;
+    margin-top: 2.25rem;
   }
 }
 
@@ -453,7 +582,8 @@
   }
 
   .home-hero-script {
-    font-size: 1.35rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
   }
 
   .home-hero-title {
@@ -502,13 +632,26 @@
     margin-right: -0.75rem;
   }
 
-  .home-hero-visual {
-    -webkit-mask-size: 118% 118%;
-    mask-size: 118% 118%;
+  .hero-photo-window {
+    -webkit-mask-size: 110% 110%;
+    mask-size: 110% 110%;
   }
 
   .home-hero-img {
     aspect-ratio: 1 / 1;
+  }
+
+  .hero-note-card {
+    width: 170px;
+    padding: 1rem 1.1rem 1.15rem;
+  }
+
+  .hero-note-card p {
+    font-size: 0.78rem;
+  }
+
+  .note-card-leaf {
+    width: 20px;
   }
 }
 
@@ -523,11 +666,9 @@
   }
 }
 
-/* Reduced motion: still the floating hero doodles and note */
+/* Reduced motion: still the floating hero petals */
 @media (prefers-reduced-motion: reduce) {
-  .doodle-rainbow,
-  .doodle-heart,
-  .home-hero-note,
+  .petal-top,
   .float-anim,
   .float-anim-delayed-1,
   .float-anim-delayed-2,
@@ -552,10 +693,47 @@
 .pastel-card:hover {
   transform: translateY(-5px);
 }
+
+/* Service cards: lilac→peach wash with a soft hover lift, glow, and icon spin-in.
+   Scoped to .service-gradient-card — plain .pastel-card stays white for other sections. */
+.service-gradient-card {
+  background: linear-gradient(
+    135deg,
+    var(--color-pastel-lilac) 0%,
+    color-mix(in srgb, var(--color-pastel-lilac) 45%, var(--color-pastel-peach)) 45%,
+    var(--color-pastel-peach) 100%
+  );
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+
+.service-gradient-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 18px 40px rgba(139, 92, 246, 0.16),
+    0 8px 20px rgba(250, 190, 160, 0.22);
+}
+
+.service-gradient-card .pastel-icon-wrapper {
+  background-color: rgba(255, 255, 255, 0.75);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+}
+
+.service-gradient-card:hover .pastel-icon-wrapper {
+  transform: rotate(-8deg) scale(1.1);
+  background-color: white;
+}
+
+.service-gradient-card .pastel-icon {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.service-gradient-card:hover .pastel-icon {
+  transform: scale(1.12) rotate(6deg);
+}
 .pastel-icon-wrapper {
   width: 64px; height: 64px;
   border-radius: 16px;
-  background-color: #f9f9ff;
+  background-color: var(--color-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -588,8 +766,8 @@
   width: 48px; height: 48px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 1.25rem;
-  color: #1a237e;
+  font-weight: 800; font-size: 1.25rem;
+  color: var(--color-navy);
   border: 4px solid white;
 }
 
@@ -626,6 +804,134 @@
 }
 
 
+
+/* -----------------------------
+   FAQ Section
+------------------------------ */
+.faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faq-item {
+  background: var(--color-surface-container-lowest);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(26, 35, 126, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.faq-item:hover {
+  box-shadow: 0 4px 16px rgba(26, 35, 126, 0.1);
+}
+
+.faq-item.open {
+  box-shadow: 0 8px 24px rgba(26, 35, 126, 0.12);
+}
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 1rem;
+}
+
+.faq-question-text {
+  flex: 1;
+}
+
+.faq-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-navy);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.faq-item.open .faq-toggle {
+  transform: rotate(180deg);
+  background: var(--color-pastel-peach);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+  padding: 0 1.5rem;
+}
+
+.faq-item.open .faq-answer {
+  max-height: 300px;
+  padding: 0 1.5rem 1.25rem;
+}
+
+/* -----------------------------
+   Blog Preview Section
+------------------------------ */
+.blog-preview-grid {
+  margin-top: 2rem;
+}
+
+.blog-preview-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+}
+
+.blog-preview-image {
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.blog-preview-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.blog-preview-card .headline-sm {
+  line-height: 1.3;
+}
+
+.blog-preview-card .body-sm {
+  flex: 1;
+  line-height: 1.6;
+}
+
+.blog-preview-card .btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+@media (max-width: 1024px) {
+  .blog-preview-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .blog-preview-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
 
 /* -----------------------------
    Responsive & Alignment Fixes

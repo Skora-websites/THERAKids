@@ -30,6 +30,9 @@
   font-size: 13px;
   color: var(--color-on-surface-variant);
   transition: color 0.2s ease;
+  /* Full-width stacked links: pad to a comfortable touch target */
+  display: block;
+  padding: 0.6rem 0;
 }
 
 .footer-links a:hover {

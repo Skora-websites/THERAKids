@@ -1,0 +1,15 @@
+# robots.txt for TheraKids Noida
+# https://therakidsnoida.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://therakidsnoida.com/sitemap.xml
+
+# Disallow admin pages
+Disallow: /admin/
+Disallow: /admin/dashboard/
+
+# Crawl-delay for polite bots
+Crawl-delay: 1

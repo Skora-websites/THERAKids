@@ -85,15 +85,168 @@
   font-size: 13px;
 }
 
+/* ===== Success confirmation step (after WhatsApp handoff) ===== */
+
+.modal-success {
+  text-align: center;
+  padding: 0.5rem 0;
+  animation: success-fade-in 0.35s ease both;
+}
+
+@keyframes success-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.success-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+  animation: success-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.success-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+@keyframes success-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-title {
+  margin-bottom: 0.5rem;
+  color: var(--color-on-background);
+}
+
+.success-text {
+  color: var(--color-on-surface-variant);
+  max-width: 42ch;
+  margin: 0 auto 1.5rem;
+}
+
+.success-summary {
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.success-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 14px;
+}
+
+.success-row span {
+  color: var(--color-on-surface-variant);
+  flex-shrink: 0;
+}
+
+.success-row strong {
+  color: var(--color-on-surface);
+  text-align: right;
+}
+
+.success-note {
+  font-size: 13px;
+  color: var(--color-on-error-container);
+  background-color: var(--color-error-container);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.success-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.success-actions .btn {
+  min-width: 140px;
+}
+
+/* ===== Auto-close countdown ring ===== */
+
+.success-countdown {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.success-countdown svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.countdown-track {
+  fill: none;
+  stroke: var(--color-outline-variant);
+  stroke-width: 2.5;
+}
+
+.countdown-progress {
+  fill: none;
+  stroke: var(--color-secondary);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 97.4;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.countdown-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
 @media (max-width: 768px) {
   .modal-container {
     padding: 1.5rem;
   }
-  
+
   .col-span-2 {
     grid-column: span 1;
   }
-  
+
   .appointment-form {
     grid-template-columns: 1fr;
   }

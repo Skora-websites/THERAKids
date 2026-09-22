@@ -8,6 +8,9 @@ import Gallery from './pages/Gallery';
 import Blogs from './pages/Blogs';
 import BlogPost from './pages/BlogPost';
 import Contact from './pages/Contact';
+import SpeechTherapy from './pages/SpeechTherapy';
+import OccupationalTherapy from './pages/OccupationalTherapy';
+import PhysicalTherapy from './pages/PhysicalTherapy';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { AppProvider } from './context/AppContext';
@@ -24,6 +27,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/services/speech-therapy" element={<SpeechTherapy />} />
+            <Route path="/services/occupational-therapy" element={<OccupationalTherapy />} />
+            <Route path="/services/physical-therapy" element={<PhysicalTherapy />} />
             <Route path="/conditions" element={<Conditions />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/blogs" element={<Blogs />} />
