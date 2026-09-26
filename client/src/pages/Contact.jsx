@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PageHero from '../components/PageHero';
+import { useAppContext } from '../context/AppContext';
 import { initScrollReveals } from '../lib/motion';
+import { usePageSeo } from '../hooks/usePageSeo';
 import './Contact.css';
 
 const Contact = () => {
-  // const { settings } = useAppContext(); // Not used currently
+  usePageSeo('/contact');
+  // Contact details come from admin (Site Settings) via /api/settings
+  const { settings } = useAppContext();
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const pageRef = useRef(null);
 
@@ -43,26 +47,33 @@ const Contact = () => {
             
             <div className="contact-item">
               <h4 className="label-lg">Phone & WhatsApp</h4>
-              <p className="body-md">+91 93135 13313<br/>+91 98993 38813</p>
+              <p className="body-md">
+                {settings.phone.split('/').map((num, i) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && <br />}
+                    {num.trim()}
+                  </React.Fragment>
+                ))}
+              </p>
             </div>
-            
+
             <div className="contact-item">
               <h4 className="label-lg">Email</h4>
-              <p className="body-md">therakids.dc@gmail.com</p>
+              <p className="body-md">{settings.email}</p>
             </div>
 
             <div className="contact-item">
               <h4 className="label-lg">Our Centers</h4>
-              <p className="body-md"><strong>Noida:</strong><br/>G-10, Block G, Sector 22, Noida, Uttar Pradesh – 201301</p>
+              <p className="body-md"><strong>Noida:</strong><br/>{settings.address1}</p>
               <br/>
-              <p className="body-md"><strong>Greater Noida West:</strong><br/>173, Itehara, Near NX-One Society, Greater Noida West, Uttar Pradesh – 201306</p>
+              <p className="body-md"><strong>Greater Noida West:</strong><br/>{settings.address2}</p>
             </div>
 
             <div className="contact-item">
               <h4 className="label-lg">Hours of Operation</h4>
-              <p className="body-md">Mon-Fri: 8:00 AM - 6:00 PM</p>
-              <p className="body-md">Saturday: 9:00 AM - 2:00 PM</p>
-              <p className="body-md">Sunday: Closed</p>
+              <p className="body-md">{settings.hours_week}</p>
+              <p className="body-md">{settings.hours_sat}</p>
+              <p className="body-md">{settings.hours_sun}</p>
             </div>
           </div>
 

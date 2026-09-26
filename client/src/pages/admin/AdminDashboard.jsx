@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { NavLink, Routes, Route, useNavigate } from 'react-router-dom';
 import API_URL from '../../config';
+import RichTextEditor from '../../components/RichTextEditor';
+import { invalidatePageSeo } from '../../hooks/usePageSeo';
 import './AdminDashboard.css';
 
 // ==========================================
@@ -32,33 +34,24 @@ const adminFetch = async (path, options = {}) => {
 // ==========================================
 
 const RESOURCES = {
-  doctors: {
-    title: 'Manage Doctors',
-    columns: ['id', 'name', 'designation', 'is_active'],
-    fields: [
-      { key: 'name', label: 'Name', required: true },
-      { key: 'designation', label: 'Designation' },
-      { key: 'specialisation', label: 'Specialisation' },
-      { key: 'profile_image', label: 'Profile Image', type: 'image', full: true },
-      { key: 'qualifications', label: 'Qualifications', full: true },
-      { key: 'short_bio', label: 'Short Bio', type: 'textarea', full: true },
-      { key: 'full_bio', label: 'Full Bio', type: 'textarea', full: true },
-      { key: 'display_order', label: 'Display Order', type: 'number' },
-      { key: 'is_active', label: 'Active', type: 'checkbox' }
-    ]
-  },
   services: {
     title: 'Manage Services',
     columns: ['id', 'name', 'slug', 'is_active'],
     fields: [
       { key: 'name', label: 'Name', required: true },
       { key: 'slug', label: 'Slug (unique)', required: true },
+      { key: 'hero_title', label: 'Hero Title (headline shown on the detail page)' },
       { key: 'display_order', label: 'Display Order', type: 'number' },
       { key: 'is_active', label: 'Active', type: 'checkbox' },
       { key: 'image', label: 'Image', type: 'image', full: true },
       { key: 'short_description', label: 'Short Description', type: 'textarea', full: true },
-      { key: 'full_description', label: 'Full Description', type: 'textarea', full: true },
-      { key: 'benefits', label: 'Benefits (JSON array, e.g. ["A","B"])', type: 'textarea', full: true }
+      { key: 'full_description', label: 'Full Description (paragraphs separated by a blank line)', type: 'textarea', full: true },
+      { key: 'benefits', label: 'Benefits (JSON array, e.g. ["A","B"])', type: 'textarea', full: true },
+      { key: 'page_sections', label: 'Page Sections (JSON array of content bands: cards | lists | tags | prose)', type: 'textarea', full: true, rows: 8 },
+      { key: 'meta_title', label: 'Meta Title', section: 'SEO Settings', full: true, counter: 60, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
+      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true },
+      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 160 },
+      { key: 'canonical_url', label: 'Canonical URL (optional, overrides the default page URL)', full: true }
     ]
   },
   gallery: {
@@ -75,18 +68,21 @@ const RESOURCES = {
   blogs: {
     title: 'Manage Blogs',
     columns: ['id', 'title', 'status', 'published_at'],
+    slugifyFrom: 'title', // live-fill slug from title until the admin edits it
     fields: [
       { key: 'title', label: 'Title', required: true, full: true },
-      { key: 'slug', label: 'Slug (unique)', required: true },
+      { key: 'slug', label: 'Slug (unique)', required: true, hint: 'Auto-filled from the blog title as you type. Edit it to customize; clear it to re-fill automatically.' },
       { key: 'category', label: 'Category' },
       { key: 'author', label: 'Author' },
       { key: 'status', label: 'Status', type: 'select', options: ['draft', 'published'] },
       { key: 'published_at', label: 'Published At', type: 'datetime-local' },
       { key: 'featured_image', label: 'Featured Image', type: 'image', full: true },
-      { key: 'seo_title', label: 'SEO Title', full: true },
-      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true },
       { key: 'excerpt', label: 'Excerpt', type: 'textarea', full: true },
-      { key: 'content', label: 'Content (HTML)', type: 'textarea', full: true, rows: 10 }
+      { key: 'content', label: 'Content', type: 'richtext', full: true },
+      { key: 'meta_title', label: 'Meta Title', section: 'SEO Settings', full: true, counter: 60, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
+      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true },
+      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 160 },
+      { key: 'canonical_url', label: 'Canonical URL (optional, overrides the default page URL)', full: true }
     ]
   },
   testimonials: {
@@ -98,6 +94,34 @@ const RESOURCES = {
       { key: 'display_order', label: 'Display Order', type: 'number' },
       { key: 'is_active', label: 'Active', type: 'checkbox' },
       { key: 'testimonial', label: 'Testimonial', type: 'textarea', full: true, rows: 4 }
+    ]
+  },
+  // Per-route meta for the pages without a resource of their own: the SEO tab.
+  // Rows are seeded per public route; the route itself stays read-only.
+  page_seo: {
+    title: 'Manage SEO',
+    note: 'One row per page. Blog posts set their meta in the Blogs panel and service pages in the Services panel, so those two are not listed here. Leave a field empty to keep the site\u2019s built-in default for that page.',
+    columns: ['id', 'page_key', 'label', 'meta_title', 'meta_description'],
+    fields: [
+      { key: 'page_key', label: 'Page (route path)', required: true, readOnly: true, hint: 'Route this meta applies to. Seeded with the page and not editable.' },
+      { key: 'label', label: 'Admin Label (how the page is named in the list)' },
+      { key: 'meta_title', label: 'Meta Title', section: 'Meta Tags', full: true, counter: 60, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
+      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true },
+      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 160 },
+      { key: 'canonical_url', label: 'Canonical URL (optional, overrides the default page URL)', full: true }
+    ],
+    noCreate: true,
+    noDelete: true
+  },
+  faqs: {
+    title: 'Manage FAQs',
+    columns: ['id', 'page_key', 'question', 'is_active'],
+    fields: [
+      { key: 'page_key', label: 'Page ("home" or a service slug, e.g. speech-therapy)', required: true },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' },
+      { key: 'question', label: 'Question', required: true, full: true },
+      { key: 'answer', label: 'Answer', type: 'textarea', full: true, rows: 4 }
     ]
   }
 };
@@ -237,6 +261,16 @@ const emptyForm = (fields) => {
   return form;
 };
 
+// WordPress-style slug: strip accents (é → e), lowercase, collapse every run of
+// non-alphanumerics to a single hyphen, trim leading/trailing hyphens.
+const slugify = (str) =>
+  String(str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
 const CrudManager = ({ resource }) => {
   const cfg = RESOURCES[resource];
   const [rows, setRows] = useState(null);
@@ -244,6 +278,11 @@ const CrudManager = ({ resource }) => {
   const [editing, setEditing] = useState(null); // null | 'new' | row object
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
+  // Slug auto-fill lock. Programmatic fills go through setForm (setting .value
+  // fires no input event), so only a REAL edit of the slug field fires the
+  // change handler below and locks it. On the edit form a saved slug counts as
+  // manual — title edits must never overwrite it.
+  const [slugManual, setSlugManual] = useState(false);
 
   const load = useCallback(() => {
     adminFetch(`/${resource}`).then(setRows).catch(e => setError(e.message));
@@ -253,7 +292,7 @@ const CrudManager = ({ resource }) => {
     load();
   }, [load]);
 
-  const openCreate = () => { setForm(emptyForm(cfg.fields)); setEditing('new'); };
+  const openCreate = () => { setForm(emptyForm(cfg.fields)); setEditing('new'); setSlugManual(false); };
   const openEdit = (row) => {
     const f = {};
     for (const field of cfg.fields) f[field.key] = row[field.key] ?? (field.type === 'checkbox' ? false : '');
@@ -265,6 +304,25 @@ const CrudManager = ({ resource }) => {
     }
     setForm(f);
     setEditing(row);
+    setSlugManual(Boolean(f.slug)); // prefilled slug behaves as manually set
+  };
+
+  const handleFieldChange = (field, value) => {
+    if (cfg.slugifyFrom && field.key === 'slug') {
+      // Manual edit locks auto-fill; clearing the field re-enables it
+      setSlugManual(String(value).length > 0);
+      setForm(prev => ({ ...prev, slug: value }));
+      return;
+    }
+    if (cfg.slugifyFrom && field.key === cfg.slugifyFrom) {
+      setForm(prev => {
+        const next = { ...prev, [field.key]: value };
+        if (!slugManual) next.slug = slugify(value); // live auto-fill
+        return next;
+      });
+      return;
+    }
+    setForm(prev => ({ ...prev, [field.key]: field.type === 'number' ? Number(value) : value }));
   };
 
   const handleSave = async (e) => {
@@ -280,6 +338,7 @@ const CrudManager = ({ resource }) => {
         await adminFetch(`/${resource}/${editing.id}`, { method: 'PUT', body: JSON.stringify(payload) });
       }
       setEditing(null);
+      if (resource === 'page_seo') invalidatePageSeo(); // public pages re-read on next load
       load();
     } catch (err) {
       setError(err.message);
@@ -306,8 +365,10 @@ const CrudManager = ({ resource }) => {
     <div className="admin-crud">
       <div className="crud-header">
         <h2>{cfg.title}</h2>
-        <button className="btn btn-primary btn-sm" onClick={openCreate}>+ Add New</button>
+        {!cfg.noCreate && <button className="btn btn-primary btn-sm" onClick={openCreate}>+ Add New</button>}
       </div>
+
+      {cfg.note && <p className="admin-note">{cfg.note}</p>}
 
       {error && <div className="admin-error">{error}</div>}
 
@@ -325,7 +386,9 @@ const CrudManager = ({ resource }) => {
                 {cfg.columns.map(col => <td key={col}>{displayCell(col, row[col])}</td>)}
                 <td className="actions-cell">
                   <button className="btn btn-outline btn-sm" onClick={() => openEdit(row)}>Edit</button>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(row)}>Delete</button>
+                  {!cfg.noDelete && (
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(row)}>Delete</button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -337,55 +400,72 @@ const CrudManager = ({ resource }) => {
         <div className="admin-modal-backdrop" onClick={() => setEditing(null)}>
           <form className="admin-modal" onClick={e => e.stopPropagation()} onSubmit={handleSave}>
             <div className="admin-modal-header">
-              <h3>{editing === 'new' ? 'Add' : 'Edit'} — {cfg.title.replace('Manage ', '')}</h3>
+              <h3>(editing === 'new' ? 'Add' : 'Edit') + ' ' + cfg.title.replace('Manage ', '')</h3>
               <button type="button" className="admin-modal-close" onClick={() => setEditing(null)}>&times;</button>
             </div>
             <div className="form-grid">
-              {cfg.fields.map(f => (
-                <div className={`form-field ${f.full ? 'full' : ''}`} key={f.key}>
-                  {f.type === 'checkbox' ? (
-                    <label className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={!!form[f.key]}
-                        onChange={e => setForm({ ...form, [f.key]: e.target.checked })}
-                      />
-                      {f.label}
-                    </label>
-                  ) : (
-                    <>
-                      <label>{f.label}{f.required && ' *'}</label>
-                      {f.type === 'image' ? (
-                        <ImageField
-                          value={form[f.key] ?? ''}
-                          required={f.required}
-                          onChange={v => setForm({ ...form, [f.key]: v })}
-                        />
-                      ) : f.type === 'textarea' ? (
-                        <textarea
-                          rows={f.rows || 3}
-                          value={form[f.key] ?? ''}
-                          required={f.required}
-                          onChange={e => setForm({ ...form, [f.key]: e.target.value })}
-                        />
-                      ) : f.type === 'select' ? (
-                        <select
-                          value={form[f.key] ?? ''}
-                          onChange={e => setForm({ ...form, [f.key]: e.target.value })}
-                        >
-                          {f.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                        </select>
-                      ) : (
-                        <input
-                          type={f.type === 'number' ? 'number' : f.type === 'datetime-local' ? 'datetime-local' : 'text'}
-                          value={form[f.key] ?? ''}
-                          required={f.required}
-                          onChange={e => setForm({ ...form, [f.key]: f.type === 'number' ? Number(e.target.value) : e.target.value })}
-                        />
-                      )}
-                    </>
+              {cfg.fields.map((f, idx) => (
+                <React.Fragment key={f.key}>
+                  {f.section && cfg.fields[idx - 1]?.section !== f.section && (
+                    <h4 className="form-section-heading">{f.section}</h4>
                   )}
-                </div>
+                  <div className={`form-field ${f.full ? 'full' : ''}`}>
+                    {f.type === 'checkbox' ? (
+                      <label className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={!!form[f.key]}
+                          onChange={e => setForm({ ...form, [f.key]: e.target.checked })}
+                        />
+                        {f.label}
+                      </label>
+                    ) : (
+                      <>
+                        <label>{f.label}{f.required && ' *'}</label>
+                        {f.type === 'richtext' ? (
+                          <RichTextEditor
+                            value={form[f.key] ?? ''}
+                            onChange={v => handleFieldChange(f, v)}
+                          />
+                        ) : f.type === 'image' ? (
+                          <ImageField
+                            value={form[f.key] ?? ''}
+                            required={f.required}
+                            onChange={v => setForm({ ...form, [f.key]: v })}
+                          />
+                        ) : f.type === 'textarea' ? (
+                          <textarea
+                            rows={f.rows || 3}
+                            value={form[f.key] ?? ''}
+                            required={f.required}
+                            onChange={e => handleFieldChange(f, e.target.value)}
+                          />
+                        ) : f.type === 'select' ? (
+                          <select
+                            value={form[f.key] ?? ''}
+                            onChange={e => handleFieldChange(f, e.target.value)}
+                          >
+                            {f.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                          </select>
+                        ) : (
+                          <input
+                            type={f.type === 'number' ? 'number' : f.type === 'datetime-local' ? 'datetime-local' : 'text'}
+                            value={form[f.key] ?? ''}
+                            required={f.required}
+                            readOnly={!!f.readOnly}
+                            onChange={e => handleFieldChange(f, e.target.value)}
+                          />
+                        )}
+                        {f.hint && <div className="field-hint">{f.hint}</div>}
+                        {f.counter != null && (
+                          <div className={`field-counter ${String(form[f.key] ?? '').length > f.counter ? 'over' : ''}`}>
+                            {String(form[f.key] ?? '').length} / {f.counter}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </React.Fragment>
               ))}
             </div>
             <div className="admin-modal-footer">
@@ -768,11 +848,12 @@ const AdminDashboard = () => {
         </div>
         <nav className="admin-nav">
           <NavLink to="/admin/dashboard" end className={({isActive}) => isActive ? 'active' : ''}>Overview</NavLink>
-          <NavLink to="/admin/dashboard/doctors" className={({isActive}) => isActive ? 'active' : ''}>Doctors</NavLink>
           <NavLink to="/admin/dashboard/services" className={({isActive}) => isActive ? 'active' : ''}>Services</NavLink>
           <NavLink to="/admin/dashboard/gallery" className={({isActive}) => isActive ? 'active' : ''}>Gallery</NavLink>
           <NavLink to="/admin/dashboard/blogs" className={({isActive}) => isActive ? 'active' : ''}>Blogs</NavLink>
+          <NavLink to="/admin/dashboard/seo" className={({isActive}) => isActive ? 'active' : ''}>SEO</NavLink>
           <NavLink to="/admin/dashboard/testimonials" className={({isActive}) => isActive ? 'active' : ''}>Testimonials</NavLink>
+          <NavLink to="/admin/dashboard/faqs" className={({isActive}) => isActive ? 'active' : ''}>FAQs</NavLink>
           <NavLink to="/admin/dashboard/appointments" className={({isActive}) => isActive ? 'active' : ''}>Appointments</NavLink>
           <NavLink to="/admin/dashboard/settings" className={({isActive}) => isActive ? 'active' : ''}>Site Settings</NavLink>
           <NavLink to="/admin/dashboard/password" className={({isActive}) => isActive ? 'active' : ''}>Change Password</NavLink>
@@ -785,11 +866,12 @@ const AdminDashboard = () => {
       <main className="admin-main-content">
         <Routes>
           <Route path="/" element={<Overview />} />
-          <Route path="doctors" element={<CrudManager key="doctors" resource="doctors" />} />
           <Route path="services" element={<CrudManager key="services" resource="services" />} />
           <Route path="gallery" element={<CrudManager key="gallery" resource="gallery" />} />
           <Route path="blogs" element={<CrudManager key="blogs" resource="blogs" />} />
+          <Route path="seo" element={<CrudManager key="page_seo" resource="page_seo" />} />
           <Route path="testimonials" element={<CrudManager key="testimonials" resource="testimonials" />} />
+          <Route path="faqs" element={<CrudManager key="faqs" resource="faqs" />} />
           <Route path="appointments" element={<AppointmentsManager />} />
           <Route path="settings" element={<SettingsManager />} />
           <Route path="password" element={<ChangePassword />} />

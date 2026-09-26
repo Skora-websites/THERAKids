@@ -12,7 +12,7 @@ const path = require('path');
 const { BLOGS } = require('../blog-data');
 
 const SEED_PATH = path.join(__dirname, '..', 'seed.sql');
-const START = '-- >>> BLOGS:AUTO-GENERATED (from blog-data.js) — do not edit by hand >>>';
+const START = '-- >>> BLOGS:AUTO-GENERATED (from blog-data.js), do not edit by hand >>>';
 const END = '-- <<< BLOGS:AUTO-GENERATED <<<';
 
 const esc = (s) => String(s).replace(/\\/g, '\\\\').replace(/'/g, "''");
@@ -30,7 +30,8 @@ function buildSection() {
       `'${esc(b.author)}'`,
       `'${esc(b.category)}'`,
       `'${esc(seoTitle)}'`,
-      `'${esc(b.excerpt)}'`,
+      // Legacy posts carry no SEO meta (meta_description stays NULL) — the public
+      // page falls back to a 160-char content excerpt (spec: legacy post scenario).
       `'published'`,
       `'${esc(b.published_at)}'`
     ].join(',\n ')})`;
@@ -40,7 +41,7 @@ function buildSection() {
 DELETE FROM blogs WHERE slug IN (
 ${slugs});
 
-INSERT INTO blogs (title, slug, excerpt, content, featured_image, author, category, seo_title, meta_description, status, published_at) VALUES
+INSERT INTO blogs (title, slug, excerpt, content, featured_image, author, category, seo_title, status, published_at) VALUES
 ${rows};
 ${END}`;
 }

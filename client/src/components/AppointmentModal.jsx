@@ -43,13 +43,13 @@ const AppointmentModal = ({ onClose }) => {
         const response = await fetch(`${API_URL}/api/services`);
         if (response.ok) setServices(await response.json());
       } catch {
-        // API unreachable — the select just shows the static fallback options below
+        // API unreachable - the select just shows the static fallback options below
       }
     };
     load();
   }, []);
 
-  // Countdown effect — a self-chaining 1s timeout so each tick re-renders the ring.
+  // Countdown effect - a self-chaining 1s timeout so each tick re-renders the ring.
   // Fires onClose when the timer reaches zero.
   useEffect(() => {
     if (!submitted || !autoClose || secondsLeft === null) return undefined;
@@ -74,7 +74,7 @@ const AppointmentModal = ({ onClose }) => {
       // Resolve the selected option back to a services.id (FK constraint on appointments.service_id)
       const selected = services.find((s) => String(s.id) === String(formData.service_id));
 
-      // API call to store in DB — service_id is a nullable FK, so send null when not chosen
+      // API call to store in DB - service_id is a nullable FK, so send null when not chosen
       const response = await fetch(`${API_URL}/api/appointments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -100,12 +100,12 @@ const AppointmentModal = ({ onClose }) => {
       // so track it and offer a manual fallback button on the confirmation screen.
       const win = window.open(url, '_blank');
       setPopupBlocked(!win);
-      // Auto-close only when WhatsApp actually opened — if the popup was blocked the
+      // Auto-close only when WhatsApp actually opened - if the popup was blocked the
       // user still needs the manual fallback button, so the screen stays open.
       setAutoClose(Boolean(win));
       setSecondsLeft(win ? AUTO_CLOSE_SECONDS : null);
 
-      // Don't close the modal — show a success confirmation step instead
+      // Don't close the modal - show a success confirmation step instead
       setIsSubmitting(false);
       setSubmitted(true);
     } catch {
@@ -138,7 +138,7 @@ const AppointmentModal = ({ onClose }) => {
             <p className="body-sm success-text">
               {popupBlocked
                 ? 'Your browser blocked the WhatsApp popup. Tap the button below to open WhatsApp and send your request.'
-                : 'WhatsApp should have opened in a new tab with your details — just hit send there and our team will confirm the slot shortly.'}
+                : 'WhatsApp should have opened in a new tab with your details. Just hit send there and our team will confirm the slot shortly.'}
             </p>
 
             <div className="success-summary">
@@ -225,7 +225,10 @@ const AppointmentModal = ({ onClose }) => {
                   <>
                     <option value="Occupational Therapy">Occupational Therapy</option>
                     <option value="Speech Therapy">Speech Therapy</option>
-                    <option value="Physical Therapy">Physical Therapy</option>
+                    <option value="Physiotherapy (Paeds)">Physiotherapy (Paeds)</option>
+                    <option value="Special Education">Special Education</option>
+                    <option value="Early Intervention">Early Intervention</option>
+                    <option value="Counseling">Counseling</option>
                   </>
                 )}
             </select>

@@ -1,42 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import TiltCard from './TiltCard';
+import API_URL from '../config';
+import fallbackServices from '../data/fallbackServices';
 import './RelatedServices.css';
 
-const services = [
-  {
-    id: 1,
-    name: 'Speech Therapy',
-    short_description: 'Helping children find their voice through articulation, language, and communication support.',
-    path: '/services/speech-therapy',
-    image: '/images/gallery/d2copy.webp',
-    icon: '🗣️'
-  },
-  {
-    id: 2,
-    name: 'Occupational Therapy',
-    short_description: 'Building independence through fine motor, sensory processing, and daily living skills.',
-    path: '/services/occupational-therapy',
-    image: '/images/gallery/d1copy.webp',
-    icon: '✋'
-  },
-  {
-    id: 3,
-    name: 'Physical Therapy',
-    short_description: 'Empowering movement and mobility through strength, balance, and coordination training.',
-    path: '/services/physical-therapy',
-    image: '/images/gallery/d6copy.webp',
-    icon: '🏃'
-  }
-];
+const SERVICE_ICONS = ['🗣️', '✋', '🏃', '📚', '🎨', '💬', '🧩', '🎒'];
 
 const RelatedServices = ({ currentService }) => {
   const navigate = useNavigate();
-  const relatedServices = services.filter(s => s.path !== currentService);
+  const [services, setServices] = useState(fallbackServices);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_URL}/api/services`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data) && data.length > 0) setServices(data);
+      })
+      .catch(() => {
+        // API unreachable - the shared static fallback list stays in place
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Show two other services (a single row), each linking to /services/:slug
+  const relatedServices = services
+    .filter((s) => s.slug && s.slug !== currentService)
+    .slice(0, 2)
+    .map((s, i) => ({ ...s, icon: s.icon || SERVICE_ICONS[i % SERVICE_ICONS.length] }));
+
+  if (relatedServices.length === 0) return null;
 
   return (
-    <section className="related-services section-padding bg-pastel-lilac">
+    <section className="related-services section-padding bg-pastel-lilac relative overflow-hidden">
       <div className="cloud-divider cloud-top fill-white">
         <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
           <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
@@ -53,10 +53,10 @@ const RelatedServices = ({ currentService }) => {
         <div className="grid grid-cols-2 gap-8 related-services-grid" data-reveal-group>
           {relatedServices.map((service) => (
             <TiltCard key={service.id} maxTilt={6}>
-              <div 
+              <div
                 className="related-service-card"
                 onClick={() => {
-                  navigate(service.path);
+                  navigate(`/services/${service.slug}`);
                   window.scrollTo(0, 0);
                 }}
               >

@@ -4,9 +4,11 @@ import InlineCTA from '../components/InlineCTA';
 import PageHero from '../components/PageHero';
 import { Sparkle, LeafDoodle, SunDoodle, UnderlineFlourish } from '../components/doodles/Doodles';
 import { initScrollReveals, createFloatLoop } from '../lib/motion';
+import { usePageSeo } from '../hooks/usePageSeo';
 import './About.css';
 
 const About = () => {
+  usePageSeo('/about');
   const founderRef = useRef(null);
 
   /* GSAP scroll reveals + gentle floating doodles in the founder section */
@@ -25,7 +27,7 @@ const About = () => {
         bg="bg-pastel-lilac"
         eyebrow="Our Story"
         title="A place where children blossom."
-        subtitle="THERAKids Foundation is a multidisciplinary team dedicated to helping children aged 0-18 reach their fullest potential — through early intervention, structured therapy, and true family partnership."
+        subtitle="THERAKids Foundation is a multidisciplinary team dedicated to helping children aged 0-18 reach their fullest potential through early intervention, structured therapy, and true family partnership."
         image="/images/hero-about.jpg"
         imageAlt="Child playing and learning in a bright therapy space"
         imagePosition="0% 100%"
@@ -42,7 +44,7 @@ const About = () => {
         <div className="container grid grid-cols-2 philosophy-grid">
           <div className="philosophy-visual" data-reveal>
             <div className="image-blob-mask">
-              <img src="https://images.unsplash.com/photo-1594608661623-aa0bd3a69d98?auto=format&fit=crop&w=800&q=80" alt="Therapist with child" className="philosophy-image" />
+              <img src="/images/about-philosophy.jpg" alt="Child learning at a therapy table" className="philosophy-image" />
             </div>
             <Sparkle className="philosophy-doodle" data-float />
           </div>
@@ -86,7 +88,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Meet the Founder — white top wave blends it out of the philosophy section;
+      {/* Meet the Founder, white top wave blends it out of the philosophy section;
           extra bottom padding keeps content clear of the 150px bottom wave */}
       <section className="founder-section bg-pastel-peach relative overflow-hidden" ref={founderRef}>
         <LeafDoodle className="founder-doodle founder-doodle-leaf" data-float />
@@ -94,20 +96,30 @@ const About = () => {
         <div className="container founder-flex-container relative z-10">
           <div className="founder-content" data-reveal>
             <p className="label-md text-navy uppercase tracking-widest mb-2">Our Founder</p>
-            <h2 className="headline-xl text-navy mb-6">Dr. Sandeep Rana</h2>
+            <h2 className="headline-xl text-navy mb-2">Sandeep Rana</h2>
+            <p className="body-lg text-navy font-semibold mb-6">Founder &amp; Chairman, THERAKids Foundation</p>
             <p className="body-lg text-navy-light mb-4">
-              "Over the years, we have conducted thousands of therapy sessions, helping hundreds of children make remarkable progress. Many of our children have successfully transitioned into mainstream schools, developed essential life skills, and improved their communication and motor abilities significantly."
+              With over 20 years of experience in healthcare management and child development, Sandeep Rana brings visionary leadership, strategic insight, and a deep sense of purpose to THERAKids Foundation.
             </p>
             <p className="body-lg text-navy-light mb-4">
-              "We take immense pride in witnessing the transformation of our young learners as they grow in confidence, capability, and independence. The success stories of our children are a testament to the dedication, expertise, and relentless efforts of our team, who work tirelessly to ensure that every therapy session brings positive change."
+              For Sandeep, THERAKids is more than a child development centre&mdash;it is a vision built on compassion, purpose, and the belief that every child deserves the opportunity to thrive.
+            </p>
+            <p className="body-lg text-navy-light mb-4">
+              What began in 2019 from a small space with a powerful dream has grown into two state-of-the-art child development centres in Noida and Greater Noida West, supported by a dedicated team of 40+ professionals across multiple disciplines of pediatric care.
+            </p>
+            <p className="body-lg text-navy-light mb-4">
+              Under his leadership, THERAKids has evolved into a trusted name in child development, with a strong commitment to accessible, ethical, and quality therapeutic care. His vision is to create an environment where children receive the right support, families feel empowered, and professionals are encouraged to grow and make a meaningful difference.
+            </p>
+            <p className="body-lg text-navy-light mb-4">
+              Beyond leading the organization, Sandeep is passionate about mentoring therapists and educators and contributing to the growth of pediatric care. He believes that true leadership is not only about building an organization, but about building people, creating impact, and transforming lives.
             </p>
             <p className="body-lg text-navy mb-6 font-semibold">
-              THERAKids is not just a therapy center; it is a place where children find hope, where parents find guidance, and where every small milestone is celebrated as a big achievement.
+              At the heart of his journey are three guiding principles: Compassion. Purpose. Karma.
             </p>
           </div>
           <div className="founder-visual" data-reveal>
             <div className="founder-image-wrapper">
-              <img src="/images/dr_sandeep_rana.jpg" alt="Dr. Sandeep Rana - Founder" />
+              <img src="/images/sandeep_rana.jpg" alt="Sandeep Rana - Founder & Chairman" />
             </div>
           </div>
         </div>
@@ -127,27 +139,38 @@ const About = () => {
         </div>
       </section>
 
-      {/* Meet the Co-Founder — mirrors the founder band with the image on the left.
+      {/* Meet the Co-Founder, mirrors the founder band with the image on the left.
           White background: it sits between the founder band's white-fading cloud and the
           global CTA's white top cloud, so any color here would read as a stray stripe. */}
       <section className="founder-section co-founder-section bg-white relative overflow-hidden">
         <div className="container founder-flex-container relative z-10">
           <div className="founder-visual" data-reveal>
             <div className="founder-image-wrapper">
-              <img src="/images/dr_ananya_sharma.jpg" alt="Dr. Ananya Sharma - Co-Founder" />
+              <img src="/images/akanksha_rana.jpg" alt="Dr. Akanksha Rana - Co-Founder" />
             </div>
           </div>
           <div className="founder-content" data-reveal>
             <p className="label-md text-navy uppercase tracking-widest mb-2">Our Co-Founder</p>
-            <h2 className="headline-xl text-navy mb-6">Dr. Ananya Sharma</h2>
+            <h2 className="headline-xl text-navy mb-2">Dr. Akanksha Rana</h2>
+            <p className="body-lg text-navy font-semibold mb-2">Co-Founder &amp; Consultant, THERAKids Foundation</p>
+            <p className="body-lg text-navy-light mb-6">Senior Pediatric Occupational Therapist</p>
             <p className="body-lg text-navy-light mb-4">
-              "Every child who walks through our doors brings a unique spark. Our role is to nurture that spark into confidence, capability, and joy — one milestone at a time."
+              With over 16 years of experience in pediatric occupational therapy and child development, Dr. Akanksha Rana is a distinguished clinician and a driving force behind the clinical vision of THERAKids Foundation.
             </p>
             <p className="body-lg text-navy-light mb-4">
-              "Working hand in hand with families, we design therapy plans that fit into real, everyday life. Progress is never one-size-fits-all, and neither is our care."
+              As Co-founder and Consultant, she plays a pivotal role in shaping THERAKids&rsquo; clinical standards, therapeutic philosophy, and commitment to child-centred care. Her expertise spans sensory integration, developmental delays, autism spectrum disorders, and pediatric rehabilitation, combining evidence-based practice with compassionate, individualized care.
+            </p>
+            <p className="body-lg text-navy-light mb-4">
+              Over the years, her clinical expertise and unwavering commitment have helped thousands of children progress toward their developmental potential while empowering families with greater understanding, confidence, and hope.
+            </p>
+            <p className="body-lg text-navy-light mb-4">
+              At THERAKids, Dr. Akanksha provides clinical leadership to a multidisciplinary team, fostering a culture of clinical excellence, innovation, continuous learning, and compassionate care.
+            </p>
+            <p className="body-lg text-navy-light mb-4">
+              Her vision is to ensure that every child is understood beyond a diagnosis, supported according to their unique needs, and given every opportunity to reach their fullest potential.
             </p>
             <p className="body-lg text-navy mb-6 font-semibold">
-              Together with our team, she champions compassionate, evidence-based care so that every family feels supported long after the session ends.
+              For Dr. Akanksha, therapy is not simply about achieving milestones&mdash;it is about unlocking potential, building confidence, and creating meaningful possibilities for every child.
             </p>
           </div>
         </div>

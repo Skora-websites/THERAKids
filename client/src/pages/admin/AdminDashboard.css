@@ -512,3 +512,48 @@
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .stats-grid-5 { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Explanatory line under a resource's table header (e.g. the SEO tab scope) */
+.admin-note {
+  margin: -0.25rem 0 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-navy-light, #5a648f);
+}
+
+/* Seeded keys (SEO page routes) are shown but not editable */
+.form-field input[readonly] {
+  background: var(--color-surface-container-low, #eff3ff);
+  color: var(--color-navy-light, #5a648f);
+  cursor: default;
+}
+
+/* ---- Blog form: SEO section, hints, live counters ---- */
+.form-section-heading {
+  grid-column: 1 / -1;
+  margin: 0.75rem 0 0.25rem;
+  padding-bottom: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  border-bottom: 1px solid var(--color-outline, #c9cede);
+}
+
+.field-hint {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--color-navy-light, #5a648f);
+}
+
+.field-counter {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--color-navy-light, #5a648f);
+  text-align: right;
+}
+
+.field-counter.over {
+  color: #d32f2f;
+  font-weight: 700;
+}

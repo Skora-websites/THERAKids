@@ -10,10 +10,12 @@
   gap: 4rem;
 }
 
+/* Paragraph rhythm comes from the mb-* utilities alone — a flex gap here used to
+   stack on top of those margins and double the spacing between blocks. */
 .therapy-intro-content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  justify-content: center;
 }
 
 .therapy-intro-visual {

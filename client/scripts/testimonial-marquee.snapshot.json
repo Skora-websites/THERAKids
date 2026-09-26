@@ -1,0 +1,32 @@
+{
+  "390": {
+    "cardWidth": 288,
+    "visibleCards": 1.25,
+    "pxPerSecond": 24.1,
+    "secondsPerCard": 12,
+    "direction": "right→left",
+    "copyWidth": 1248,
+    "durationSeconds": 52,
+    "cards": 4
+  },
+  "754": {
+    "cardWidth": 336,
+    "visibleCards": 2.09,
+    "pxPerSecond": 45,
+    "secondsPerCard": 7.5,
+    "direction": "right→left",
+    "copyWidth": 1440,
+    "durationSeconds": 32,
+    "cards": 4
+  },
+  "1440": {
+    "cardWidth": 336,
+    "visibleCards": 4,
+    "pxPerSecond": 45.1,
+    "secondsPerCard": 7.4,
+    "direction": "right→left",
+    "copyWidth": 1440,
+    "durationSeconds": 32,
+    "cards": 4
+  }
+}

@@ -2,6 +2,19 @@
   border-radius: 0 0 48px 48px;
 }
 
+/* Compact condition cards: wider column, tighter padding & rhythm */
+.conditions-page .service-detail-card {
+  padding: 1.75rem 2.25rem;
+}
+
+.conditions-page .service-detail-content {
+  gap: 2rem;
+}
+
+.conditions-page .service-text {
+  gap: 1rem;
+}
+
 .condition-icon-wrapper-small {
   width: 48px;
   height: 48px;

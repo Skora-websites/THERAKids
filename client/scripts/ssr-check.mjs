@@ -19,9 +19,7 @@ const pages = [
   ['Blogs', '/src/pages/Blogs.jsx', '/blogs'],
   ['BlogPost', '/src/pages/BlogPost.jsx', '/blogs/sample-slug', '/blogs/:slug'],
   ['Contact', '/src/pages/Contact.jsx', '/contact'],
-  ['SpeechTherapy', '/src/pages/SpeechTherapy.jsx', '/services/speech-therapy'],
-  ['OccupationalTherapy', '/src/pages/OccupationalTherapy.jsx', '/services/occupational-therapy'],
-  ['PhysicalTherapy', '/src/pages/PhysicalTherapy.jsx', '/services/physical-therapy'],
+  ['ServiceDetail', '/src/pages/ServiceDetail.jsx', '/services/speech-therapy', '/services/:slug'],
   ['AdminLogin', '/src/pages/admin/AdminLogin.jsx', '/admin'],
   // Mounted under the same parent pattern App.jsx uses, because AdminDashboard's inner
   // <Routes> relies on descendant routing against the /admin/dashboard/* remainder.

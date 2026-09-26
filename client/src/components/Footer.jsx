@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import Logo from './Logo';
+import { useAppContext } from '../context/AppContext';
 import './Footer.css';
 
 const Footer = () => {
-  const [settings] = useState({
-    phone: '+91 98993 38813 / +91 93135 13313',
-    email: 'therakids.dc@gmail.com',
-    address1: 'G-10, Block G, Sector 22, Noida - 201301',
-    address2: '173, Itehara, Near NX-One Society, Gr. Noida West - 201306'
-  });
+  // Contact details come from admin (Site Settings) via /api/settings
+  const { settings } = useAppContext();
 
   return (
     <footer className="global-footer">
@@ -28,7 +25,7 @@ const Footer = () => {
               <NavLink to="/services">Our Services</NavLink>
               <NavLink to="/services/speech-therapy">Speech Therapy</NavLink>
               <NavLink to="/services/occupational-therapy">Occupational Therapy</NavLink>
-              <NavLink to="/services/physical-therapy">Physical Therapy</NavLink>
+              <NavLink to="/services/physiotherapy-paeds">Physiotherapy (Paeds)</NavLink>
               <NavLink to="/conditions">Conditions We Treat</NavLink>
               <NavLink to="/gallery">Gallery</NavLink>
               <NavLink to="/blogs">Blogs</NavLink>
@@ -47,9 +44,9 @@ const Footer = () => {
 
         <div className="footer-hours">
           <h4 className="label-lg">Hours</h4>
-          <p className="body-sm">Mon-Fri: 8am - 6pm</p>
-          <p className="body-sm">Sat: 9am - 2pm</p>
-          <p className="body-sm">Sun: Closed</p>
+          <p className="body-sm">{settings.hours_week}</p>
+          <p className="body-sm">{settings.hours_sat}</p>
+          <p className="body-sm">{settings.hours_sun}</p>
         </div>
       </div>
       <div className="container footer-bottom">

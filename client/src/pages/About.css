@@ -90,7 +90,7 @@
    Extra bottom padding keeps content clear of the bottom cloud wave
    (60px mobile / 90px desktop), which overlays the section's lower edge. */
 .founder-section {
-  padding: var(--spacing-xl) 0 calc(var(--spacing-xl) + 70px);
+  padding: calc(var(--spacing-xl) + 70px) 0 calc(var(--spacing-xl) + 70px);
 }
 
 @media (min-width: 992px) {
@@ -134,15 +134,17 @@
   justify-content: space-between;
 }
 
+/* Wider text column: the new bios are 5-6 paragraphs, so a hard 50/50 split
+   starves the copy while leaving ~180px of dead air around the portrait. */
 .founder-content {
-  flex: 1;
+  flex: 1.2;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .founder-visual {
-  flex: 1;
+  flex: 0.8;
   display: flex;
   justify-content: center;
 }
@@ -154,7 +156,7 @@
   box-shadow: var(--shadow-lg);
   aspect-ratio: 3/4;
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
 }
 
 .founder-image-wrapper img {
@@ -169,7 +171,13 @@
     text-align: center;
     gap: 3rem;
   }
-  
+
+  /* stacked: let content keep its natural height instead of flex-grow share */
+  .founder-content,
+  .founder-visual {
+    flex: none;
+  }
+
   .founder-visual {
     width: 100%;
   }

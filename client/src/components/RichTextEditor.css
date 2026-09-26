@@ -1,0 +1,97 @@
+/* RichTextEditor — admin blog content WYSIWYG */
+
+.rte {
+  border: 1px solid var(--color-outline, #c9cede);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: #f6f7fb;
+  border-bottom: 1px solid var(--color-outline, #c9cede);
+}
+
+.rte-btn {
+  border: 1px solid transparent;
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  cursor: pointer;
+  color: var(--color-navy, #1a237e);
+}
+
+.rte-btn:hover {
+  background: var(--color-pastel-lilac, #e3d4ff);
+}
+
+.rte-select {
+  border: 1px solid var(--color-outline, #c9cede);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.82rem;
+  padding: 3px 4px;
+  color: var(--color-navy, #1a237e);
+}
+
+.rte-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.rte-color input[type='color'] {
+  width: 26px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--color-outline, #c9cede);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.rte-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--color-outline, #c9cede);
+  margin: 0 3px;
+}
+
+.rte-content {
+  min-height: 320px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  outline: none;
+}
+
+.rte-content:focus {
+  box-shadow: inset 0 0 0 2px rgba(26, 35, 126, 0.12);
+}
+
+.rte-content:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-outline, #9aa0b5);
+  pointer-events: none;
+}
+
+.rte-content h2 { font-size: 1.5rem; margin: 1rem 0 0.5rem; }
+.rte-content h3 { font-size: 1.25rem; margin: 0.75rem 0 0.5rem; }
+.rte-content p { margin: 0 0 0.75rem; }
+.rte-content img { max-width: 100%; height: auto; border-radius: 6px; }
+.rte-content table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+.rte-content td, .rte-content th { border: 1px solid #c9cede; padding: 6px 8px; }
+.rte-content a { color: var(--color-primary, #3949ab); }

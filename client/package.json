@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node scripts/run-suites.mjs",
+    "test:marquee": "node scripts/testimonial-marquee.test.mjs",
+    "test:seo": "node scripts/seo.test.mjs",
+    "test:blogs": "node scripts/blog-features.test.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.2.0",
@@ -22,6 +26,7 @@
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "oxlint": "^1.81.0",
+    "puppeteer-core": "^25.11.0",
     "vite": "^8.3.0"
   }
 }

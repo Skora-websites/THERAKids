@@ -11,6 +11,7 @@ import {
 } from '../components/doodles/Doodles';
 import { createHeroTimeline, createFloatLoop, initScrollReveals, createParallax } from '../lib/motion';
 import API_URL from '../config';
+import { usePageSeo } from '../hooks/usePageSeo';
 import { useAppContext } from '../context/AppContext';
 import fallbackBlogs from '../data/fallbackBlogs';
 import './Home.css';
@@ -22,35 +23,41 @@ const trustBadges = [
 ];
 
 const fallbackServices = [
-  { id: 1, name: 'Comprehensive Assessment', short_description: 'To identify speech and communication needs.' },
-  { id: 2, name: 'Autism Assessment Clinic', short_description: 'Multidisciplinary autism assessment clinic.' },
-  { id: 3, name: 'Language Development', short_description: 'Support receptive and expressive language skills.' },
-  { id: 4, name: 'Literacy Support', short_description: 'Evidence-based program to support reading.' },
-  { id: 5, name: 'Social Communication', short_description: 'Working with children to gain confidence in social situations.' },
-  { id: 6, name: 'Speech Sound Disorders', short_description: 'Helping children improve their articulation.' },
-  { id: 7, name: 'Animal Assisted Therapy', short_description: 'Work with our golden retriever on social goals.' },
-  { id: 8, name: 'Brick-by-BrickAr', short_description: 'Lego based social emotional program.' }
+  { id: 1, name: 'Occupational Therapy', short_description: 'Building fine motor, sensory, and daily-living skills for independence.' },
+  { id: 2, name: 'Physiotherapy (Paeds)', short_description: 'Strength, balance, and movement for confident exploration.' },
+  { id: 3, name: 'Special Education', short_description: 'Tailored support for literacy, numeracy, and school readiness.' },
+  { id: 4, name: 'Speech Therapy', short_description: 'Developing communication, articulation, and language skills.' },
+  { id: 5, name: 'Social Group Training', short_description: 'Group sessions building peer interaction and play skills.' },
+  { id: 6, name: 'Early Intervention', short_description: 'Targeted support in the earliest years, when it matters most.' },
+  { id: 7, name: 'Psychological Assessment', short_description: 'Cognitive, developmental, and behavioural evaluations.' },
+  { id: 8, name: 'Counseling', short_description: 'Emotional support for children and their parents.' }
 ];
 
+/* Marquee: whole sets rendered per half-track so the -50% keyframe always lands
+   on an identical frame. Two sets per half ≈ 2300px of content, wider than any
+   common viewport, so the loop never shows an empty gap. */
+const MARQUEE_SET_COPIES = 2;
+
 const founders = [
-  { id: 1, name: 'Dr. Sandeep Rana', role: 'Founder', profile_image: '/images/dr_sandeep_rana.jpg' },
-  { id: 2, name: 'Dr. Ananya Sharma', role: 'Co-Founder', profile_image: '/images/dr_ananya_sharma.jpg' }
+  { id: 1, name: 'Sandeep Rana', role: 'Founder & Chairman', profile_image: '/images/sandeep_rana.jpg' },
+  { id: 2, name: 'Dr. Akanksha Rana', role: 'Co-Founder & Consultant', profile_image: '/images/akanksha_rana.jpg' }
 ];
 
 const fallbackTestimonials = [
   { id: 1, name: 'Priya M.', designation: 'Parent of a 6-year-old', testimonial: 'The team at THERAkids has been wonderful with our son. His communication has grown so much since we started, and he genuinely looks forward to every session.' },
-  { id: 2, name: 'Arun K.', designation: 'Parent of an 8-year-old', testimonial: 'We finally feel heard. The therapists took the time to understand our daughter and built a plan that works for her — and for our whole family.' },
+  { id: 2, name: 'Arun K.', designation: 'Parent of an 8-year-old', testimonial: 'We finally feel heard. The therapists took the time to understand our daughter and built a plan that works for her and for our whole family.' },
   { id: 3, name: 'Sneha R.', designation: 'Parent of a 4-year-old', testimonial: 'From the first assessment to every milestone since, the care and professionalism here have been exceptional. Our child is more confident every day.' }
 ];
 
 const fallbackProcess = [
-  { id: 1, step: '1', title: 'Contact us', desc: 'to make a referral.', img: 'https://images.unsplash.com/photo-1544396821-4dd40b938ad3?auto=format&fit=crop&w=300&q=80', color: 'peach' },
-  { id: 2, step: '2', title: 'Assessment', desc: 'Provision of a customized, comprehensive assessment.', img: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=300&q=80', color: 'lilac' },
-  { id: 3, step: '3', title: 'Personalized Plan', desc: 'Customized care plans to support individual needs.', img: 'https://images.unsplash.com/photo-1594608661623-aa0bd3a69d98?auto=format&fit=crop&w=300&q=80', color: 'peach' },
-  { id: 4, step: '4', title: 'Intervention', desc: 'Flexible therapy plans including clinic and school based.', img: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=300&q=80', color: 'lilac' }
+  { id: 1, step: '1', title: 'Contact us', desc: 'to make a referral.', img: '/images/process/contact.jpg', color: 'peach' },
+  { id: 2, step: '2', title: 'Assessment', desc: 'Provision of a customized, comprehensive assessment.', img: '/images/process/assessment.jpg', color: 'lilac' },
+  { id: 3, step: '3', title: 'Personalized Plan', desc: 'Customized care plans to support individual needs.', img: '/images/process/plan.jpg', color: 'peach' },
+  { id: 4, step: '4', title: 'Intervention', desc: 'Flexible therapy plans including clinic and school based.', img: '/images/process/intervention.jpg', color: 'lilac' }
 ];
 
-const faqData = [
+// Fallbacks used only when /api/faqs is unreachable
+const fallbackFaqs = [
   {
     id: 1,
     question: 'What is Occupational Therapy and how does it help children?',
@@ -59,7 +66,7 @@ const faqData = [
   {
     id: 2,
     question: 'At what age should my child start therapy?',
-    answer: 'Most pediatric therapies start from the age of 3 years. However, some therapies like speech therapy can start even earlier. Early intervention is key — the sooner we can assess and begin working with your child, the better the outcomes. We recommend consulting with our specialists if you notice any developmental delays.'
+    answer: 'Most pediatric therapies start from the age of 3 years. However, some therapies like speech therapy can start even earlier. Early intervention is key: the sooner we can assess and begin working with your child, the better the outcomes. We recommend consulting with our specialists if you notice any developmental delays.'
   },
   {
     id: 3,
@@ -68,8 +75,8 @@ const faqData = [
   },
   {
     id: 4,
-    question: 'When does my child need Physical Therapy?',
-    answer: 'If your child has difficulty performing basic movements because of an injury or illness, they may need physical therapy. Delay in learning motor skills is not always considered a problem with movement, but our physiotherapists can help assess whether your child would benefit from physical therapy to improve mobility, balance, and strength.'
+    question: 'When does my child need Physiotherapy?',
+    answer: 'If your child has difficulty performing basic movements because of an injury or illness, they may need physiotherapy. Delay in learning motor skills is not always considered a problem with movement, but our physiotherapists can help assess whether your child would benefit from therapy to improve mobility, balance, and strength.'
   },
   {
     id: 5,
@@ -88,13 +95,17 @@ const decorateService = (service, index) => {
 };
 
 const Home = () => {
+  // Admin "SEO" tab row for "/" - empty fields keep the static index.html tags
+  usePageSeo('/');
   const [services, setServices] = useState(fallbackServices);
   const [testimonials, setTestimonials] = useState(fallbackTestimonials);
   const [process] = useState(fallbackProcess);
   const [features] = useState(trustBadges);
   const [openFaq, setOpenFaq] = useState(null);
+  const [faqs, setFaqs] = useState(fallbackFaqs);
   const faqRef = useRef(null);
   const blogRef = useRef(null);
+
   const [blogs, setBlogs] = useState(fallbackBlogs);
 
   const { setIsModalOpen } = useAppContext();
@@ -105,14 +116,15 @@ const Home = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const [servicesRes, testimonialsRes, blogsRes] = await Promise.all([
+        const [servicesRes, testimonialsRes, blogsRes, faqsRes] = await Promise.all([
           fetch(`${API_URL}/api/services`),
           fetch(`${API_URL}/api/testimonials`),
-          fetch(`${API_URL}/api/blogs`)
+          fetch(`${API_URL}/api/blogs`),
+          fetch(`${API_URL}/api/faqs?page=home`)
         ]);
         if (servicesRes.ok) {
           const data = await servicesRes.json();
-          // Benefits come back parsed (JSON column) from MySQL — normalize for decorateService
+          // Benefits come back parsed (JSON column) from MySQL - normalize for decorateService
           if (data.length) {
             setServices(data.map((s) => ({
               ...s,
@@ -129,15 +141,21 @@ const Home = () => {
           const data = await blogsRes.json();
           if (data.length) {
             // Normalize: DB rows may use featured_image or image; cards expect `image`.
-            setBlogs(data.slice(0, 3).map((b) => ({
+            // The home blog grid is 2 columns - keep only 2 cards so no orphan third row.
+            setBlogs(data.slice(0, 2).map((b) => ({
               ...b,
               image: b.featured_image || b.image || null,
               excerpt: b.excerpt || b.short_description || ''
             })));
           }
         }
+        // FAQs are admin-edited; keep the static fallbacks if the API has none
+        if (faqsRes.ok) {
+          const data = await faqsRes.json();
+          if (data.length) setFaqs(data);
+        }
       } catch {
-        // API unreachable — all fallbacks stay in place (services, testimonials, blogs)
+        // API unreachable - all fallbacks stay in place (services, testimonials, blogs)
       }
     };
     load();
@@ -161,7 +179,7 @@ const Home = () => {
   return (
     <div className="home-page" ref={pageRef}>
       <StructuredData type="organization" />
-      <StructuredData type="faq" data={faqData} />
+      <StructuredData type="faq" data={faqs} />
       {/* Hero Section (Peach) */}
       <section className="bg-pastel-peach home-hero relative overflow-hidden" style={{ paddingTop: 'calc(2.5rem + 104px)' }} ref={heroRef}>
         <div className="container home-hero-grid z-10 relative">
@@ -248,7 +266,8 @@ const Home = () => {
             <h2 className="headline-xl text-navy">Intervention Programs We Offer</h2>
           </div>
           <div className="grid grid-cols-4 gap-6 services-grid-expanded" data-reveal-group>
-            {services.map((service, index) => {
+            {/* Show 8 programs so the 4-col grid forms two complete rows (API can return 9) */}
+            {services.slice(0, 8).map((service, index) => {
               const decorated = decorateService(service, index);
               return (
                 <div key={decorated.id}>
@@ -294,7 +313,10 @@ const Home = () => {
                 <TiltCard maxTilt={7}>
                   <div className="process-step text-center">
                     <div className="process-img-wrapper mb-6 relative mx-auto">
-                      <img src={step.img} alt={step.title} className="process-arch-img w-full object-cover" />
+                      {/* Arch clip window: nothing (photo, shine) can render outside the arch */}
+                      <div className="process-arch-window">
+                        <img src={step.img} alt={step.title} className="process-arch-img w-full object-cover" />
+                      </div>
                       <div className={`process-badge bg-pastel-${step.color}`}>
                         {step.step}
                       </div>
@@ -336,7 +358,7 @@ const Home = () => {
             }}>Learn more</button>
           </div>
 
-          <div className="flex gap-4 items-end" data-reveal-group>
+          <div className="founders-img-grid" data-reveal-group>
             {founders.map((founder) => (
               <div key={founder.id} className="about-arch-img-wrapper">
                 <img src={founder.profile_image} alt={`${founder.name} - ${founder.role}`} className="about-arch-img w-full object-cover" />
@@ -346,7 +368,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Testimonials (Peach) — rendered only when data is available */}
+      {/* Testimonials (Peach), rendered only when data is available */}
       {testimonials.length > 0 && (
         <section className="bg-pastel-peach section-padding relative overflow-hidden">
           {/* White clouds above and below: neighbors are the white Founders band and FAQ */}
@@ -360,23 +382,35 @@ const Home = () => {
               <p className="label-md text-navy uppercase tracking-widest">Happy families</p>
               <h2 className="headline-xl text-navy">What Parents Say</h2>
             </div>
-            <div className="grid grid-cols-2 gap-6 testimonials-grid" data-reveal-group>
-              {testimonials.map((testimonial) => (
-                <div key={testimonial.id}>
-                  <TiltCard maxTilt={6}>
-                    <div className="pastel-card testimonial-card">
-                      <div className={`testimonial-quote-icon mb-4 ${testimonials.indexOf(testimonial) % 2 === 0 ? 'bg-white' : 'bg-pastel-lilac'}`}>
-                        <Quote className="text-white" size={22} fill="currentColor" />
-                      </div>
-                      <p className="body-md text-navy-light mb-6">&ldquo;{testimonial.testimonial}&rdquo;</p>
-                      <div className="testimonial-author">
-                        <h4 className="label-lg text-navy">{testimonial.name}</h4>
-                        {testimonial.designation && <p className="body-sm text-navy-light">{testimonial.designation}</p>}
-                      </div>
+          </div>
+          {/* Full-bleed marquee: one "set" is shorter than most screens, so the list is
+              rendered COPIES times and the animation translates exactly half the track.
+              Two full sets per half guarantee the row never runs dry on any viewport. */}
+          <div className="testimonial-marquee" data-reveal>
+            <div
+              className="testimonial-marquee-track"
+              style={{ '--marquee-cards': testimonials.length * MARQUEE_SET_COPIES }}
+            >
+              {Array.from({ length: MARQUEE_SET_COPIES * 2 }).flatMap((_, set) =>
+                testimonials.map((testimonial, i) => (
+                <div
+                  className="testimonial-slide"
+                  key={`${set}-${testimonial.id}-${i}`}
+                  aria-hidden={set > 0 ? 'true' : undefined}
+                >
+                  <article className="pastel-card testimonial-card">
+                    <Quote className="testimonial-quote-mark" size={34} fill="currentColor" />
+                    <p className="body-md text-navy-light testimonial-text">&ldquo;{testimonial.testimonial}&rdquo;</p>
+                    <div className="testimonial-author">
+                      <h4 className="label-lg text-navy">{testimonial.name}</h4>
+                      {testimonial.designation && (
+                        <p className="body-sm testimonial-role">{testimonial.designation}</p>
+                      )}
                     </div>
-                  </TiltCard>
+                  </article>
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
           <div className="cloud-divider cloud-bottom fill-white">
@@ -393,9 +427,8 @@ const Home = () => {
           <div className="section-header center mb-12" data-reveal>
             <p className="label-md text-navy uppercase tracking-widest">Got Questions?</p>
             <h2 className="headline-xl text-navy">Frequently Asked Questions</h2>
-          </div>
-          <div className="faq-list" data-reveal-group>
-            {faqData.map((faq) => (
+          </div>          <div className="faq-list" data-reveal-group>
+            {faqs.map((faq) => (
               <div key={faq.id} className={`faq-item ${openFaq === faq.id ? 'open' : ''}`}>
                 <button
                   className="faq-question"

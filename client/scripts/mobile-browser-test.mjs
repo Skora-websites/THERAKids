@@ -15,9 +15,8 @@ const PAGES = [
   ['Blogs', '/blogs'],
   ['BlogPost', '/blogs/speech-milestones-toddlers'],
   ['Contact', '/contact'],
-  ['SpeechTherapy', '/services/speech-therapy'],
-  ['OccupationalTherapy', '/services/occupational-therapy'],
-  ['PhysicalTherapy', '/services/physical-therapy'],
+  ['ServiceDetail (speech)', '/services/speech-therapy'],
+  ['ServiceDetail (pre-vocational)', '/services/pre-vocational-training'],
   ['AdminLogin', '/admin'],
 ];
 

@@ -8,6 +8,7 @@ const multer = require('multer');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const sanitizeHtml = require('sanitize-html');
 
 const app = express();
 const PORT = process.env.PORT || 5005; // 5000 is reserved by Windows on some machines
@@ -123,6 +124,108 @@ app.get('/api/blogs/:slug', async (req, res) => {
   }
 });
 
+app.get('/api/services/:slug', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM services WHERE slug = ? AND is_active = 1', [req.params.slug]);
+    if (rows.length === 0) return res.status(404).json({ message: 'Service not found' });
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// FAQs for a page — ?page=home or ?page=<service slug>. Omit ?page= for all active rows.
+app.get('/api/faqs', async (req, res) => {
+  try {
+    const page = req.query.page;
+    const [rows] = page
+      ? await pool.query('SELECT * FROM faqs WHERE page_key = ? AND is_active = 1 ORDER BY display_order ASC, id ASC', [page])
+      : await pool.query('SELECT * FROM faqs WHERE is_active = 1 ORDER BY page_key ASC, display_order ASC, id ASC');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// ROBOTS.TXT + DYNAMIC XML SITEMAP (built from CMS content)
+// ==========================================
+const SITE_URL = 'https://therakidsnoida.com';
+const escapeXml = (s) => String(s).replace(
+  /[&<>"']/g,
+  (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c])
+);
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(
+    'User-agent: *\n' +
+    'Allow: /\n' +
+    'Disallow: /admin\n' +
+    'Disallow: /api/\n' +
+    '\n' +
+    `Sitemap: ${SITE_URL}/sitemap.xml\n`
+  );
+});
+
+// urlset: static routes + active services + published blogs (drafts excluded).
+// lastmod comes from blogs.updated_at; services have no timestamp column.
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const [services] = await pool.query('SELECT slug FROM services WHERE is_active = 1 ORDER BY display_order ASC');
+    const [blogs] = await pool.query('SELECT slug, updated_at FROM blogs WHERE status = \'published\' ORDER BY published_at DESC');
+
+    const staticPages = [
+      { loc: '/', priority: '1.0' },
+      { loc: '/about', priority: '0.8' },
+      { loc: '/services', priority: '0.9' },
+      { loc: '/conditions', priority: '0.7' },
+      { loc: '/gallery', priority: '0.6' },
+      { loc: '/blogs', priority: '0.8' },
+      { loc: '/contact', priority: '0.7' }
+    ];
+
+    const entries = staticPages.map((p) => ({ loc: SITE_URL + p.loc, priority: p.priority }));
+    services.forEach((s) => entries.push({ loc: `${SITE_URL}/services/${encodeURIComponent(s.slug)}`, priority: '0.8' }));
+    blogs.forEach((b) => {
+      const d = b.updated_at ? new Date(b.updated_at) : null;
+      entries.push({
+        loc: `${SITE_URL}/blogs/${encodeURIComponent(b.slug)}`,
+        lastmod: d && !isNaN(d) ? d.toISOString().slice(0, 10) : null
+      });
+    });
+
+    const body = entries
+      .map((e) => {
+        let xml = `  <url>\n    <loc>${escapeXml(e.loc)}</loc>`;
+        if (e.lastmod) xml += `\n    <lastmod>${e.lastmod}</lastmod>`;
+        if (e.priority) xml += `\n    <priority>${e.priority}</priority>`;
+        return xml + '\n  </url>';
+      })
+      .join('\n');
+
+    res.type('application/xml').send(
+      `<?xml version="1.0" encoding="UTF-8"?>\n` +
+      `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`
+    );
+  } catch (error) {
+    res.status(500).type('text/plain').send(`Could not generate sitemap: ${error.message}`);
+  }
+});
+
+// Per-route SEO for the static pages (admin "SEO" tab). Public: the SPA reads it
+// on navigation, and the table is only a handful of rows. Blog posts and service
+// pages carry their own meta columns and are not part of this payload.
+app.get('/api/seo', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT page_key, label, meta_title, meta_keywords, meta_description, canonical_url FROM page_seo ORDER BY id ASC'
+    );
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/testimonials', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY display_order ASC');
@@ -183,7 +286,7 @@ const RESOURCES = {
   },
   services: {
     table: 'services',
-    fields: ['name', 'slug', 'short_description', 'full_description', 'image', 'benefits', 'display_order', 'is_active'],
+    fields: ['name', 'slug', 'hero_title', 'short_description', 'full_description', 'image', 'benefits', 'page_sections', 'display_order', 'is_active', 'meta_title', 'meta_keywords', 'meta_description', 'canonical_url'],
     orderBy: 'display_order ASC, id ASC'
   },
   gallery: {
@@ -193,13 +296,28 @@ const RESOURCES = {
   },
   blogs: {
     table: 'blogs',
-    fields: ['title', 'slug', 'excerpt', 'content', 'featured_image', 'author', 'category', 'seo_title', 'meta_description', 'canonical_url', 'status', 'published_at'],
+    fields: ['title', 'slug', 'excerpt', 'content', 'featured_image', 'author', 'category', 'seo_title', 'meta_title', 'meta_keywords', 'meta_description', 'canonical_url', 'status', 'published_at'],
     orderBy: 'published_at DESC, id DESC'
   },
   testimonials: {
     table: 'testimonials',
     fields: ['name', 'testimonial', 'image', 'designation', 'display_order', 'is_active'],
     orderBy: 'display_order ASC, id ASC'
+  },
+  faqs: {
+    table: 'faqs',
+    fields: ['page_key', 'question', 'answer', 'display_order', 'is_active'],
+    orderBy: 'display_order ASC, id ASC'
+  },
+  // Per-route SEO for the pages without a resource of their own (the admin "SEO"
+  // tab). Rows are seeded by scripts/migrate-seo.js, so creating/deleting pages
+  // here is blocked — admins only edit the meta values.
+  page_seo: {
+    table: 'page_seo',
+    fields: ['page_key', 'label', 'meta_title', 'meta_keywords', 'meta_description', 'canonical_url'],
+    orderBy: 'id ASC',
+    noCreate: true,
+    noDelete: true
   },
   appointments: {
     table: 'appointments',
@@ -283,6 +401,69 @@ app.put('/api/admin/password', authenticateToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// ==========================================
+// BLOG CONTENT SANITIZER (allowlist)
+// Keeps the rich formatting a Word/Docs paste produces — headings, inline styles
+// (alignment/colours/sizes), links, lists (incl. <ol start>), tables (colspan/
+// rowspan + cell styles) and images — while stripping scripts, event handlers,
+// javascript: URLs, <style>/<meta>/<link>/<iframe> and Office junk (mso-* classes
+// die with the class attribute, <o:p> and conditional comments with the tag/comment).
+// ==========================================
+const COLOR_RE = /^(#[0-9a-f]{3,8}|[a-z]+|rgba?\([\d\s.,%]+\))$/i;
+const SIZE_RE = /^\d+(\.\d+)?(px|pt|em|rem|%)$/;
+
+const blogSanitizeOptions = {
+  allowedTags: [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'br', 'hr',
+    'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'del', 'span', 'sub', 'sup', 'code', 'pre',
+    'blockquote', 'ul', 'ol', 'li', 'a', 'img',
+    'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th', 'figure', 'figcaption'
+  ],
+  allowedAttributes: {
+    a: ['href', 'title', 'target', 'rel'],
+    img: ['src', 'alt', 'title', 'width', 'height', 'style'],
+    td: ['colspan', 'rowspan', 'style'],
+    th: ['colspan', 'rowspan', 'style', 'scope'],
+    // style on lists keeps Word's list indent (margin-left) and list colours
+    ol: ['start', 'type', 'style'],
+    ul: ['type', 'style'],
+    li: ['value', 'style'],
+    table: ['border', 'cellpadding', 'cellspacing', 'width', 'style'],
+    span: ['style'], div: ['style'], p: ['style'], blockquote: ['style'],
+    h1: ['style'], h2: ['style'], h3: ['style'], h4: ['style'], h5: ['style'], h6: ['style'],
+    td: ['colspan', 'rowspan', 'style']
+  },
+  allowedStyles: {
+    '*': {
+      'text-align': [/^(left|right|center|justify)$/],
+      'color': [COLOR_RE],
+      'background-color': [COLOR_RE],
+      'font-weight': [/^(bold|normal|[1-9]00)$/],
+      'font-style': [/^(italic|normal)$/],
+      'text-decoration': [/^(underline|line-through|none)$/],
+      'font-size': [SIZE_RE],
+      'margin-left': [SIZE_RE],
+      'border': [/^[a-z0-9.\s(),#%-]+$/i],
+      'border-collapse': [/^(collapse|separate)$/],
+      'padding': [SIZE_RE]
+    }
+  },
+  allowedSchemes: ['http', 'https', 'mailto'],
+  allowProtocolRelative: true,
+  nonTextTags: ['script', 'style', 'textarea', 'option', 'iframe', 'object', 'embed'],
+  disallowedTagsMode: 'discard'
+};
+
+const sanitizeBlogContent = (html) => sanitizeHtml(String(html), blogSanitizeOptions);
+
+// Per-resource/field value hook for the generic CRUD handlers
+const sanitizeValue = (resource, field, value) => {
+  if (resource === 'blogs' && field === 'content' && typeof value === 'string') {
+    return sanitizeBlogContent(value);
+  }
+  return value;
+};
 
 // Columns that may hold /uploads/ paths, per resource
 const IMAGE_FIELDS = {
@@ -390,7 +571,7 @@ app.post('/api/admin/:resource', authenticateToken, async (req, res) => {
   try {
     const [result] = await pool.query(
       `INSERT INTO ${cfg.table} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`,
-      cols.map(c => req.body[c])
+      cols.map(c => sanitizeValue(req.params.resource, c, req.body[c]))
     );
     res.status(201).json({ id: result.insertId, message: 'Created' });
   } catch (error) {
@@ -408,7 +589,7 @@ app.put('/api/admin/:resource/:id', authenticateToken, async (req, res) => {
     const [oldRows] = await pool.query(`SELECT * FROM ${cfg.table} WHERE id = ?`, [req.params.id]);
     await pool.query(
       `UPDATE ${cfg.table} SET ${cols.map(c => `${c} = ?`).join(', ')} WHERE id = ?`,
-      [...cols.map(c => req.body[c]), req.params.id]
+      [...cols.map(c => sanitizeValue(req.params.resource, c, req.body[c])), req.params.id]
     );
     // If an image field was replaced, its old file may now be orphaned
     const replacedPaths = (IMAGE_FIELDS[req.params.resource] || [])
@@ -425,6 +606,7 @@ app.put('/api/admin/:resource/:id', authenticateToken, async (req, res) => {
 app.delete('/api/admin/:resource/:id', authenticateToken, async (req, res) => {
   const cfg = RESOURCES[req.params.resource];
   if (!cfg) return res.status(404).json({ error: 'Unknown resource' });
+  if (cfg.noDelete) return res.status(405).json({ error: 'Delete not allowed for this resource' });
   try {
     const [rows] = await pool.query(`SELECT * FROM ${cfg.table} WHERE id = ?`, [req.params.id]);
     await pool.query(`DELETE FROM ${cfg.table} WHERE id = ?`, [req.params.id]);

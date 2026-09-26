@@ -1,42 +1,29 @@
 // One-off migration: point services.image and gallery rows at the real
-// downloaded photos in client/public/images/gallery/ instead of Unsplash URLs.
+// downloaded photos in client/public/images/ instead of Unsplash URLs.
+// Gallery rows use the curated set in src/data/galleryImages.json (the 110-photo
+// drop de-duplicated, captioned, and grouped into categories incl. both centres).
 // Reads the same .env the server uses, so no credentials are duplicated here.
 require('dotenv').config();
 const mysql = require('mysql2/promise');
+const curatedGallery = require('../client/src/data/galleryImages.json');
 
 const SERVICE_IMAGES = {
-  'occupational-therapy': '/images/gallery/d1copy.webp',
-  'speech-therapy': '/images/gallery/d2copy.webp',
-  'special-education': '/images/gallery/d8copy.webp',
-  'aba-therapy': '/images/gallery/d3copy.webp',
-  'social-group-training': '/images/gallery/d4copy.webp',
-  'behaviour-modification': '/images/gallery/4copy.webp',
-  'parents-child-counselling': '/images/gallery/3copy.webp',
-  'pre-vocational-training': '/images/gallery/7copy.webp'
+  'occupational-therapy': '/images/services/occupational-therapy.jpg',
+  'physiotherapy-paeds': '/images/services/physiotherapy-paeds.jpg',
+  'special-education': '/images/services/special-education.jpg',
+  'speech-therapy': '/images/services/speech-therapy.jpg',
+  'social-group-training': '/images/services/social-group-training.jpg',
+  'early-intervention': '/images/services/early-intervention.jpg',
+  'psychological-assessment': '/images/services/psychological-assessment.jpg',
+  'reviews': '/images/services/reviews.jpg',
+  'counseling': '/images/services/counseling.jpg',
+  'parent-training': '/images/services/parent-training.jpg',
+  'behaviour-modification': '/images/services/behaviour-modification.jpg',
+  'brain-gym-therapy': '/images/services/brain-gym-therapy.jpg'
 };
 
-// Mirrors the Gallery.jsx fallback list (order = display order)
-const GALLERY_ROWS = [
-  ['d1copy.webp', 'Occupational Therapy Session', 'Therapy'],
-  ['d2copy.webp', 'Speech Therapy', 'Therapy'],
-  ['d3copy.webp', 'Group Activity', 'Activities'],
-  ['d4copy.webp', 'Play & Learning', 'Activities'],
-  ['d5copy.webp', 'Therapy Centre', 'Our Centre'],
-  ['d6copy.webp', 'Physical Therapy', 'Therapy'],
-  ['d7copy.webp', 'Creative Activities', 'Activities'],
-  ['d8copy.webp', 'Centre Environment', 'Our Centre'],
-  ['10.1copy.webp', 'Sensory Integration', 'Therapy'],
-  ['1copy.webp', 'Child Development', 'Activities'],
-  ['2copy.webp', 'Interactive Session', 'Activities'],
-  ['9.1copy.webp', 'Motor Skills Training', 'Therapy'],
-  ['11copy.webp', 'Our Facility', 'Our Centre'],
-  ['8copy.webp', 'Learning Through Play', 'Activities'],
-  ['3copy.webp', 'Counselling Session', 'Therapy'],
-  ['4copy.webp', 'Social Skills Group', 'Activities'],
-  ['5copy.webp', 'Therapy Room', 'Our Centre'],
-  ['6copy.webp', 'Fun Learning', 'Activities'],
-  ['7copy.webp', 'Individual Therapy', 'Therapy']
-];
+// [file, caption, category] triples from the curated set, in display order
+const GALLERY_ROWS = curatedGallery;
 
 async function main() {
   const pool = mysql.createPool({
@@ -71,32 +58,55 @@ async function main() {
       console.log('No services left on Unsplash URLs.');
     }
 
-    // 2) Gallery: replace remote/stock rows with the 19 real centre photos
+    // 2) Gallery: replace stock/old rows with the curated real centre photos.
+    // Old rows are everything remote OR pointing at the replaced webp copies.
     const [removed] = await pool.query(
-      "DELETE FROM gallery WHERE image_path LIKE 'https://images.unsplash.com/%' OR image_path LIKE 'https://picsum.photos/%'"
+      "DELETE FROM gallery WHERE image_path LIKE 'https://%' OR image_path LIKE '/images/gallery/%copy.webp'"
     );
-    console.log(`gallery rows removed (stock URLs): ${removed.affectedRows}`);
+    console.log(`gallery rows removed (stock/old webp): ${removed.affectedRows}`);
 
-    const [existing] = await pool.query(
-      "SELECT COUNT(*) AS n FROM gallery WHERE image_path LIKE '/images/gallery/%'"
-    );
-    if (existing[0].n === 0) {
-      const values = GALLERY_ROWS.map(
-        ([file, caption, category], i) => [`/images/gallery/${file}`, caption, category, i + 1, 1]
+    // Idempotent upsert by image_path: refresh captions/categories/order of the
+    // curated rows, then add any that are missing. Admin-added rows survive.
+    let updated = 0;
+    for (const [i, [file, caption, category]] of GALLERY_ROWS.entries()) {
+      const imagePath = `/images/gallery/therakids/${file}`;
+      const [result] = await pool.query(
+        'UPDATE gallery SET caption = ?, category = ?, display_order = ?, is_active = 1 WHERE image_path = ?',
+        [caption, category, i + 1, imagePath]
       );
+      updated += result.affectedRows;
+    }
+    const [known] = await pool.query('SELECT image_path FROM gallery');
+    const knownPaths = new Set(known.map((r) => r.image_path));
+    const toInsert = GALLERY_ROWS
+      .map(([file, caption, category], i) => [`/images/gallery/therakids/${file}`, caption, category, i + 1, 1])
+      .filter(([imagePath]) => !knownPaths.has(imagePath));
+    if (toInsert.length) {
       const [result] = await pool.query(
         'INSERT INTO gallery (image_path, caption, category, display_order, is_active) VALUES ?',
-        [values]
+        [toInsert]
       );
       console.log(`gallery rows inserted: ${result.affectedRows}`);
-    } else {
-      console.log(`gallery already has ${existing[0].n} local photo row(s) — skipping insert.`);
     }
+    console.log(`gallery rows updated: ${updated}, inserted: ${toInsert.length}`);
+
+    // 3) Blogs: point featured images at the local topic photos
+    const BLOG_IMAGES = {
+      'understanding-sensory-processing': '/images/blogs/sensory-processing.jpg',
+      'speech-milestones-toddlers': '/images/blogs/speech-milestones.jpg'
+    };
+    let blogRows = 0;
+    for (const [slug, imagePath] of Object.entries(BLOG_IMAGES)) {
+      const [result] = await pool.query('UPDATE blogs SET featured_image = ? WHERE slug = ?', [imagePath, slug]);
+      blogRows += result.affectedRows;
+    }
+    console.log(`blogs.featured_image updated: ${blogRows} row(s)`);
 
     // Summary
     const [svc] = await pool.query("SELECT COUNT(*) AS n FROM services WHERE image LIKE '/images/%'");
     const [gal] = await pool.query("SELECT COUNT(*) AS n FROM gallery WHERE image_path LIKE '/images/gallery/%'");
-    console.log(`\nDone. services on local images: ${svc[0].n}, gallery local rows: ${gal[0].n}`);
+    const [rem] = await pool.query("SELECT COUNT(*) AS n FROM blogs WHERE featured_image LIKE 'http%' OR featured_image LIKE '/images/gallery/%copy.webp'");
+    console.log(`\nDone. services on local images: ${svc[0].n}, gallery local rows: ${gal[0].n}, blogs on stock/remote images: ${rem[0].n}`);
   } catch (err) {
     console.error('Migration failed:', err.message);
     process.exitCode = 1;

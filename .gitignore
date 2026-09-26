@@ -17,3 +17,6 @@ server/uploads/
 
 # Dev audit screenshots (large, not source)
 client/scripts/hero-shots/
+
+# Codebuff/Freebuff agent state
+.freebuff/

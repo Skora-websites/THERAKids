@@ -16,14 +16,14 @@ const pages = [
   ['Gallery', '/src/pages/Gallery.jsx', '/gallery', '*'],
   ['Blogs', '/src/pages/Blogs.jsx', '/blogs', '*'],
   ['Contact', '/src/pages/Contact.jsx', '/contact', '*'],
-  ['SpeechTherapy', '/src/pages/SpeechTherapy.jsx', '/services/speech-therapy', '/services/speech-therapy/*'],
-  ['OccupationalTherapy', '/src/pages/OccupationalTherapy.jsx', '/services/occupational-therapy', '/services/occupational-therapy/*'],
-  ['PhysicalTherapy', '/src/pages/PhysicalTherapy.jsx', '/services/physical-therapy', '/services/physical-therapy/*'],
+  // ServiceDetail renders its hero/bands client-side after /api/services resolves,
+  // so an SSR pass only sees its loading state — hero/wave checks don't apply.
+  ['ServiceDetail', '/src/pages/ServiceDetail.jsx', '/services/speech-therapy', '/services/:slug'],
   ['AdminLogin', '/src/pages/admin/AdminLogin.jsx', '/admin', '*'],
 ];
 
-const HERO_PAGES = ['Home', 'About', 'Services', 'Conditions', 'Gallery', 'Blogs', 'Contact', 'SpeechTherapy', 'OccupationalTherapy', 'PhysicalTherapy'];
-const THERAPY_PAGES = ['SpeechTherapy', 'OccupationalTherapy', 'PhysicalTherapy'];
+const HERO_PAGES = ['Home', 'About', 'Services', 'Conditions', 'Gallery', 'Blogs', 'Contact'];
+const THERAPY_PAGES = []; // therapy hero/breadcrumb checks live on in the browser tests
 
 let failures = 0;
 const check = (name, cond, detail) => {
