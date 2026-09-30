@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import API_URL from '../config';
+import { OFFICIAL_WHATSAPP } from '../lib/contact';
+import { FALLBACK_DATA } from '../data/fallbackData';
 import './AppointmentModal.css';
 
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '919899338813';
+const WHATSAPP_NUMBER = OFFICIAL_WHATSAPP;
 
 // Seconds the success screen stays open before auto-dismissing
 const AUTO_CLOSE_SECONDS = 15;
@@ -35,15 +37,19 @@ const AppointmentModal = ({ onClose }) => {
   const [autoClose, setAutoClose] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(null);
 
-  // Services come from the DB; the modal shows real names and sends a real service_id (or null).
-  const [services, setServices] = useState([]);
+  // Services come from the DB (static fallback first so the list always has options);
+  // the modal shows real names and sends a real service_id (or null).
+  const [services, setServices] = useState(FALLBACK_DATA.services);
   useEffect(() => {
     const load = async () => {
       try {
         const response = await fetch(`${API_URL}/api/services`);
-        if (response.ok) setServices(await response.json());
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) setServices(data);
+        }
       } catch {
-        // API unreachable - the select just shows the static fallback options below
+        // API unreachable - the static fallback service list stays
       }
     };
     load();
@@ -217,20 +223,9 @@ const AppointmentModal = ({ onClose }) => {
             <label className="label-sm">Therapy / Service Interested In</label>
             <select name="service_id" className="input-field" value={formData.service_id} onChange={handleChange}>
               <option value="">Select a service...</option>
-              {services.length > 0
-                ? services.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))
-                : (
-                  <>
-                    <option value="Occupational Therapy">Occupational Therapy</option>
-                    <option value="Speech Therapy">Speech Therapy</option>
-                    <option value="Physiotherapy (Paeds)">Physiotherapy (Paeds)</option>
-                    <option value="Special Education">Special Education</option>
-                    <option value="Early Intervention">Early Intervention</option>
-                    <option value="Counseling">Counseling</option>
-                  </>
-                )}
+              {services.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
             </select>
           </div>
 

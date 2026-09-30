@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -9,6 +9,8 @@ import Gallery from './pages/Gallery';
 import Blogs from './pages/Blogs';
 import BlogPost from './pages/BlogPost';
 import Contact from './pages/Contact';
+import Programs from './pages/Programs';
+import Legal from './pages/Legal';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { AppProvider } from './context/AppContext';
@@ -37,7 +39,12 @@ function App() {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blogs/:slug" element={<BlogPost />} />
+            <Route path="/programs" element={<Programs />} />
             <Route path="/contact" element={<Contact />} />
+            {/* Legal hub. Old URLs redirect so existing links keep working. */}
+            <Route path="/legal" element={<Legal />} />
+            <Route path="/privacy-policy" element={<Navigate to="/legal" replace />} />
+            <Route path="/terms" element={<Navigate to="/legal" replace />} />
           </Route>
           
           {/* Admin Pages */}

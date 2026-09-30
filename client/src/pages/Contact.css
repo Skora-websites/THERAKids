@@ -3,6 +3,33 @@
   border-radius: 0 0 48px 48px;
 }
 
+/* Prominent "call us" CTA inside the page hero (official number, one tap on mobile) */
+.contact-call-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  border-radius: 999px;
+}
+
+/* Phone / email links: stacked, tappable, hover feedback */
+.contact-phone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.contact-phone-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.contact-phone-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
 .contact-subtitle {
   color: var(--color-on-surface-variant);
   margin-top: 1rem;
@@ -76,4 +103,23 @@
   .contact-page .contact-content-section.section-padding {
     padding-top: 2rem;
   }
+}
+
+/* Contact form status messages (DB-backed submit) */
+.contact-form-error {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  color: #b91c1c;
+}
+
+.contact-form-success {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(22, 163, 74, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.35);
+  color: #15803d;
 }

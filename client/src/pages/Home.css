@@ -233,17 +233,36 @@
   transform: translateY(-4px) scale(1.12) rotate(-6deg);
 }
 
-/* Specialists arch photos: gentle lift on hover */
-.about-arch-img-wrapper {
-  transition: transform 0.35s ease;
+/* The visual frame is a child (not the grid item itself): GSAP's reveal
+   writes inline transforms onto grid children, which would clobber the CSS
+   tilt — so the rotation lives on .polaroid-frame, untouched by GSAP. */
+.polaroid-frame {
+  background: var(--color-surface-container-lowest, #fff);
+  padding: 10px 10px 26px;
+  border-radius: 6px;
+  box-shadow:
+    0 20px 44px -12px rgba(26, 35, 126, 0.35),
+    0 4px 10px rgba(26, 35, 126, 0.08);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
-.about-arch-img-wrapper:hover {
-  transform: translateY(-8px);
+.founder-polaroid:first-child .polaroid-frame {
+  transform: rotate(-7deg);
 }
 
-.about-arch-img-wrapper:hover .about-arch-img {
-  box-shadow: 0 18px 36px rgba(26, 35, 126, 0.16);
+.founder-polaroid:last-child .polaroid-frame {
+  transform: rotate(6deg);
+}
+
+.founder-polaroid:hover {
+  z-index: 3;
+}
+
+.founder-polaroid:hover .polaroid-frame {
+  transform: rotate(0deg) translateY(-6px);
+  box-shadow:
+    0 26px 48px -14px rgba(26, 35, 126, 0.4),
+    0 6px 14px rgba(26, 35, 126, 0.1);
 }
 
 .hero-badge-label {
@@ -815,23 +834,33 @@
   border: 4px solid white;
 }
 
-/* About Us Section — founders photo pair (equal 2-up grid) */
-.about-arch-img-wrapper {
-  width: 100%;
+/* Meet Our Founders — polaroid pair: white-framed snapshots, tilted and
+   overlapping like a hand-held photo stack (per the client's reference). */
+.founders-img-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.75rem 0 1.25rem;
 }
 
-/* Grid, not flex: width:50% inside a flex row collapsed the second photo to
-   0px on narrow viewports once the founders pair grew to two real portraits. */
-.founders-img-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  align-items: end;
+.founder-polaroid {
+  position: relative;
+  width: min(46%, 250px);
+  z-index: 1;
 }
-.about-arch-img {
-  aspect-ratio: 3/4;
-  border-radius: 150px 150px 0 0;
-  border: 8px solid white;
+
+.founder-polaroid:last-child {
+  margin-left: -44px;
+  z-index: 2;
+}
+
+.founder-polaroid-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 3px;
+  background: var(--color-surface-container-low);
 }
 
 /* Footer Transition Shapes */
@@ -857,6 +886,104 @@
 }
 
 
+
+/* -----------------------------
+   Hero Video Section — split flex layout
+------------------------------ */
+.video-split {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.video-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.video-copy .video-sub {
+  margin: 0;
+}
+
+/* The wrapper carries the decorative frame (pastel ring + rim accents), so the
+   player itself stays a clean 16:9 stage — cohesive with the framed arch
+   portraits and card-panel language used across the site. */
+.video-frame-wrapper {
+  position: relative;
+  flex: 1.2;
+  min-width: 0;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: calc(var(--radius-lg) + 10px);
+  background: linear-gradient(
+    150deg,
+    rgba(227, 212, 255, 0.9) 0%,
+    var(--color-surface-container-lowest) 45%,
+    rgba(250, 219, 190, 0.9) 100%
+  );
+  box-shadow:
+    0 28px 56px -22px rgba(26, 35, 126, 0.3),
+    0 0 0 1px var(--color-border-brand);
+}
+
+.home-hero-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  /* Portrait/vertical clips LETTERBOX inside the 16:9 stage — the frame keeps
+     its shape and the empty bars read as an intentional cinema stage. */
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  /* Deep-navy stage with a soft lilac glow so the bars look designed */
+  background:
+    radial-gradient(120% 130% at 50% -10%, rgba(118, 119, 236, 0.35), transparent 55%),
+    var(--color-navy);
+}
+
+.video-frame-note {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--color-border-brand);
+  color: var(--color-navy);
+  border-radius: var(--radius-full);
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-resting);
+  pointer-events: none;
+}
+
+.video-frame-note svg {
+  color: var(--color-cta-primary);
+}
+
+@media (max-width: 640px) {
+  .video-frame-wrapper {
+    padding: 7px;
+    border-radius: calc(var(--radius-lg) + 7px);
+  }
+}
+
+/* Split stacks on tablet-and-below */
+@media (max-width: 1024px) {
+  .video-split {
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .video-copy .video-sub {
+    margin: 0 auto;
+    max-width: 620px;
+  }
+}
 
 /* -----------------------------
    FAQ Section
@@ -946,6 +1073,14 @@
   padding: 1.5rem;
 }
 
+/* Full-bleed image: cancel the card's padding so the photo runs edge to edge
+   (matches the Blogs page cards, where the image also bleeds to the border) */
+.blog-preview-card .blog-preview-image {
+  margin: -1.5rem -1.5rem 1rem;
+  border-radius: 0;
+  height: 200px;
+}
+
 .blog-preview-image {
   width: 100%;
   height: 180px;
@@ -1015,14 +1150,106 @@
   .container.grid-cols-2 { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 768px) {
-  .services-grid-expanded { grid-template-columns: 1fr !important; }
-  .process-grid { grid-template-columns: 1fr !important; }
-  .features-grid { grid-template-columns: 1fr !important; }
-  .hero-title { font-size: 2.5rem; }
+/* Phones: services stay 2-per-row (per the client brief) and the process
+   section shrinks into compact cards so it doesn't dominate the page. */
+@media (max-width: 640px) {
+  .services-grid-expanded {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
 
-  
-  .founders-img-grid { max-width: 400px; margin: 0 auto; }
+  .services-grid-expanded .pastel-card {
+    padding: 1rem 0.85rem;
+  }
+
+  .services-grid-expanded .pastel-icon-wrapper {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    margin-bottom: 0.6rem !important;
+  }
+
+  .services-grid-expanded .pastel-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .services-grid-expanded .headline-sm {
+    font-size: 0.86rem;
+    line-height: 1.3;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .services-grid-expanded .body-sm {
+    font-size: 0.74rem;
+    line-height: 1.45;
+    /* Clamp long blurbs so paired cards stay equal-height at 2-up */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .process-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem 0.75rem !important;
+    margin-top: 1.75rem !important;
+  }
+
+  .process-arch-window,
+  .process-grid .tilt-card {
+    border-radius: 90px 90px 0 0;
+  }
+
+  .process-arch-img {
+    border-radius: 90px 90px 0 0;
+    aspect-ratio: 4 / 5;
+  }
+
+  .process-badge {
+    width: 34px;
+    height: 34px;
+    font-size: 0.95rem;
+    bottom: -14px;
+    border-width: 3px;
+  }
+
+  .process-step h3 {
+    font-size: 0.92rem;
+    margin-bottom: 0.3rem !important;
+  }
+
+  .process-step .body-sm {
+    font-size: 0.78rem;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .process-step .process-img-wrapper {
+    margin-bottom: 1.4rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title { font-size: 2.5rem; }
+  .features-grid { grid-template-columns: 1fr !important; }
+
+  .founders-img-grid { max-width: 360px; margin: 0 auto; }
+
+  .founder-polaroid {
+    width: 46%;
+  }
+
+  .founder-polaroid:last-child {
+    margin-left: -34px;
+  }
+
+  .polaroid-frame {
+    padding: 7px 7px 18px;
+  }
 }
 
 /* -----------------------------

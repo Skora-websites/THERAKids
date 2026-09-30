@@ -4,6 +4,7 @@ import StructuredData from './StructuredData';
 import { setRouteSeo } from '../lib/seo';
 import Header from './Header';
 import Footer from './Footer';
+import WhatsAppButton from './WhatsAppButton';
 import AppointmentModal from './AppointmentModal';
 import CTASection from './CTASection';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -30,6 +31,7 @@ const Layout = () => {
       <CTASection />
       <Footer />
       {isModalOpen && <AppointmentModal onClose={() => setIsModalOpen(false)} />}
+      <WhatsAppButton />
       <ThemeSwitcher />
     </>
   );

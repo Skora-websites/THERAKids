@@ -3,7 +3,7 @@ import React from 'react';
 const Logo = ({ className, white = false }) => (
   <img 
     src={white ? "/logo-white.png" : "/logo.png"} 
-    alt="THERAKids Logo" 
+    alt="TheraKids Child Development Center logo - pediatric therapy services in Noida" 
     className={className} 
   />
 );

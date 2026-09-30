@@ -158,9 +158,20 @@
   font-size: 13px;
 }
 
+/* Keep the td a real table cell (display:flex here breaks row alignment); the
+   buttons lay themselves out inline instead. */
 .actions-cell {
-  display: flex;
-  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.actions-cell .btn {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.actions-cell .btn:last-child {
+  margin-right: 0;
 }
 
 .btn-danger {

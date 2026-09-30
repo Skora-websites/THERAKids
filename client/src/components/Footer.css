@@ -1,11 +1,113 @@
+/* Colorful themed footer: layered brand gradient + a rich texture stack
+   (polka dots, diagonal weave, pastel cloud blobs) instead of a flat surface,
+   with colored headings and hover accents. V2: richer washes, coral corner,
+   mint lift — more vibrant while staying in the pastel family. */
 .global-footer {
-  background-color: var(--color-surface-container-low);
+  position: relative;
+  overflow: hidden;
+  background:
+    /* polka-dot grid */
+    radial-gradient(rgba(124, 111, 240, 0.16) 1.3px, transparent 1.8px),
+    /* diagonal fabric weave */
+    repeating-linear-gradient(135deg, rgba(26, 35, 126, 0.03) 0 1.5px, transparent 1.5px 12px),
+    /* vibrant washes: lilac top-right, amber left, coral corner, mint lift */
+    radial-gradient(1100px 480px at 88% -5%, rgba(124, 111, 240, 0.24), transparent 62%),
+    radial-gradient(900px 420px at 4% 12%, rgba(242, 169, 59, 0.2), transparent 58%),
+    radial-gradient(760px 420px at 102% 96%, rgba(233, 79, 157, 0.18), transparent 60%),
+    radial-gradient(900px 460px at -6% 104%, rgba(52, 199, 174, 0.14), transparent 58%),
+    linear-gradient(168deg, #f6f3fd 0%, #fdf4ee 42%, #f3eefb 100%);
+  background-size: 24px 24px, auto, auto, auto, auto, auto;
   padding: var(--spacing-xl) 0 2rem;
   border-top: 1px solid var(--color-outline-variant);
 }
 
+/* Soft organic cloud blobs anchoring the texture — echoes the hero photo
+   composition and the CTA band's transition shapes */
+.global-footer::before,
+.global-footer::after {
+  content: '';
+  position: absolute;
+  border-radius: 52% 48% 55% 45% / 55% 46% 54% 45%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.global-footer::before {
+  width: 420px;
+  height: 300px;
+  left: -140px;
+  bottom: -110px;
+  background: radial-gradient(closest-side, rgba(250, 190, 160, 0.55), transparent 72%);
+}
+
+.global-footer::after {
+  width: 460px;
+  height: 320px;
+  right: -160px;
+  top: -120px;
+  background: radial-gradient(closest-side, rgba(198, 184, 255, 0.6), transparent 72%);
+}
+
+/* Keep every content block above the texture layers */
+.global-footer > .container {
+  position: relative;
+  z-index: 1;
+}
+
 .footer-content {
   margin-bottom: var(--spacing-lg);
+}
+
+/* Four columns: brand + socials / quick links / contact / hours */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 0.85fr 1.25fr 1fr;
+  gap: 2rem 2.5rem;
+}
+
+@media (max-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* Phone: brand block centered, columns left-aligned as readable lists */
+  .footer-brand {
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-brand .footer-desc {
+    max-width: 300px;
+  }
+
+  /* Quick Links stay TWO PER ROW on phones (3 rows of 2) instead of
+     collapsing to one long column */
+  .footer-links nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0 1rem;
+  }
+
+  .footer-links a {
+    padding: 0.55rem 0;
+  }
+
+  .footer-links h4,
+  .footer-contact h4,
+  .footer-hours h4 {
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-contact p,
+  .footer-hours p {
+    margin-bottom: 0.4rem;
+  }
 }
 
 .footer-brand {
@@ -19,33 +121,214 @@
   max-width: 250px;
 }
 
-.footer-links nav {
+/* ---- Social icons ---- */
+.footer-social {
   display: flex;
-  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-surface-container-high);
+  color: var(--color-on-surface-variant);
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-social a:hover {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  transform: translateY(-2px);
+}
+
+.footer-social svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---- Legal links (Privacy / Terms) ---- */
+.footer-legal {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  color: var(--color-on-surface-variant);
+}
+
+.footer-legal a {
+  color: var(--color-on-surface-variant);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-legal a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.footer-legal-sep {
+  opacity: 0.6;
+}
+
+/* ---- Quick Links: two tight columns that read as ONE section ---- */
+.footer-links nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1.25rem;
   margin-top: 1rem;
+}
+
+@media (max-width: 480px) {
+  .footer-links nav {
+    grid-template-columns: 1fr;
+  }
 }
 
 .footer-links a {
   font-size: 13px;
   color: var(--color-on-surface-variant);
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
   /* Full-width stacked links: pad to a comfortable touch target */
   display: block;
-  padding: 0.6rem 0;
+  padding: 0.45rem 0;
 }
 
 .footer-links a:hover {
   color: var(--color-primary);
+  transform: translateX(3px);
 }
 
-.footer-contact h4, .footer-hours h4 {
+.footer-links a {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* Column headings: subtle colorful underline accent, no dots */
+.footer-links h4, .footer-contact h4, .footer-hours h4 {
   margin-bottom: 1rem;
+  color: var(--color-navy, var(--color-on-surface));
+  position: relative;
+  padding-bottom: 0.45rem;
+}
+
+.footer-links h4::after,
+.footer-contact h4::after,
+.footer-hours h4::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 34px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-primary), #7c6ff0);
 }
 
 .footer-contact p, .footer-hours p {
   color: var(--color-on-surface-variant);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ---- Clickable contact details ---- */
+.footer-contact-link {
+  color: var(--color-on-surface-variant);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  /* Phone numbers and addresses may wrap - keep lines airy */
+  display: inline-block;
+  padding: 0.1rem 0;
+}
+
+.footer-contact-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+/* Phone numbers stack as separate tap targets (mobile-friendly) */
+.footer-phone-link {
+  display: block;
+  padding: 0.2rem 0;
+}
+
+/* Keep the two phone numbers side by side on mobile */
+@media (max-width: 768px) {
+  .footer-contact .body-sm:first-of-type {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+  }
+
+  .footer-phone-link {
+    display: inline-block;
+  }
+}
+
+.footer-maps-link {
+  font-size: 13px;
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.footer-maps-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Media partners ("as covered by") trust strip ---- */
+.footer-media {
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--color-outline-variant);
+  text-align: center;
+}
+
+/* No card behind the logos — they sit directly on the textured footer per
+   the client brief (transparent background). */
+.footer-media-logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem 2rem;
+  background: transparent;
+  border: 0;
+  padding: 0.25rem 0;
+}
+
+/* Wordmark badge for partners whose official logo file is not available yet */
+.partner-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 8px;
+  background-color: var(--color-surface-container);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
+
+.footer-media-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Logos stay in their original colours (client requirement) with a gentle
+     lift on hover to signal they are links. */
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.footer-media-logo:hover {
+  transform: translateY(-2px);
+}
+
+.footer-media-logo img {
+  width: auto;
+  /* Bump small source files up on high-density screens without blur */
+  image-rendering: auto;
 }
 
 .footer-bottom {
@@ -55,14 +338,24 @@
   color: var(--color-on-surface-variant);
 }
 
-
-
-
-.footer-logo {
-  height: 100px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-  object-position: left center;
+.footer-credit-sep {
+  margin: 0 0.5rem;
 }
 
+.footer-credit-link {
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* New-logo footer sizing: the 455×118 wordmark renders cleanly at width-based
+   sizing (the old asset needed object-fit cover hacks for its padding). */
+.footer-logo {
+  width: 175px;
+  height: auto;
+  align-self: flex-start;
+}
+
+.footer-credit-link:hover {
+  text-decoration: underline;
+}

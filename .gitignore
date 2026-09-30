@@ -18,5 +18,16 @@ server/uploads/
 # Dev audit screenshots (large, not source)
 client/scripts/hero-shots/
 
+# Database dumps (deployment artifacts; contain the admin password hash)
+*.sql
+!server/schema.sql
+!server/seed.sql
+
+# Full-project snapshot archives (131MB — over GitHub's 100MB file limit)
+THERAKids.zip
+
+# One-off reference image, not source
+popup-ref.jpg
+
 # Codebuff/Freebuff agent state
 .freebuff/

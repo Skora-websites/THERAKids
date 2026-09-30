@@ -87,34 +87,6 @@ INSERT INTO services (name, slug, short_description, full_description, image, be
  '["Focus and attention","Memory and coordination","Learning readiness","Nervous-system organization"]', 12, 1);
 
 -- ==========================================
--- DOCTORS (4, matching the About page specialists)
--- ==========================================
-
-DELETE FROM doctors WHERE name IN
-  ('Dr. Priya Sharma','Dr. Rahul Verma','Dr. Neha Kapoor','Dr. Vikram Singh');
-
-INSERT INTO doctors (name, designation, specialisation, profile_image, short_bio, qualifications, display_order, is_active) VALUES
-('Dr. Priya Sharma', 'Lead Occupational Therapist', 'Pediatric Occupational Therapy',
- '/images/dr_priya.jpg',
- 'Leads our occupational therapy team with over a decade of experience helping children master daily-living and sensory skills.',
- 'BOT (Occupational Therapy), Certified in Sensory Integration (SI)', 1, 1),
-
-('Dr. Rahul Verma', 'Speech Pathologist', 'Speech-Language Pathology',
- '/images/dr_rahul.jpg',
- 'Specializes in articulation, receptive and expressive language, and social communication for children aged 0-18.',
- 'MASLP (Speech-Language Pathology), Certified in Hanen Program', 2, 1),
-
-('Dr. Neha Kapoor', 'Child Psychologist', 'Clinical Child Psychology',
- '/images/dr_neha.jpg',
- 'Conducts developmental and psychological assessments and supports families through behavioural challenges.',
- 'M.Phil Clinical Psychology, RCI Registered', 3, 1),
-
-('Dr. Vikram Singh', 'Occupational Therapist', 'Neuro-Developmental Therapy',
- '/images/dr_vikram.jpg',
- 'Focuses on motor development, postural control, and pre-vocational skill building for older children.',
- 'BOT (Occupational Therapy), NDT Certified', 4, 1);
-
--- ==========================================
 -- GALLERY (19 real centre photos, matching the Gallery page fallbacks)
 -- ==========================================
 
@@ -271,3 +243,95 @@ INSERT IGNORE INTO page_seo (page_key, label) VALUES
 ('/gallery', 'Gallery'),
 ('/blogs', 'Blogs listing'),
 ('/contact', 'Contact');
+-- ==========================================
+-- PROCESS STEPS (Home "Our Process", 4 steps)
+-- ==========================================
+
+DELETE FROM process_steps;
+
+INSERT INTO process_steps (step, title, description, image, tone, display_order, is_active) VALUES
+('1', 'Contact us', 'to make a referral.', '/images/process/contact.jpg', 'peach', 1, 1),
+('2', 'Assessment', 'Provision of a customized, comprehensive assessment.', '/images/process/assessment.jpg', 'lilac', 2, 1),
+('3', 'Personalized Plan', 'Customized care plans to support individual needs.', '/images/process/plan.jpg', 'peach', 3, 1),
+('4', 'Intervention', 'Flexible therapy plans including clinic and school based.', '/images/process/intervention.jpg', 'lilac', 4, 1);
+
+-- ==========================================
+-- CONDITIONS WE TREAT (12, matching /images/conditions/*)
+-- ==========================================
+
+DELETE FROM conditions_data;
+
+INSERT INTO conditions_data (name, short_name, description, focus_areas, image, display_order, is_active) VALUES
+('Autism Spectrum Disorder', 'Autism', 'A neurodevelopmental condition affecting communication, social interaction, and behavior. We focus on enhancing social skills, sensory processing, and promoting independence.', '["Social Skills","Sensory Regulation","Communication"]', '/images/conditions/autism.jpg', 1, 1),
+('ADHD', 'ADHD', 'Attention-Deficit/Hyperactivity Disorder involves differences in attention, focus, and impulse control. Our therapies help build executive functioning, emotional regulation, and academic success.', '["Executive Functioning","Impulse Control","Attention Span"]', '/images/conditions/adhd.jpg', 2, 1),
+('Down Syndrome', 'Down Syndrome', 'A genetic condition causing developmental and physical differences. We provide early intervention focusing on motor milestones, speech development, and cognitive skills.', '["Motor Milestones","Speech Development","Cognitive Skills"]', '/images/conditions/down-syndrome.jpg', 3, 1),
+('Cerebral Palsy', 'Cerebral Palsy', 'A group of disorders affecting movement and muscle tone. Our therapies focus on maximizing mobility, functional independence, and overall quality of life.', '["Mobility","Muscle Tone","Functional Independence"]', '/images/conditions/cerebral-palsy.jpg', 4, 1),
+('Global Developmental Delay (GDD)', 'GDD', 'When a child is significantly delayed in multiple developmental areas (motor, speech, cognitive). We provide comprehensive, multidisciplinary intervention to bridge the gaps.', '["Multidisciplinary Care","Milestone Tracking","Early Intervention"]', '/images/conditions/gdd.jpg', 5, 1),
+('Learning Disability', 'LD', 'Challenges affecting how the brain receives, processes, or responds to information (e.g., Dyslexia). We offer specialized educational support to build academic confidence.', '["Reading & Writing","Academic Confidence","Special Education"]', '/images/conditions/learning-disability.jpg', 6, 1),
+('Speech & Language Delay', 'Speech Delay', 'When a child''s language development is slower than typical milestones. Our speech pathologists work to improve articulation, comprehension, and expressive communication.', '["Articulation","Comprehension","Expressive Language"]', '/images/conditions/speech-delay.jpg', 7, 1),
+('High Risk Infants', 'High Risk Infants', 'Infants born prematurely or with medical complications requiring early developmental monitoring and preventative therapy to ensure optimal growth trajectories.', '["Early Monitoring","Preventative Therapy","Infant Care"]', '/images/conditions/high-risk-infants.jpg', 8, 1),
+('Intellectual Disability', 'ID', 'Characterized by significant limitations in intellectual functioning and adaptive behavior. We focus on teaching functional life skills and enhancing independence.', '["Life Skills","Independence","Adaptive Behavior"]', '/images/conditions/intellectual-disability.jpg', 9, 1),
+('Developmental Coordination Disorder', 'DCD', 'Also known as dyspraxia, affecting physical coordination. We help improve motor planning, balance, and execution of daily physical tasks.', '["Motor Planning","Balance","Physical Coordination"]', '/images/conditions/dcd.jpg', 10, 1),
+('Social Communication Disorder', 'SCD', 'Difficulties with the use of verbal and nonverbal language for social purposes. We facilitate social groups to practice pragmatic language and peer interactions.', '["Pragmatic Language","Peer Interaction","Group Sessions"]', '/images/conditions/social-communication.jpg', 11, 1),
+('Hemiparesis', 'Hemiparesis', 'Weakness or partial paralysis on one side of the body. Our PT and OT programs focus on strengthening, bilateral coordination, and functional mobility.', '["Strengthening","Bilateral Coordination","Functional Mobility"]', '/images/conditions/hemiparesis.jpg', 12, 1);
+
+-- ==========================================
+-- FOUNDERS (2, About page bios + Home founders grid)
+-- ==========================================
+
+DELETE FROM founders;
+
+INSERT INTO founders (name, role, title_line, subtitle_line, profile_image, paragraphs, closing_line, display_order, is_active) VALUES
+('Sandeep Rana', 'Founder & Chairman', 'Founder & Chairman, THERAKids Foundation', NULL, '/images/sandeep_rana.jpg',
+ '["With over 20 years of experience in healthcare management and child development, Sandeep Rana brings visionary leadership, strategic insight, and a deep sense of purpose to THERAKids Foundation.","For Sandeep, THERAKids is more than a child development centre— it is a vision built on compassion, purpose, and the belief that every child deserves the opportunity to thrive.","What began in 2019 from a small space with a powerful dream has grown into two state-of-the-art child development centres in Noida and Greater Noida West, supported by a dedicated team of 40+ professionals across multiple disciplines of pediatric care.","Under his leadership, THERAKids has evolved into a trusted name in child development, with a strong commitment to accessible, ethical, and quality therapeutic care. His vision is to create an environment where children receive the right support, families feel empowered, and professionals are encouraged to grow and make a meaningful difference.","Beyond leading the organization, Sandeep is passionate about mentoring therapists and educators and contributing to the growth of pediatric care. He believes that true leadership is not only about building an organization, but about building people, creating impact, and transforming lives."]',
+ 'At the heart of his journey are three guiding principles: Compassion. Purpose. Karma.', 1, 1),
+('Dr. Akanksha Rana', 'Co-Founder & Consultant', 'Co-Founder & Consultant, THERAKids Foundation', 'Senior Pediatric Occupational Therapist', '/images/akanksha_rana.jpg',
+ '["With over 16 years of experience in pediatric occupational therapy and child development, Dr. Akanksha Rana is a distinguished clinician and a driving force behind the clinical vision of THERAKids Foundation.","As Co-founder and Consultant, she plays a pivotal role in shaping THERAKids'' clinical standards, therapeutic philosophy, and commitment to child-centred care. Her expertise spans sensory integration, developmental delays, autism spectrum disorders, and pediatric rehabilitation, combining evidence-based practice with compassionate, individualized care.","Over the years, her clinical expertise and unwavering commitment have helped thousands of children progress toward their developmental potential while empowering families with greater understanding, confidence, and hope.","At THERAKids, Dr. Akanksha provides clinical leadership to a multidisciplinary team, fostering a culture of clinical excellence, innovation, continuous learning, and compassionate care.","Her vision is to ensure that every child is understood beyond a diagnosis, supported according to their unique needs, and given every opportunity to reach their fullest potential."]',
+ 'For Dr. Akanksha, therapy is not simply about achieving milestones— it is about unlocking potential, building confidence, and creating meaningful possibilities for every child.', 2, 1);
+
+-- ==========================================
+-- PAGE CONTENT (generic JSON blocks; About mission/values)
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS page_content (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  page_key VARCHAR(100) NOT NULL,
+  `key` VARCHAR(100) NOT NULL,
+  content JSON NOT NULL,
+  display_order INT DEFAULT 0,
+  is_active TINYINT(1) DEFAULT 1,
+  UNIQUE KEY uq_page_key (page_key, `key`)
+);
+
+DELETE FROM page_content WHERE page_key = 'about';
+
+INSERT INTO page_content (page_key, `key`, content, display_order, is_active) VALUES
+('about', 'about_intro', '{"heading":"Our Mission & Philosophy","paragraphs":["THERAKids Foundation – Child Development Centre is a leading multidisciplinary organization dedicated to providing high-quality therapy services for children facing developmental, sensory, cognitive, and physical challenges.","We are committed to creating an environment where every child receives specialized care tailored to their unique needs. With a strong emphasis on early intervention and a structured therapeutic approach, we work closely with children and their families to enhance their abilities, promote independence, and improve their overall quality of life."]}', 1, 1),
+('about', 'about_values', '{"items":[{"title":"Equipping for Independence","text":"Our mission is to equip children with the necessary skills to develop independence, confidence, and convenience in their daily lives."},{"title":"Nurturing Environment","text":"We aim to create a safe, motivated, and encouraging space where children overcome challenges and celebrate every small milestone as a big achievement."},{"title":"Empowering Families","text":"Therapy is not just about intervention; it is about empowering children and their parents to navigate daily life with greater ease and success."}]}', 2, 1);
+
+-- ==========================================
+-- ASSESSMENTS CARDS (Services page "Comprehensive Assessments" section)
+-- Rows alternate: heading row -> bullet-list row (answer = JSON array); the
+-- Services page pairs adjacent rows. page_key='assessments' is only queried by
+-- the Services page, so these rows never surface as public FAQs.
+-- ==========================================
+
+DELETE FROM faqs WHERE page_key = 'assessments';
+
+INSERT INTO faqs (page_key, question, answer, display_order, is_active) VALUES
+('assessments', 'Psychological Assessments', 'Heading row; bullets in the next row.', 1, 1),
+('assessments', 'Psychological Assessments — bullet list', '["Developmental Assessments (DQ)","IQ Assessment (MISIC) & EQ Assessment","Learning Disability (LD) Assessment","VSMCs & Gesell Scale"]', 2, 1),
+('assessments', 'OT & PT Assessments', 'Heading row; bullets in the next row.', 3, 1),
+('assessments', 'OT & PT Assessments — bullet list', '["Sensory Profile & Motor Assessment","Manual Muscle Testing (MMT) & Goniometry","Infant Neurological International Battery (INFANIB)","Miller Assessment for Preschoolers (MAP) & Berg Balance Scale"]', 4, 1);
+-- ==========================================
+-- HOME FAQS (Home page accordion, 5 questions)
+-- ==========================================
+
+DELETE FROM faqs WHERE page_key = 'home';
+
+INSERT INTO faqs (page_key, question, answer, display_order, is_active) VALUES
+('home', 'What is Occupational Therapy and how does it help children?', 'Occupational therapy helps children develop the motor, sensory, and cognitive skills needed for everyday activities. Our therapists work with children to improve fine motor skills, sensory processing, and visual motor skills needed for dressing, writing, and playing. We track every child''s improvement and tailor our approach to their unique potential.', 1, 1),
+('home', 'At what age should my child start therapy?', 'Most pediatric therapies start from the age of 3 years. However, some therapies like speech therapy can start even earlier. Early intervention is key: the sooner we can assess and begin working with your child, the better the outcomes. We recommend consulting with our specialists if you notice any developmental delays.', 2, 1),
+('home', 'What does Speech Therapy involve?', 'Speech therapy supports children in developing strong communication skills. It addresses articulation, receptive and expressive language, social pragmatic skills, and helps children express their thoughts and articulate words. Our speech-language pathologists also work on non-verbal communication and body language skills.', 3, 1),
+('home', 'When does my child need Physiotherapy?', 'If your child has difficulty performing basic movements because of an injury or illness, they may need physiotherapy. Delay in learning motor skills is not always considered a problem with movement, but our physiotherapists can help assess whether your child would benefit from therapy to improve mobility, balance, and strength.', 4, 1),
+('home', 'How do I know which therapy is right for my child?', 'Every child is unique. We begin with a comprehensive assessment to understand your child''s specific needs, strengths, and areas for growth. Based on this evaluation, our multidisciplinary team creates an individualized plan that may include one or more therapy types. Contact us to schedule an initial consultation.', 5, 1);

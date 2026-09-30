@@ -197,6 +197,18 @@
     margin: -1.875rem -2.5rem 0;
     min-width: 0;
   }
+
+  /* Consistent optical alignment across pages: every text column STARTS at the
+     same height instead of floating mid-hero. (Centering made short-title pages
+     like Gallery/Contact sit visibly lower than About/Services.) 6rem puts the
+     eyebrow at the same y as the two-line-title pages. */
+  .page-hero-grid {
+    align-items: start;
+  }
+
+  .page-hero-content {
+    padding-top: 6rem;
+  }
 }
 
 .page-hero-img {

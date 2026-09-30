@@ -29,7 +29,7 @@ const InlineCTA = () => {
             <span className="heart-icon">♡</span>
           </div>
           
-          <img src="/images/cta-illustration2.png" alt="Schedule an appointment" className="inline-cta-illustration" />
+          <img src="/images/cta-illustration2.png" alt="Book an appointment with TheraKids pediatric therapy specialists in Noida" className="inline-cta-illustration" loading="lazy" />
           
           <div className="handwritten-text text-right">
             <span>Small</span>

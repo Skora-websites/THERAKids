@@ -19,6 +19,22 @@ const ALLOWED_STYLE_PROPS = new Set([
   'text-decoration', 'font-size', 'margin-left', 'border', 'border-collapse', 'padding'
 ]);
 
+const escapeHtmlText = (s) =>
+  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// A plain-text draft (clipboard has no HTML flavour — Notepad, plain emails,
+// some AI tools) becomes real paragraph blocks instead of one collapsed blob:
+// blank lines split paragraphs, single line breaks are kept as <br> so
+// hard-wrapped drafts stay exactly as written.
+const plainTextToBlocks = (text) =>
+  String(text)
+    .replace(/\r\n?/g, '\n')
+    .split(/\n{2,}/)
+    .map((para) => para.split('\n').map((line) => line.trim()).filter(Boolean))
+    .filter((lines) => lines.length)
+    .map((lines) => `<p>${lines.map(escapeHtmlText).join('<br>')}</p>`)
+    .join('');
+
 const stripPasteJunk = (html) => {
   const doc = new DOMParser().parseFromString(html, 'text/html');
 
@@ -27,6 +43,18 @@ const stripPasteJunk = (html) => {
   const comments = [];
   while (walker.nextNode()) comments.push(walker.currentNode);
   comments.forEach((node) => node.remove());
+
+  // Legacy <font face|color|size> tags (Word, older pages): unwrap so the text
+  // keeps its position but never drags a foreign typeface into the editor.
+  let fonts = [...doc.body.querySelectorAll('font')];
+  while (fonts.length) {
+    fonts.forEach((f) => {
+      const parent = f.parentNode;
+      while (f.firstChild) parent.insertBefore(f.firstChild, f);
+      f.remove();
+    });
+    fonts = [...doc.body.querySelectorAll('font')];
+  }
 
   [...doc.body.querySelectorAll('*')].forEach((el) => {
     const tag = el.tagName.toLowerCase();
@@ -39,12 +67,28 @@ const stripPasteJunk = (html) => {
       const name = attr.name.toLowerCase();
       // classes carry mso-* junk; on* are inline event handlers
       if (name === 'class' || name.startsWith('on')) { el.removeAttribute(attr.name); return; }
+      // font/presentation attributes: the site renders everything in its own
+      // fonts, so face/color-as-attr etc. are noise (Word, Google Docs)
+      if (['face', 'bgcolor', 'valign', 'text', 'link', 'vlink', 'alink', 'id', 'dir'].includes(name)) {
+        el.removeAttribute(attr.name);
+        return;
+      }
+      // legacy align="center" → modern inline style (kept by the allowlist below)
+      if (name === 'align') {
+        const v = attr.value.trim().toLowerCase();
+        if (['left', 'center', 'right', 'justify'].includes(v) && !/text-align/i.test(el.getAttribute('style') || '')) {
+          el.style.textAlign = v;
+        }
+        el.removeAttribute(attr.name);
+        return;
+      }
       // executable URLs must never reach the editor (server strips them too)
       if ((name === 'href' || name === 'src') && /^\s*(javascript|vbscript):/i.test(attr.value)) {
         el.removeAttribute(attr.name);
         return;
       }
-      // keep only allowlisted style properties (drops mso-* and friends)
+      // keep only allowlisted style properties (drops font-family, line-height,
+      // mso-* and friends — the site font always wins)
       if (name === 'style') {
         const kept = attr.value
           .split(';')
@@ -146,8 +190,19 @@ const RichTextEditor = ({ value, onChange }) => {
   };
 
   const handlePaste = async (e) => {
-    const html = e.clipboardData ? e.clipboardData.getData('text/html') : '';
-    if (!html) return; // plain-text clipboard → browser default paste (spec #5)
+    const clipboard = e.clipboardData;
+    if (!clipboard) return; // let the browser handle exotic clipboard types
+
+    let html = clipboard.getData('text/html') || '';
+    let plainOnly = false;
+    if (!html) {
+      // No HTML flavour: treat the plain text as a draft and lay it out into
+      // real paragraphs rather than dumping an unstructured blob.
+      const text = clipboard.getData('text/plain');
+      if (!text) return; // nothing usable on the clipboard
+      plainOnly = true;
+      html = plainTextToBlocks(text);
+    }
 
     e.preventDefault();
 
@@ -155,9 +210,9 @@ const RichTextEditor = ({ value, onChange }) => {
     const sel = window.getSelection();
     const range = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
 
-    let cleaned = stripPasteJunk(html);
+    let cleaned = plainOnly ? html : stripPasteJunk(html);
     const token = localStorage.getItem('admin_token');
-    cleaned = await rehostImages(cleaned, token); // resolves after ALL uploads
+    if (!plainOnly) cleaned = await rehostImages(cleaned, token); // resolves after ALL uploads
 
     // Insert through a detached, classless host first: running insertHTML directly
     // inside the editor makes Blink's editing StyleAdjuster reconcile the fragment

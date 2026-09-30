@@ -275,20 +275,27 @@ await check('live counters: over-limit turns red, within-limit is neutral', asyn
       return counter ? { text: counter.textContent, over: counter.classList.contains('over') } : null;
     }));
 
-  const overTitle = 'X'.repeat(70);
+  const overTitle = 'X'.repeat(110);
   await typeInto(page, 'Meta Title', overTitle, { clear: true });
   let counter = await counterState('Meta Title');
   assert(counter, 'Meta Title counter missing');
-  assert(counter.over, 'counter should be red/over at 70 chars (target 60)');
-  assert(counter.text.includes('60'), `counter should show target 60, got "${counter.text}"`);
+  assert(counter.over, 'counter should be red/over at 110 chars (target 100)');
+  assert(counter.text.includes('100'), `counter should show target 100, got "${counter.text}"`);
 
   await typeInto(page, 'Meta Title', SEO_POST.meta.title, { clear: true });
   counter = await counterState('Meta Title');
-  assert(!counter.over, 'counter should be neutral within the 60-char target');
+  assert(!counter.over, 'counter should be neutral within the 100-char target');
 
-  await typeInto(page, 'Meta Description', 'Y'.repeat(200), { clear: true });
+  const overKeywords = 'k'.repeat(120);
+  await typeInto(page, 'Meta Keywords', overKeywords, { clear: true });
+  counter = await counterState('Meta Keywords');
+  assert(counter, 'Meta Keywords counter missing');
+  assert(counter.over, 'keywords counter should be red at 120 chars (target 100)');
+  await typeInto(page, 'Meta Keywords', SEO_POST.meta.keywords, { clear: true });
+
+  await typeInto(page, 'Meta Description', 'Y'.repeat(520), { clear: true });
   counter = await counterState('Meta Description');
-  assert(counter.over, 'description counter should be red at 200 chars (target 160)');
+  assert(counter.over, 'description counter should be red at 520 chars (target 500)');
   await typeInto(page, 'Meta Description', SEO_POST.meta.description, { clear: true });
 
   await page.click('.admin-modal .admin-modal-close');

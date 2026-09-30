@@ -1,0 +1,116 @@
+/* Compact "Stay Updated" strip at the top of the footer. */
+
+.footer-newsletter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  padding: 1.25rem 1.75rem;
+  border-radius: 18px;
+  background: linear-gradient(120deg, var(--color-pastel-peach) 0%, var(--color-pastel-lilac) 100%);
+  margin-bottom: var(--spacing-lg);
+}
+
+.footer-newsletter-copy {
+  flex: 1 1 220px;
+}
+
+.footer-newsletter-heading {
+  color: var(--color-navy, var(--color-on-surface));
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.15rem;
+}
+
+.footer-newsletter-sub {
+  color: var(--color-navy-light, var(--color-on-surface-variant));
+  margin: 0;
+}
+
+/* Input + button on one line (stack on narrow screens) */
+.footer-newsletter-form {
+  display: flex;
+  gap: 0.6rem;
+  flex: 2 1 340px;
+  min-width: 0;
+}
+
+.footer-newsletter-input {
+  flex: 1;
+  min-width: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1.1rem;
+  background-color: var(--color-surface-container-lowest);
+}
+
+.footer-newsletter-btn {
+  border-radius: 999px;
+  padding: 0.7rem 1.5rem;
+  white-space: nowrap;
+}
+
+/* Consent text sits on the gradient, so keep it navy for contrast */
+.footer-newsletter-consent {
+  flex-basis: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: var(--color-navy, var(--color-on-surface));
+  cursor: pointer;
+}
+
+.footer-newsletter-consent input {
+  margin-top: 2px;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+}
+
+.footer-newsletter-consent a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer-newsletter-success {
+  flex: 2 1 340px;
+  color: var(--color-navy, var(--color-on-surface));
+  font-weight: 600;
+  margin: 0;
+}
+
+.footer-newsletter-error {
+  flex-basis: 100%;
+  color: var(--color-error, #b3261e);
+  font-weight: 600;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .footer-newsletter {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1.25rem;
+  }
+
+  /* Column mode trap: the desktop row layout's flex-BASIS values (copy 220px,
+     form 340px) become HEIGHTS here, leaving phantom blocks of empty gradient
+     inside the panel. Reset every child to content height. */
+  .footer-newsletter > * {
+    flex: none;
+  }
+
+  .footer-newsletter-form {
+    flex-direction: column;
+  }
+
+  .footer-newsletter-input {
+    flex: 0 0 auto;
+  }
+
+  .footer-newsletter-btn {
+    width: 100%;
+  }
+}

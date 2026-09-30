@@ -18,8 +18,8 @@ const pool = mysql.createPool({
 
 // Real contact details (previously hardcoded in Footer.jsx / Contact.jsx)
 const SETTINGS = {
-  phone: '+91 98993 38813 / +91 93135 13313',
-  email: 'therakids.dc@gmail.com',
+  phone: '+91 93135 13313 / +91 98993 38813',
+  email: 'info@therakids.com',
   address1: 'G-10, Block G, Sector 22, Noida - 201301',
   address2: '173, Itehara, Near NX-One Society, Gr. Noida West - 201306',
   hours_week: 'Mon-Fri: 8:00 AM - 6:00 PM',

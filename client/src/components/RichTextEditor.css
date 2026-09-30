@@ -78,6 +78,28 @@
   outline: none;
 }
 
+/* WYSIWYG font rules: a pasted draft keeps its structure (headings, paragraphs,
+   links, colours, sizes) but always renders in the site's own fonts — the same
+   body/heading split the public blog page uses (Blogs.css / index.css), so what
+   the admin sees is what visitors get. The `*` rule kills any pasted font-family
+   (Word's Calibri, Google Docs' Arial) without touching the allowed styles. */
+.rte-content {
+  font-family: var(--font-body, 'Figtree', 'Segoe UI', sans-serif);
+}
+
+.rte-content * {
+  font-family: inherit;
+}
+
+.rte-content h1,
+.rte-content h2,
+.rte-content h3,
+.rte-content h4,
+.rte-content h5,
+.rte-content h6 {
+  font-family: var(--font-heading, 'Fraunces', Georgia, serif);
+}
+
 .rte-content:focus {
   box-shadow: inset 0 0 0 2px rgba(26, 35, 126, 0.12);
 }

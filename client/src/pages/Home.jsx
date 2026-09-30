@@ -4,6 +4,7 @@ import { ArrowRight, Heart, Activity, Brain, Puzzle, Users, Sparkles, MessageCir
 import InlineCTA from '../components/InlineCTA';
 import TiltCard from '../components/TiltCard';
 import StructuredData from '../components/StructuredData';
+import LeadPopup from '../components/LeadPopup';
 import {
   HeartDoodle,
   PetalDuo,
@@ -13,7 +14,7 @@ import { createHeroTimeline, createFloatLoop, initScrollReveals, createParallax 
 import API_URL from '../config';
 import { usePageSeo } from '../hooks/usePageSeo';
 import { useAppContext } from '../context/AppContext';
-import fallbackBlogs from '../data/fallbackBlogs';
+import { FALLBACK_DATA } from '../data/fallbackData';
 import './Home.css';
 
 const trustBadges = [
@@ -22,68 +23,56 @@ const trustBadges = [
   { id: 3, label: 'Better, Brighter Futures', icon: <SproutDoodle className="badge-doodle" /> }
 ];
 
-const fallbackServices = [
-  { id: 1, name: 'Occupational Therapy', short_description: 'Building fine motor, sensory, and daily-living skills for independence.' },
-  { id: 2, name: 'Physiotherapy (Paeds)', short_description: 'Strength, balance, and movement for confident exploration.' },
-  { id: 3, name: 'Special Education', short_description: 'Tailored support for literacy, numeracy, and school readiness.' },
-  { id: 4, name: 'Speech Therapy', short_description: 'Developing communication, articulation, and language skills.' },
-  { id: 5, name: 'Social Group Training', short_description: 'Group sessions building peer interaction and play skills.' },
-  { id: 6, name: 'Early Intervention', short_description: 'Targeted support in the earliest years, when it matters most.' },
-  { id: 7, name: 'Psychological Assessment', short_description: 'Cognitive, developmental, and behavioural evaluations.' },
-  { id: 8, name: 'Counseling', short_description: 'Emotional support for children and their parents.' }
+/* "Intervention Programs We Offer" is a STATIC section per the client brief —
+   these eight programs are fixed marketing copy, not admin-managed DB rows. */
+const STATIC_SERVICES = [
+  { name: 'Occupational Therapy', short_description: 'Building everyday skills — from writing and dressing to play and self-care.' },
+  { name: 'Speech Therapy', short_description: 'Helping children find their voice, from first words to confident conversation.' },
+  { name: 'Physical Therapy', short_description: 'Strength, balance and coordination for confident movement.' },
+  { name: 'Behaviour Modification', short_description: 'Positive, evidence-based strategies for everyday challenges.' },
+  { name: 'Special Education', short_description: 'Individualised learning plans that keep every child on track.' },
+  { name: 'Sensory Integration', short_description: 'Helping children process the world comfortably and calmly.' },
+  { name: 'Social Group Therapy', short_description: 'Guided peer groups that build friendships and social confidence.' },
+  { name: 'Early Intervention', short_description: 'The sooner we start, the brighter the tomorrow — support for ages 0-3.' },
+];
+
+/* "Our Process" is a STATIC section per the client brief — the four steps of
+   the therapy journey, with the site's own process photos. */
+const STATIC_PROCESS_STEPS = [
+  {
+    step: 1,
+    title: 'Book a Consultation',
+    tone: 'peach',
+    image: '/images/process/contact.jpg',
+    description: 'Tell us about your child — we listen first, and suggest the right next step.',
+  },
+  {
+    step: 2,
+    title: 'Assessment & Screening',
+    tone: 'lilac',
+    image: '/images/process/assessment.jpg',
+    description: 'A gentle, play-based evaluation maps your child\'s strengths and needs.',
+  },
+  {
+    step: 3,
+    title: 'Personalized Therapy Plan',
+    tone: 'peach',
+    image: '/images/process/plan.jpg',
+    description: 'A multidisciplinary plan built around your child and your family.',
+  },
+  {
+    step: 4,
+    title: 'Therapy & Progress',
+    tone: 'lilac',
+    image: '/images/process/intervention.jpg',
+    description: 'Regular sessions with tracked milestones — celebrate every win together.',
+  },
 ];
 
 /* Marquee: whole sets rendered per half-track so the -50% keyframe always lands
    on an identical frame. Two sets per half ≈ 2300px of content, wider than any
    common viewport, so the loop never shows an empty gap. */
 const MARQUEE_SET_COPIES = 2;
-
-const founders = [
-  { id: 1, name: 'Sandeep Rana', role: 'Founder & Chairman', profile_image: '/images/sandeep_rana.jpg' },
-  { id: 2, name: 'Dr. Akanksha Rana', role: 'Co-Founder & Consultant', profile_image: '/images/akanksha_rana.jpg' }
-];
-
-const fallbackTestimonials = [
-  { id: 1, name: 'Priya M.', designation: 'Parent of a 6-year-old', testimonial: 'The team at THERAkids has been wonderful with our son. His communication has grown so much since we started, and he genuinely looks forward to every session.' },
-  { id: 2, name: 'Arun K.', designation: 'Parent of an 8-year-old', testimonial: 'We finally feel heard. The therapists took the time to understand our daughter and built a plan that works for her and for our whole family.' },
-  { id: 3, name: 'Sneha R.', designation: 'Parent of a 4-year-old', testimonial: 'From the first assessment to every milestone since, the care and professionalism here have been exceptional. Our child is more confident every day.' }
-];
-
-const fallbackProcess = [
-  { id: 1, step: '1', title: 'Contact us', desc: 'to make a referral.', img: '/images/process/contact.jpg', color: 'peach' },
-  { id: 2, step: '2', title: 'Assessment', desc: 'Provision of a customized, comprehensive assessment.', img: '/images/process/assessment.jpg', color: 'lilac' },
-  { id: 3, step: '3', title: 'Personalized Plan', desc: 'Customized care plans to support individual needs.', img: '/images/process/plan.jpg', color: 'peach' },
-  { id: 4, step: '4', title: 'Intervention', desc: 'Flexible therapy plans including clinic and school based.', img: '/images/process/intervention.jpg', color: 'lilac' }
-];
-
-// Fallbacks used only when /api/faqs is unreachable
-const fallbackFaqs = [
-  {
-    id: 1,
-    question: 'What is Occupational Therapy and how does it help children?',
-    answer: 'Occupational therapy helps children develop the motor, sensory, and cognitive skills needed for everyday activities. Our therapists work with children to improve fine motor skills, sensory processing, and visual motor skills needed for dressing, writing, and playing. We track every child\'s improvement and tailor our approach to their unique potential.'
-  },
-  {
-    id: 2,
-    question: 'At what age should my child start therapy?',
-    answer: 'Most pediatric therapies start from the age of 3 years. However, some therapies like speech therapy can start even earlier. Early intervention is key: the sooner we can assess and begin working with your child, the better the outcomes. We recommend consulting with our specialists if you notice any developmental delays.'
-  },
-  {
-    id: 3,
-    question: 'What does Speech Therapy involve?',
-    answer: 'Speech therapy supports children in developing strong communication skills. It addresses articulation, receptive and expressive language, social pragmatic skills, and helps children express their thoughts and articulate words. Our speech-language pathologists also work on non-verbal communication and body language skills.'
-  },
-  {
-    id: 4,
-    question: 'When does my child need Physiotherapy?',
-    answer: 'If your child has difficulty performing basic movements because of an injury or illness, they may need physiotherapy. Delay in learning motor skills is not always considered a problem with movement, but our physiotherapists can help assess whether your child would benefit from therapy to improve mobility, balance, and strength.'
-  },
-  {
-    id: 5,
-    question: 'How do I know which therapy is right for my child?',
-    answer: 'Every child is unique. We begin with a comprehensive assessment to understand your child\'s specific needs, strengths, and areas for growth. Based on this evaluation, our multidisciplinary team creates an individualized plan that may include one or more therapy types. Contact us to schedule an initial consultation.'
-  }
-];
 
 // Icons cycled onto service cards (API rows don't carry icons)
 const serviceIcons = [Activity, Brain, MessageCircle, Sparkles, Users, Ear, Heart, Puzzle];
@@ -97,49 +86,51 @@ const decorateService = (service, index) => {
 const Home = () => {
   // Admin "SEO" tab row for "/" - empty fields keep the static index.html tags
   usePageSeo('/');
-  const [services, setServices] = useState(fallbackServices);
-  const [testimonials, setTestimonials] = useState(fallbackTestimonials);
-  const [process] = useState(fallbackProcess);
+  // Initial state = static fallback (frontend-only deploys / offline); the API
+  // response replaces it whenever it answers.
+  const [testimonials, setTestimonials] = useState(FALLBACK_DATA.testimonials);
   const [features] = useState(trustBadges);
   const [openFaq, setOpenFaq] = useState(null);
-  const [faqs, setFaqs] = useState(fallbackFaqs);
-  const faqRef = useRef(null);
-  const blogRef = useRef(null);
+  const [faqs, setFaqs] = useState(FALLBACK_DATA.faqs);
+  const [blogs, setBlogs] = useState(FALLBACK_DATA.blogs.slice(0, 2).map((b) => ({
+    ...b,
+    image: b.featured_image || b.image || null,
+    excerpt: b.excerpt || b.short_description || ''
+  })));
+  const [founders, setFounders] = useState(FALLBACK_DATA.founders);
+  // Loading gate for the remaining DB sections (testimonials/founders/blogs).
+  const [loading, setLoading] = useState(true);
+  // Free-screening lead popup: opens ~10s after the home page loads, on EVERY
+  // visit/reload (never permanently suppressed) - client requirement.
+  const [leadPopupOpen, setLeadPopupOpen] = useState(false);
 
-  const [blogs, setBlogs] = useState(fallbackBlogs);
-
-  const { setIsModalOpen } = useAppContext();
+  const { setIsModalOpen, settings } = useAppContext();
   const navigate = useNavigate();
   const heroRef = useRef(null);
   const pageRef = useRef(null);
 
   useEffect(() => {
+    let cancelled = false;
     const load = async () => {
       try {
-        const [servicesRes, testimonialsRes, blogsRes, faqsRes] = await Promise.all([
-          fetch(`${API_URL}/api/services`),
+        const [testimonialsRes, blogsRes, foundersRes, faqsRes] = await Promise.all([
           fetch(`${API_URL}/api/testimonials`),
           fetch(`${API_URL}/api/blogs`),
+          fetch(`${API_URL}/api/founders`),
           fetch(`${API_URL}/api/faqs?page=home`)
         ]);
-        if (servicesRes.ok) {
-          const data = await servicesRes.json();
-          // Benefits come back parsed (JSON column) from MySQL - normalize for decorateService
-          if (data.length) {
-            setServices(data.map((s) => ({
-              ...s,
-              short_description: s.short_description || '',
-              benefits: typeof s.benefits === 'string' ? s.benefits : JSON.stringify(s.benefits || [])
-            })));
-          }
-        }
+        if (cancelled) return;
         if (testimonialsRes.ok) {
           const data = await testimonialsRes.json();
-          if (data.length) setTestimonials(data);
+          if (Array.isArray(data) && data.length > 0) setTestimonials(data);
+        }
+        if (faqsRes.ok) {
+          const data = await faqsRes.json();
+          if (Array.isArray(data) && data.length > 0) setFaqs(data);
         }
         if (blogsRes.ok) {
           const data = await blogsRes.json();
-          if (data.length) {
+          if (Array.isArray(data)) {
             // Normalize: DB rows may use featured_image or image; cards expect `image`.
             // The home blog grid is 2 columns - keep only 2 cards so no orphan third row.
             setBlogs(data.slice(0, 2).map((b) => ({
@@ -149,16 +140,20 @@ const Home = () => {
             })));
           }
         }
-        // FAQs are admin-edited; keep the static fallbacks if the API has none
-        if (faqsRes.ok) {
-          const data = await faqsRes.json();
-          if (data.length) setFaqs(data);
+        if (foundersRes.ok) {
+          const data = await foundersRes.json();
+          if (Array.isArray(data) && data.length > 0) setFounders(data);
         }
       } catch {
-        // API unreachable - all fallbacks stay in place (services, testimonials, blogs)
+        // API unreachable - static fallback data keeps every section populated
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
     load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   /* GSAP: hero entrance, floating doodles, scroll reveals, gentle photo parallax */
@@ -174,6 +169,14 @@ const Home = () => {
       cleanupReveals?.();
       cleanupParallax?.();
     };
+  }, []);
+
+  /* Lead popup: fires ~7 seconds after the home page opens. The timer starts
+     on mount (i.e. every open/reload of Home) and is cleaned up if the user
+     navigates away before it fires. */
+  useEffect(() => {
+    const timer = setTimeout(() => setLeadPopupOpen(true), 7_000);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -221,7 +224,7 @@ const Home = () => {
             {/* Deep-peach sweep + organic blob-masked photo window, per the reference */}
             <div className="hero-sweep" aria-hidden="true" />
             <div className="hero-photo-window">
-              <img src="/images/home%20hero%20img.png" alt="Therapist and toddler stacking colorful blocks together" className="home-hero-img" data-parallax />
+              <img src="/images/home%20hero%20img.png" alt="Pediatric occupational therapist helping a toddler stack colorful blocks during a therapy session at TheraKids Noida child development center" className="home-hero-img" data-parallax />
             </div>
             {/* Coral petals upper-left + small coral dot on the photo's left rim */}
             <PetalDuo className="doodle petal-top" data-float />
@@ -265,25 +268,30 @@ const Home = () => {
             <p className="label-md text-navy uppercase tracking-widest">How we can work together</p>
             <h2 className="headline-xl text-navy">Intervention Programs We Offer</h2>
           </div>
-          <div className="grid grid-cols-4 gap-6 services-grid-expanded" data-reveal-group>
-            {/* Show 8 programs so the 4-col grid forms two complete rows (API can return 9) */}
-            {services.slice(0, 8).map((service, index) => {
-              const decorated = decorateService(service, index);
-              return (
-                <div key={decorated.id}>
-                  <TiltCard maxTilt={8}>
-                    <div className="card pastel-card service-gradient-card">
-                      <div className="pastel-icon-wrapper mb-4 mx-auto">
-                        {decorated.icon}
+          {loading ? (
+            <div className="body-md text-navy-light text-center" style={{ padding: '2rem 0' }}>Loading services…</div>
+          ) : (
+            <div className="grid grid-cols-4 gap-6 services-grid-expanded" data-reveal-group>
+              {/* Show 8 programs so the 4-col grid forms two complete rows. Static section:
+                  content is hardcoded here, not fetched from the services API. */}
+              {STATIC_SERVICES.map((service, index) => {
+                const decorated = decorateService(service, index);
+                return (
+                  <div key={decorated.name}>
+                    <TiltCard maxTilt={8}>
+                      <div className="card pastel-card service-gradient-card">
+                        <div className="pastel-icon-wrapper mb-4 mx-auto">
+                          {decorated.icon}
+                        </div>
+                        <h3 className="headline-sm text-navy mb-2 text-center">{decorated.name}</h3>
+                        <p className="body-sm text-navy-light text-center">{decorated.short_description}</p>
                       </div>
-                      <h3 className="headline-sm text-navy mb-2 text-center">{decorated.name}</h3>
-                      <p className="body-sm text-navy-light text-center">{decorated.short_description}</p>
-                    </div>
-                  </TiltCard>
-                </div>
-              );
-            })}
-          </div>
+                    </TiltCard>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Inline CTA Section */}
           <div className="mt-12" data-reveal>
@@ -299,7 +307,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Process Section (Lilac) */}
+      {/* Process Section (Lilac) — STATIC per the client brief: four fixed steps,
+          not admin-managed. Images are the site's own process photos. */}
       <section className="bg-pastel-lilac section-padding relative overflow-hidden">
         <div className="container z-10 relative">
           <div className="section-header center mb-16" data-reveal>
@@ -308,28 +317,36 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-4 gap-8 process-grid" data-reveal-group>
-            {process.map((step) => (
-              <div key={step.id}>
+            {STATIC_PROCESS_STEPS.map((step) => (
+              <div key={step.title}>
                 <TiltCard maxTilt={7}>
                   <div className="process-step text-center">
                     <div className="process-img-wrapper mb-6 relative mx-auto">
                       {/* Arch clip window: nothing (photo, shine) can render outside the arch */}
                       <div className="process-arch-window">
-                        <img src={step.img} alt={step.title} className="process-arch-img w-full object-cover" />
+                        <img
+                        src={step.image}
+                        alt={`TheraKids pediatric therapy process step ${step.step}: ${step.title} in Noida`}
+                        className="process-arch-img w-full object-cover"
+                        loading="lazy"
+                      />
                       </div>
-                      <div className={`process-badge bg-pastel-${step.color}`}>
+                      <div className={`process-badge bg-pastel-${step.tone}`}>
                         {step.step}
                       </div>
                     </div>
                     <h3 className="headline-sm text-navy mb-2">{step.title}</h3>
-                    <p className="body-sm text-navy-light">{step.desc}</p>
+                    <p className="body-sm text-navy-light">{step.description}</p>
                   </div>
                 </TiltCard>
               </div>
             ))}
           </div>
           <div className="text-center mt-12" data-reveal>
-            <button className="btn btn-primary px-8 shadow-sm" onClick={() => window.scrollTo(0, 0)}>Contact Us</button>
+            <button className="btn btn-primary px-8 shadow-sm" onClick={() => {
+              navigate('/contact');
+              window.scrollTo(0, 0);
+            }}>Contact Us</button>
           </div>
         </div>
 
@@ -341,42 +358,58 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Meet Our Founders (White) */}
-      <section className="bg-white section-padding relative overflow-hidden">
-        <div className="container grid grid-cols-2 gap-12 items-center z-10 relative">
-          <div data-reveal>
-            <h2 className="headline-xl text-navy mb-6">Meet Our Founders</h2>
-            <p className="body-lg text-navy-light mb-4">
-              At THERAkids, we are dedicated to empowering children aged 0-18 to reach their full potential through our specialized multidisciplinary approach to pediatric care and development.
-            </p>
-            <p className="body-lg text-navy-light mb-8">
-              Meet the founders whose vision and dedication continue to guide our team of passionate professionals in providing personalized, holistic therapies for every child.
-            </p>
-            <button className="btn btn-outline border-navy text-navy" onClick={() => {
-              navigate('/about');
-              window.scrollTo(0, 0);
-            }}>Learn more</button>
-          </div>
-
-          <div className="founders-img-grid" data-reveal-group>
-            {founders.map((founder) => (
-              <div key={founder.id} className="about-arch-img-wrapper">
-                <img src={founder.profile_image} alt={`${founder.name} - ${founder.role}`} className="about-arch-img w-full object-cover" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials (Peach), rendered only when data is available */}
-      {testimonials.length > 0 && (
-        <section className="bg-pastel-peach section-padding relative overflow-hidden">
-          {/* White clouds above and below: neighbors are the white Founders band and FAQ */}
-          <div className="cloud-divider cloud-top fill-white">
+      {/* Meet Our Founders (White) - portraits come from the founders table.
+          The section (and its reveal animations) renders only once the API data
+          has loaded, so GSAP never registers triggers on placeholder children. */}
+      {founders.length > 0 && (
+        <section className="bg-white section-padding relative overflow-hidden">
+          {/* Single-wave seams: the lilac Process band's bottom wave already
+              carves this section's top edge, so only the bottom seam needs a
+              wave here (peach, into Testimonials). */}
+          <div className="cloud-divider cloud-bottom fill-pastel-peach">
             <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
               <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
             </svg>
           </div>
+          <div className="container grid grid-cols-2 gap-12 items-center z-10 relative">
+            <div data-reveal>
+              <h2 className="headline-xl text-navy mb-6">Meet Our Founders</h2>
+              <p className="body-lg text-navy-light mb-4">
+                At THERAkids, we are dedicated to empowering children aged 0-18 to reach their full potential through our specialized multidisciplinary approach to pediatric care and development.
+              </p>
+              <p className="body-lg text-navy-light mb-8">
+                Meet the founders whose vision and dedication continue to guide our team of passionate professionals in providing personalized, holistic therapies for every child.
+              </p>
+              <button className="btn btn-outline border-navy text-navy" onClick={() => {
+                navigate('/about');
+                window.scrollTo(0, 0);
+              }}>Learn more</button>
+            </div>
+
+            <div className="founders-img-grid" data-reveal-group>
+              {founders.map((founder) => (
+                <figure key={founder.id} className="founder-polaroid">
+                  <div className="polaroid-frame">
+                    <img
+                      src={founder.profile_image}
+                      alt={`Therapy center co-founder ${founder.name} - ${founder.role} at TheraKids pediatric therapy center Noida`}
+                      className="founder-polaroid-img"
+                      loading="lazy"
+                    />
+                  </div>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Testimonials (Peach), rendered only when the API returns rows */}
+      {testimonials.length > 0 && (
+        <section className="bg-pastel-peach section-padding relative overflow-hidden">
+          {/* Single-wave seams: the white Founders band's bottom wave already
+              carves this section's top edge (peach), and the white Hero Video
+              band below contributes its own white top wave. */}
           <div className="container z-10 relative">
             <div className="section-header center mb-12" data-reveal>
               <p className="label-md text-navy uppercase tracking-widest">Happy families</p>
@@ -421,41 +454,90 @@ const Home = () => {
         </section>
       )}
 
-      {/* FAQ Section (White) */}
-      <section className="bg-white section-padding relative overflow-hidden" ref={faqRef}>
-        <div className="container z-10 relative">
-          <div className="section-header center mb-12" data-reveal>
-            <p className="label-md text-navy uppercase tracking-widest">Got Questions?</p>
-            <h2 className="headline-xl text-navy">Frequently Asked Questions</h2>
-          </div>          <div className="faq-list" data-reveal-group>
-            {faqs.map((faq) => (
-              <div key={faq.id} className={`faq-item ${openFaq === faq.id ? 'open' : ''}`}>
-                <button
-                  className="faq-question"
-                  onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                >
-                  <span className="faq-question-text headline-sm text-navy">{faq.question}</span>
-                  <span className="faq-toggle">
-                    {openFaq === faq.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </span>
-                </button>
-                <div className="faq-answer">
-                  <p className="body-md text-navy-light">{faq.answer}</p>
-                </div>
-              </div>
-            ))}
+      {/* Hero Video Section (White) — split layout: copy left, video right.
+          Placed AFTER Testimonials so the band rhythm stays a strict
+          peach→white→lilac→white alternation down to the peach CTA.
+          Title/description/video come from site_settings so the client can
+          swap them in the admin panel. */}
+      <section className="bg-white section-padding relative overflow-hidden">
+        {/* Testimonials' white bottom wave carves the peach→white seam above;
+            the lilac cloud below feeds the white→lilac seam into FAQ. */}
+        <div className="container video-split z-10 relative">
+          <div className="video-copy" data-reveal>
+            <p className="label-md text-navy uppercase tracking-widest">Inside THERAKids</p>
+            <h2 className="headline-xl text-navy mb-4">{settings.home_video_title || 'Step Inside THERAKids'}</h2>
+            <p className="body-lg text-navy-light video-sub">
+              {settings.home_video_description ||
+                'A two-minute look at our centers, our therapists, and the joyful progress children make here every day.'}
+            </p>
           </div>
+          <div className="video-frame-wrapper" data-reveal>
+            <video
+              className="home-hero-video"
+              src={settings.home_video_url || '/videos/hero-video.mp4'}
+              poster="/images/hero_doctor_kid.jpg"
+              controls
+              preload="metadata"
+              playsInline
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+
+        {/* Lilac cloud below carves the white→lilac seam into the FAQ band. */}
+        <div className="cloud-divider cloud-bottom fill-pastel-lilac">
+          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
+            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
+          </svg>
         </div>
       </section>
 
-      {/* Blog Preview Section (Lilac) */}
-      {blogs.length > 0 && (
-        <section className="bg-pastel-lilac section-padding relative overflow-hidden" ref={blogRef}>
-          <div className="cloud-divider cloud-top fill-white">
+      {/* FAQ Section (Lilac) - home-page FAQs only (faqs table, page_key='home') */}
+      {faqs.length > 0 && (
+        <section className="bg-pastel-lilac section-padding relative overflow-hidden">
+          {/* Single-wave seams: the Video band's lilac bottom wave already
+              carves this section's top edge, so only the bottom seam needs a
+              wave here (white, into Blog). */}
+          <div className="container z-10 relative">
+            <div className="section-header center mb-12" data-reveal>
+              <p className="label-md text-navy uppercase tracking-widest">Got Questions?</p>
+              <h2 className="headline-xl text-navy">Frequently Asked Questions</h2>
+            </div>
+            <div className="faq-list" data-reveal-group>
+              {faqs.map((faq) => (
+                <div key={faq.id} className={`faq-item ${openFaq === faq.id ? 'open' : ''}`}>
+                  <button
+                    className="faq-question"
+                    onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                  >
+                    <span className="faq-question-text headline-sm text-navy">{faq.question}</span>
+                    <span className="faq-toggle">
+                      {openFaq === faq.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </span>
+                  </button>
+                  <div className="faq-answer">
+                    <p className="body-md text-navy-light">{faq.answer}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* White cloud below carves the lilac→white seam into Blog. */}
+          <div className="cloud-divider cloud-bottom fill-white">
             <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
               <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
             </svg>
           </div>
+        </section>
+      )}
+
+      {/* Blog Preview Section (White) - posts come from the blogs table */}
+      {blogs.length > 0 && (
+        <section className="bg-white section-padding relative overflow-hidden">
+          {/* Single-wave seams: the FAQ band's white bottom wave already
+              carves this section's top edge, so only the bottom seam needs a
+              wave here (peach, into the CTA band). */}
           <div className="container z-10 relative">
             <div className="section-header center mb-12" data-reveal>
               <p className="label-md text-navy uppercase tracking-widest">Latest Insights</p>
@@ -465,10 +547,12 @@ const Home = () => {
               {blogs.map((blog) => (
                 <div key={blog.id}>
                   <TiltCard maxTilt={6}>
-                    <div className="pastel-card blog-preview-card">
+                    {/* Same framed card treatment as the Blogs page (.card base:
+                        white surface + brand border), full-bleed image on top. */}
+                    <div className="card blog-preview-card">
                       {blog.image && (
                         <div className="blog-preview-image">
-                          <img src={blog.image} alt={blog.title} />
+                          <img src={blog.image} alt={`${blog.title} - pediatric therapy blog by TheraKids Noida specialists`} loading="lazy" />
                         </div>
                       )}
                       <h3 className="headline-sm text-navy mb-2">{blog.title}</h3>
@@ -499,13 +583,12 @@ const Home = () => {
               </button>
             </div>
           </div>
-          <div className="cloud-divider cloud-bottom fill-white">
-            <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-              <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-            </svg>
-          </div>
+          {/* Single-wave seam into the CTA band: the site-wide CTASection's
+              white top wave carves this edge (it renders outside .home-page,
+              so its wave doesn't show up in the in-page seam audit). */}
         </section>
       )}
+      <LeadPopup open={leadPopupOpen} onClose={() => setLeadPopupOpen(false)} />
     </div>
   );
 };

@@ -262,3 +262,21 @@
   border-bottom: 2px dashed rgba(118, 119, 236, 0.2);
   padding-bottom: 1rem;
 }
+
+/* Straighten the item lists: 'list-style: inside' (from the utility class)
+   plus the browser's default 40px <ul> padding floated bullets ~40px right of
+   the title and tucked wrapped lines under the marker. Outside markers with
+   an explicit indent keep every line flush. */
+.assessment-card ul {
+  list-style: disc outside;
+  padding-left: 1.4rem;
+  margin: 0.25rem 0 0;
+}
+
+.assessment-card li {
+  padding-left: 0.25rem;
+}
+
+.assessment-card li::marker {
+  color: var(--color-pastel-lilac);
+}

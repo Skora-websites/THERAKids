@@ -1,0 +1,253 @@
+/* Home-page lead-generation popup (free screening / assessment funnel) —
+   glossy pastel-gradient panel per the client's reference mock. */
+
+.lead-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: rgb(20 16 44 / 45%);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lead-popup-backdrop.is-visible {
+  opacity: 1;
+}
+
+/* Full-bleed pastel gradient panel — no inner white card (reference mock) */
+.lead-popup {
+  position: relative;
+  width: min(520px, 100%);
+  border-radius: 26px;
+  padding: 2.5rem 2.25rem 1.9rem;
+  text-align: center;
+  overflow: hidden;
+  transform: translateY(24px) scale(0.96);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  background:
+    radial-gradient(140% 120% at 8% 0%, rgb(214 199 255 / 85%) 0%, transparent 46%),
+    radial-gradient(130% 110% at 96% 4%, rgb(255 205 220 / 90%) 0%, transparent 48%),
+    radial-gradient(120% 130% at 100% 100%, rgb(255 214 228 / 95%) 0%, transparent 55%),
+    radial-gradient(120% 120% at 0% 100%, rgb(255 231 209 / 95%) 0%, transparent 52%),
+    linear-gradient(150deg, #fdf1ec 0%, #fdeef5 45%, #efeafd 100%);
+  box-shadow:
+    0 30px 70px rgb(20 16 44 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 85%);
+}
+
+.lead-popup-backdrop.is-visible .lead-popup {
+  transform: translateY(0) scale(1);
+}
+
+/* Glossy sweep: a soft diagonal sheen drifting across the panel */
+.lead-popup-gloss {
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgb(255 255 255 / 0%) 42%,
+    rgb(255 255 255 / 55%) 50%,
+    rgb(255 255 255 / 0%) 58%,
+    transparent 68%
+  );
+  transform: translateX(-70%) rotate(8deg);
+  animation: lead-popup-sheen 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes lead-popup-sheen {
+  0% { transform: translateX(-70%) rotate(8deg); }
+  55%, 100% { transform: translateX(70%) rotate(8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lead-popup-backdrop,
+  .lead-popup {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .lead-popup-gloss {
+    animation: none;
+    display: none;
+  }
+}
+
+/* Simple white cross: plain circle, no animation */
+.lead-popup-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: var(--color-navy, #1a237e);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+/* Theme-aware floating doodles */
+.lead-popup-doodle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.lead-popup-sparkle {
+  top: 20px;
+  left: 22px;
+  width: 34px;
+  height: 34px;
+  color: #f2b33d;
+  opacity: 0.9;
+}
+
+.lead-popup-heart {
+  bottom: 18px;
+  left: 20px;
+  width: 38px;
+  height: 38px;
+  transform: rotate(-12deg);
+  color: rgb(233 79 157 / 35%);
+}
+
+/* Pill eyebrow badge */
+.lead-popup-eyebrow {
+  display: inline-block;
+  padding: 0.4rem 1.25rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgb(255 255 255 / 75%), rgb(255 240 245 / 90%));
+  box-shadow: inset 0 0 0 1px rgb(124 111 240 / 12%), 0 2px 10px rgb(124 111 240 / 10%);
+  color: #6a5ae0;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+  position: relative;
+  z-index: 2;
+}
+
+.lead-popup-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.9rem, 4.4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--color-navy, #1a237e);
+  margin-bottom: 0.85rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Gradient italic accent line ("on track?"). background-clip:text only paints
+   the element's line box — the italic glyphs' ink runs ~5px past it (tight
+   1.1 line-height), and everything outside the painted box renders
+   transparent, which chopped the bottom off the "?". The padded inline-block
+   box (cancelled by negative margins, so layout is unchanged) extends the
+   painted area over the full glyph extent. */
+.lead-popup-title-accent {
+  display: inline-block;
+  font-style: italic;
+  padding: 0.08em 0.1em 0.16em;
+  margin: -0.08em -0.1em -0.16em;
+  background: linear-gradient(90deg, #7c6ff0 0%, #b16cea 40%, #e94f9d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.lead-popup-text {
+  color: #565f7a;
+  max-width: 38ch;
+  margin: 0 auto 1.3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Two CTAs side by side (stack under 560px), pill-shaped with arrows */
+.lead-popup-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 560px) {
+  .lead-popup-actions {
+    flex-direction: column;
+  }
+}
+
+.lead-popup-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border-radius: 999px;
+  padding: 0.85rem 1.35rem;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.lead-popup-btn-arrow {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.lead-popup-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.lead-popup-btn:hover .lead-popup-btn-arrow {
+  transform: translateX(3px);
+}
+
+/* Primary CTA: pink → coral */
+.lead-popup-btn-primary {
+  background: linear-gradient(120deg, #f7699d 0%, #f9536e 100%);
+  box-shadow: 0 12px 26px rgb(249 83 110 / 40%);
+}
+
+/* Secondary CTA: violet */
+.lead-popup-btn-secondary {
+  background: linear-gradient(120deg, #8d7bf5 0%, #6a5ae0 100%);
+  box-shadow: 0 12px 26px rgb(106 90 224 / 40%);
+}
+
+.lead-popup-note {
+  color: #565f7a;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.lead-popup-note a {
+  color: #6a5ae0;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.lead-popup-note a:hover {
+  text-decoration: underline;
+}

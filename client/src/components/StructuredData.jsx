@@ -1,7 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import API_URL from '../config';
+import { CONTACT_FALLBACKS } from '../lib/contact';
 
 const SITE_URL = 'https://therakidsnoida.com';
+// Settings shape built from the official contact constants (used until /api/settings
+// answers, or permanently on frontend-only deploys)
+const CONTACT_FALLBACKS_SETTINGS = {
+  phone: CONTACT_FALLBACKS.phone,
+  email: CONTACT_FALLBACKS.email,
+  address1: CONTACT_FALLBACKS.address1,
+  address2: CONTACT_FALLBACKS.address2
+};
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+// Official social profiles and Maps deep link (mirrored in the footer);
+// sameAs helps search engines connect the brand across platforms.
+const SOCIAL_PROFILES = [
+  'https://www.facebook.com/therakidsnoida',
+  'https://www.instagram.com/therakids_noida/',
+  'https://www.youtube.com/@therakids_noida',
+  'https://x.com/therakids_noida'
+];
+const MAPS_URL =
+  'https://www.google.com/maps/search/?api=1&query=THERAKids%20Foundation%2C%20G-10%2C%20Block%20G%2C%20Sector%2022%2C%20Noida%2C%20Uttar%20Pradesh%20201301';
 
 // "Mon-Fri" / "Saturday" → [day names] (≥3-char prefix match, e.g. Mon → Monday)
 const parseDayPart = (dayPart) => {
@@ -53,45 +74,70 @@ const splitAddress = (addr) => {
 // First phone number, normalised to +91XXXXXXXXXX
 const firstPhone = (phone) => String(phone || '').split('/')[0].replace(/[^+\d]/g, '') || null;
 
+// Organization JSON-LD rendered on the Home page: name/logo/description are site
+// boilerplate, but addresses, phones and emails come from admin-edited Site
+// Settings. Not rendered until the settings fetch resolves.
+const OrganizationSchema = () => {
+  // Start from the official contact fallbacks so the org block renders even on
+  // frontend-only deploys; admin-edited settings overwrite when /api answers.
+  const [s, setS] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_URL}/api/settings`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data && Object.keys(data).length > 0) setS(data);
+      })
+      .catch(() => {
+        // API unreachable - keep the fallback contact info below
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const settings = s || CONTACT_FALLBACKS_SETTINGS;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'TheraKids Noida',
+    url: SITE_URL,
+    logo: `${SITE_URL}/logo.png`,
+    description: 'TheraKids Noida - pediatric therapy and child development services in Noida and Greater Noida, Delhi NCR.',
+    address: [settings.address1, settings.address2]
+      .filter(Boolean)
+      .map((addr) => {
+        const parsed = splitAddress(addr);
+        return parsed
+          ? { '@type': 'PostalAddress', ...parsed, addressRegion: 'Uttar Pradesh', addressCountry: 'IN' }
+          : null;
+      })
+      .filter(Boolean),
+    telephone: (settings.phone || '').split('/').map(firstPhone).filter(Boolean),
+    email: settings.email ? [settings.email] : undefined,
+    sameAs: SOCIAL_PROFILES
+  };
+  return <JsonLd schema={schema} />;
+};
+
+const JsonLd = ({ schema }) => {
+  if (!schema) return null;
+
+  // \u003c (and the JS line separators) keep admin-supplied text from ever
+  // closing the <script> block, while staying valid JSON for parsers.
+  const json = JSON.stringify(schema)
+    .replace(/</g, '\\u003c')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json }} />;
+};
+
 const StructuredData = ({ type, data }) => {
+  if (type === 'organization') return <OrganizationSchema />;
+
   const getSchema = () => {
     switch (type) {
-      case 'organization':
-        return {
-          '@context': 'https://schema.org',
-          '@type': 'Organization',
-          name: 'TheraKids Noida',
-          url: 'https://therakidsnoida.com',
-          logo: 'https://therakidsnoida.com/images/thera-kids-logo1.png',
-          description: 'TheraKids Noida offers world-class Occupational therapy, Physiotherapy, speech therapy, Special Education, and Counseling to child/kids in Noida, Delhi NCR.',
-          address: [
-            {
-              '@type': 'PostalAddress',
-              streetAddress: 'G-10, Block G, Sector 22',
-              addressLocality: 'Noida',
-              addressRegion: 'Uttar Pradesh',
-              postalCode: '201301',
-              addressCountry: 'IN'
-            },
-            {
-              '@type': 'PostalAddress',
-              streetAddress: '173, Itehara, Near NX-One Society',
-              addressLocality: 'Greater Noida West',
-              addressRegion: 'Uttar Pradesh',
-              postalCode: '201306',
-              addressCountry: 'IN'
-            }
-          ],
-          telephone: ['+919313513313', '+919899338813'],
-          email: ['contact@therakidsnoida.com', 'therakids.dc@gmail.com'],
-          sameAs: [
-            'https://www.facebook.com/therakidsnoida',
-            'https://www.instagram.com/therakidsnoida',
-            'https://www.twitter.com/therakidsnoida',
-            'https://www.linkedin.com/company/therakidsnoida'
-          ]
-        };
-      
       case 'localBusiness': {
         // Business-type JSON-LD rendered site-wide (Layout); address, phone and
         // hours all come from admin-edited Site Settings (with App fallbacks).
@@ -105,7 +151,7 @@ const StructuredData = ({ type, data }) => {
           '@type': 'MedicalBusiness',
           name: 'TheraKids Noida',
           url: SITE_URL,
-          logo: `${SITE_URL}/images/thera-kids-logo1.png`,
+          logo: `${SITE_URL}/logo.png`,
           image: `${SITE_URL}/images/home%20hero%20img.png`,
           description: 'TheraKids Noida offers world-class Occupational therapy, physical therapy, speech therapy, and Counseling to child/kids in Noida, Delhi NCR under the supervision of highly trained specialists.',
           telephone: firstPhone(s.phone),
@@ -120,44 +166,16 @@ const StructuredData = ({ type, data }) => {
             : undefined,
           openingHoursSpecification: hours,
           geo: { '@type': 'GeoCoordinates', latitude: 28.5802, longitude: 77.334 },
+          hasMap: MAPS_URL,
           medicalSpecialty: [
             'Pediatric Occupational Therapy',
             'Pediatric Speech Therapy',
             'Pediatric Physiotherapy'
           ],
-          sameAs: [
-            'https://www.facebook.com/therakidsnoida',
-            'https://www.instagram.com/therakidsnoida',
-            'https://www.twitter.com/therakidsnoida',
-            'https://www.linkedin.com/company/therakidsnoida'
-          ]
+          sameAs: SOCIAL_PROFILES
         };
       }
 
-      case 'medicalBusiness':
-        return {
-          '@context': 'https://schema.org',
-          '@type': 'MedicalBusiness',
-          name: 'TheraKids Noida',
-          url: 'https://therakidsnoida.com',
-          description: 'Pediatric child development center offering Occupational Therapy, Speech Therapy, Physiotherapy, Special Education, and Early Intervention for children in Noida and Greater Noida.',
-          medicalSpecialty: [
-            'Pediatric Occupational Therapy',
-            'Pediatric Speech Therapy',
-            'Pediatric Physiotherapy'
-          ],
-          availableService: data?.services || [],
-          address: {
-            '@type': 'PostalAddress',
-            streetAddress: 'G-10, Block G, Sector 22',
-            addressLocality: 'Noida',
-            addressRegion: 'Uttar Pradesh',
-            postalCode: '201301',
-            addressCountry: 'IN'
-          },
-          telephone: '+919313513313'
-        };
-      
       case 'service':
         return {
           '@context': 'https://schema.org',
@@ -217,16 +235,7 @@ const StructuredData = ({ type, data }) => {
   };
 
   const schema = getSchema();
-  if (!schema) return null;
-
-  // \u003c (and the JS line separators) keep admin-supplied text from ever
-  // closing the <script> block, while staying valid JSON for parsers.
-  const json = JSON.stringify(schema)
-    .replace(/</g, '\\u003c')
-    .replace(/\u2028/g, '\\u2028')
-    .replace(/\u2029/g, '\\u2029');
-
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json }} />;
+  return <JsonLd schema={schema} />;
 };
 
 export default StructuredData;

@@ -8,6 +8,10 @@ const CTASection = () => {
   const { setIsModalOpen } = useAppContext();
   const sectionRef = useRef(null);
 
+  // The top wave must match the section ABOVE this site-wide band.
+  // Every page ends on a white band, so the default is white.
+  const topFill = 'fill-white';
+
   useEffect(() => {
     const cleanupReveals = initScrollReveals(sectionRef.current);
     const cleanupFloat = createFloatLoop(sectionRef.current, '[data-float]');
@@ -24,7 +28,7 @@ const CTASection = () => {
       ref={sectionRef}
     >
       {/* Cloud Divider to overlap the section above */}
-      <div className="cloud-divider cloud-top fill-white">
+      <div className={`cloud-divider cloud-top ${topFill}`}>
         <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
           <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
         </svg>

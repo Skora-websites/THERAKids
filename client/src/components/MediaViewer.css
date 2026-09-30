@@ -1,0 +1,183 @@
+/* In-page media viewer (Programs page resources & videos).
+   Reuses .prog-btn from Programs.css — this viewer only renders there. */
+
+.mv-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 35, 126, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.mv-dialog {
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  width: min(960px, 100%);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: mv-in 0.22s ease;
+}
+
+@keyframes mv-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem 0.9rem;
+}
+
+.mv-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-navy);
+  font-size: 1.15rem;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.mv-close {
+  flex-shrink: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-low);
+  color: var(--color-navy);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mv-close:hover {
+  background: var(--color-surface-container-high);
+}
+
+.mv-desc {
+  margin: 0;
+  padding: 0 1.4rem 0.9rem;
+  font-size: 0.88rem;
+  color: var(--color-on-surface-variant);
+}
+
+.mv-frame {
+  margin: 0 1.4rem 1.4rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-inverse-surface);
+  border: 1px solid var(--color-border-brand);
+}
+
+.mv-frame-video {
+  aspect-ratio: 16 / 9;
+}
+
+.mv-frame-video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.mv-frame-doc {
+  height: min(68vh, 640px);
+}
+
+.mv-frame-doc iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: #fff;
+}
+
+.mv-frame-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-container-low);
+}
+
+.mv-frame-image img {
+  max-width: 100%;
+  max-height: 68vh;
+  object-fit: contain;
+  display: block;
+}
+
+/* Fallback: can't render inline (docx, external site, non-YouTube video) */
+.mv-fallback {
+  margin: 0 1.4rem 1.4rem;
+  border: 1px dashed var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-low);
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  color: var(--color-on-surface-variant);
+}
+
+.mv-fallback svg {
+  color: var(--color-cta-primary);
+}
+
+.mv-fallback p {
+  margin: 0;
+  font-size: 0.92rem;
+  max-width: 380px;
+}
+
+.mv-fallback-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .mv-overlay {
+    padding: 0.75rem;
+  }
+
+  .mv-header {
+    padding: 0.9rem 1rem 0.7rem;
+  }
+
+  .mv-title {
+    font-size: 1rem;
+  }
+
+  .mv-desc {
+    padding: 0 1rem 0.7rem;
+  }
+
+  .mv-frame {
+    margin: 0 1rem 1rem;
+  }
+
+  .mv-frame-doc {
+    height: 60vh;
+  }
+}

@@ -5,7 +5,7 @@
 // Reads the same .env the server uses, so no credentials are duplicated here.
 require('dotenv').config();
 const mysql = require('mysql2/promise');
-const curatedGallery = require('../client/src/data/galleryImages.json');
+const curatedGallery = require('./gallery-curated.json');
 
 const SERVICE_IMAGES = {
   'occupational-therapy': '/images/services/occupational-therapy.jpg',
@@ -93,7 +93,12 @@ async function main() {
     // 3) Blogs: point featured images at the local topic photos
     const BLOG_IMAGES = {
       'understanding-sensory-processing': '/images/blogs/sensory-processing.jpg',
-      'speech-milestones-toddlers': '/images/blogs/speech-milestones.jpg'
+      'speech-milestones-toddlers': '/images/blogs/speech-milestones.jpg',
+      'difference-between-occupational-therapy-and-physiotherapy': '/images/services/occupational-therapy.jpg',
+      'benefits-of-speech-therapy-for-kids': '/images/services/speech-therapy.jpg',
+      'sign-that-child-needs-occupational-therapy': '/images/services/early-intervention.jpg',
+      'occupational-therapy-center-in-noida': '/images/gallery/therakids/noida-centre-01.jpg',
+      'speech-therapy-what-is-it-types-test-treatment': '/images/services/special-education.jpg'
     };
     let blogRows = 0;
     for (const [slug, imagePath] of Object.entries(BLOG_IMAGES)) {

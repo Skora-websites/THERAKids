@@ -1,18 +1,110 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import InlineCTA from '../components/InlineCTA';
 import PageHero from '../components/PageHero';
+import API_URL from '../config';
 import { initScrollReveals, createFloatLoop } from '../lib/motion';
 import { usePageSeo } from '../hooks/usePageSeo';
+import { FALLBACK_DATA } from '../data/fallbackData';
 import './Conditions.css';
 // The condition cards reuse the service-detail layout classes defined in Services.css
 import './Services.css';
 
+/* Icons cycle onto condition cards by display order (the DB rows carry no icon). */
+const CONDITION_ICONS = [
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <path d="M12 16v-4"></path>
+    <path d="M12 8h.01"></path>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2v20"></path>
+    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9z"></path>
+    <path d="M12 3a9 9 0 0 0-9 9h18a9 9 0 0 0-9-9z"></path>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="5" r="3"></circle>
+    <line x1="12" y1="22" x2="12" y2="8"></line>
+    <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>,
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+    <line x1="16" y1="8" x2="2" y2="22"></line>
+    <line x1="17.5" y1="15" x2="9" y2="15"></line>
+  </svg>
+];
+
+// focus_areas is a JSON column (mysql2 may deliver a string or a parsed array)
+const parseFocusAreas = (raw) => {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string' && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 const Conditions = () => {
   usePageSeo('/conditions');
   const pageRef = useRef(null);
+  const [conditions, setConditions] = useState(FALLBACK_DATA.conditions);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_URL}/api/conditions`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data) && data.length > 0) setConditions(data);
+      })
+      .catch(() => {
+        // API unreachable - the section renders empty rather than hardcoded content
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   /* GSAP scroll reveals for the condition cards */
@@ -25,181 +117,6 @@ const Conditions = () => {
     };
   }, []);
 
-  const conditions = [
-    {
-      id: 1,
-      name: 'Autism Spectrum Disorder',
-      short_name: 'Autism',
-      description: 'A neurodevelopmental condition affecting communication, social interaction, and behavior. We focus on enhancing social skills, sensory processing, and promoting independence.',
-      focus_areas: ['Social Skills', 'Sensory Regulation', 'Communication'],
-      image: '/images/conditions/autism.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-          <line x1="9" y1="9" x2="9.01" y2="9"></line>
-          <line x1="15" y1="9" x2="15.01" y2="9"></line>
-        </svg>
-      )
-    },
-    {
-      id: 2,
-      name: 'ADHD',
-      short_name: 'ADHD',
-      description: 'Attention-Deficit/Hyperactivity Disorder involves differences in attention, focus, and impulse control. Our therapies help build executive functioning, emotional regulation, and academic success.',
-      focus_areas: ['Executive Functioning', 'Impulse Control', 'Attention Span'],
-      image: '/images/conditions/adhd.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-      )
-    },
-    {
-      id: 3,
-      name: 'Down Syndrome',
-      short_name: 'Down Syndrome',
-      description: 'A genetic condition causing developmental and physical differences. We provide early intervention focusing on motor milestones, speech development, and cognitive skills.',
-      focus_areas: ['Motor Milestones', 'Speech Development', 'Cognitive Skills'],
-      image: '/images/conditions/down-syndrome.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-          <line x1="7" y1="7" x2="7.01" y2="7"></line>
-        </svg>
-      )
-    },
-    {
-      id: 4,
-      name: 'Cerebral Palsy',
-      short_name: 'Cerebral Palsy',
-      description: 'A group of disorders affecting movement and muscle tone. Our therapies focus on maximizing mobility, functional independence, and overall quality of life.',
-      focus_areas: ['Mobility', 'Muscle Tone', 'Functional Independence'],
-      image: '/images/conditions/cerebral-palsy.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M12 16v-4"></path>
-          <path d="M12 8h.01"></path>
-        </svg>
-      )
-    },
-    {
-      id: 5,
-      name: 'Global Developmental Delay (GDD)',
-      short_name: 'GDD',
-      description: 'When a child is significantly delayed in multiple developmental areas (motor, speech, cognitive). We provide comprehensive, multidisciplinary intervention to bridge the gaps.',
-      focus_areas: ['Multidisciplinary Care', 'Milestone Tracking', 'Early Intervention'],
-      image: '/images/conditions/gdd.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 2v20"></path>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-        </svg>
-      )
-    },
-    {
-      id: 6,
-      name: 'Learning Disability',
-      short_name: 'LD',
-      description: 'Challenges affecting how the brain receives, processes, or responds to information (e.g., Dyslexia). We offer specialized educational support to build academic confidence.',
-      focus_areas: ['Reading & Writing', 'Academic Confidence', 'Special Education'],
-      image: '/images/conditions/learning-disability.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-        </svg>
-      )
-    },
-    {
-      id: 7,
-      name: 'Speech & Language Delay',
-      short_name: 'Speech Delay',
-      description: 'When a child’s language development is slower than typical milestones. Our speech pathologists work to improve articulation, comprehension, and expressive communication.',
-      focus_areas: ['Articulation', 'Comprehension', 'Expressive Language'],
-      image: '/images/conditions/speech-delay.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-      )
-    },
-    {
-      id: 8,
-      name: 'High Risk Infants',
-      short_name: 'High Risk Infants',
-      description: 'Infants born prematurely or with medical complications requiring early developmental monitoring and preventative therapy to ensure optimal growth trajectories.',
-      focus_areas: ['Early Monitoring', 'Preventative Therapy', 'Infant Care'],
-      image: '/images/conditions/high-risk-infants.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9z"></path>
-          <path d="M12 3a9 9 0 0 0-9 9h18a9 9 0 0 0-9-9z"></path>
-        </svg>
-      )
-    },
-    {
-      id: 9,
-      name: 'Intellectual Disability',
-      short_name: 'ID',
-      description: 'Characterized by significant limitations in intellectual functioning and adaptive behavior. We focus on teaching functional life skills and enhancing independence.',
-      focus_areas: ['Life Skills', 'Independence', 'Adaptive Behavior'],
-      image: '/images/conditions/intellectual-disability.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
-        </svg>
-      )
-    },
-    {
-      id: 10,
-      name: 'Developmental Coordination Disorder',
-      short_name: 'DCD',
-      description: 'Also known as dyspraxia, affecting physical coordination. We help improve motor planning, balance, and execution of daily physical tasks.',
-      focus_areas: ['Motor Planning', 'Balance', 'Physical Coordination'],
-      image: '/images/conditions/dcd.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="5" r="3"></circle>
-          <line x1="12" y1="22" x2="12" y2="8"></line>
-          <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
-        </svg>
-      )
-    },
-    {
-      id: 11,
-      name: 'Social Communication Disorder',
-      short_name: 'SCD',
-      description: 'Difficulties with the use of verbal and nonverbal language for social purposes. We facilitate social groups to practice pragmatic language and peer interactions.',
-      focus_areas: ['Pragmatic Language', 'Peer Interaction', 'Group Sessions'],
-      image: '/images/conditions/social-communication.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-        </svg>
-      )
-    },
-    {
-      id: 12,
-      name: 'Hemiparesis',
-      short_name: 'Hemiparesis',
-      description: 'Weakness or partial paralysis on one side of the body. Our PT and OT programs focus on strengthening, bilateral coordination, and functional mobility.',
-      focus_areas: ['Strengthening', 'Bilateral Coordination', 'Functional Mobility'],
-      image: '/images/conditions/hemiparesis.jpg',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
-          <line x1="16" y1="8" x2="2" y2="22"></line>
-          <line x1="17.5" y1="15" x2="9" y2="15"></line>
-        </svg>
-      )
-    }
-  ];
-
   return (
     <div className="conditions-page" ref={pageRef}>
       <PageHero
@@ -209,7 +126,7 @@ const Conditions = () => {
         title="Every child's journey is unique."
         subtitle="We provide specialized, multidisciplinary care tailored to your child's unique developmental profile."
         image="/images/hero-conditions.jpg"
-        imageAlt="Therapist supporting a child during an activity"
+        imageAlt="Child development therapist supporting a child during a play-based activity at TheraKids Noida"
         imagePosition="27% 0%"
         scriptNote="Every step counts"
       />
@@ -222,41 +139,55 @@ const Conditions = () => {
 
       <section className="bg-white section-padding pt-4">
         <div className="container max-w-6xl mx-auto">
-          <div className="flex flex-col gap-8" data-reveal-group>
-            {conditions.map((condition, index) => (
-              <div 
-                key={condition.id}
-                className="service-detail-card"
-              >
-                <div className={`service-detail-content ${index % 2 !== 0 ? 'reverse' : ''}`}>
-                  <div className="service-text">
-                    <div className="flex items-center gap-3">
-                      <div className="text-navy w-8 h-8">
-                        {condition.icon}
+          {loading ? (
+            <div className="body-md text-navy-light text-center" style={{ padding: '2rem 0' }}>Loading conditions…</div>
+          ) : (
+            <div className="flex flex-col gap-8" data-reveal-group>
+              {conditions.map((condition, index) => {
+                const focusAreas = parseFocusAreas(condition.focus_areas);
+                return (
+                  <div
+                    key={condition.id}
+                    className="service-detail-card"
+                  >
+                    <div className={`service-detail-content ${index % 2 !== 0 ? 'reverse' : ''}`}>
+                      <div className="service-text">
+                        <div className="flex items-center gap-3">
+                          <div className="text-navy w-8 h-8">
+                            {CONDITION_ICONS[index % CONDITION_ICONS.length]}
+                          </div>
+                          <h2 className="headline-xl">{condition.name}</h2>
+                        </div>
+                        <p className="body-lg">{condition.description}</p>
+
+                        {focusAreas.length > 0 && (
+                          <div className="service-benefits">
+                            <h4 className="label-lg">Key Focus Areas:</h4>
+                            <ul>
+                              {focusAreas.map((area, idx) => (
+                                <li key={idx} className="body-sm">{area}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
-                      <h2 className="headline-xl">{condition.name}</h2>
-                    </div>
-                    <p className="body-lg">{condition.description}</p>
-                    
-                    <div className="service-benefits">
-                      <h4 className="label-lg">Key Focus Areas:</h4>
-                      <ul>
-                        {condition.focus_areas.map((area, idx) => (
-                          <li key={idx} className="body-sm">{area}</li>
-                        ))}
-                      </ul>
+
+                      <div className="service-visual">
+                        <div className="condition-blob">
+                          <img src={condition.image} alt={`${condition.name} treatment for children at TheraKids pediatric therapy center Noida`} style={{width: '100%', height: '100%', objectFit: 'cover'}} loading="lazy" />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="service-visual">
-                    <div className="condition-blob">
-                      <img src={condition.image} alt={condition.name} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                    </div>
-                  </div>
+                );
+              })}
+              {!loading && conditions.length === 0 && (
+                <div className="body-md text-navy-light text-center" style={{ padding: '2rem 0' }}>
+                  Condition information is being updated. Please contact us for details.
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
     </div>

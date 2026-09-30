@@ -5,6 +5,8 @@ import { useAppContext } from '../context/AppContext';
 import { prefersReducedMotion } from '../lib/motion';
 import './Header.css';
 
+/* Primary navigation. Contact Us stays reachable via the footer and the
+   appointment modal, per the client's request; /programs is its replacement. */
 const NAV_ITEMS = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About Us' },
@@ -12,7 +14,7 @@ const NAV_ITEMS = [
   { to: '/conditions', label: 'Conditions We Treat' },
   { to: '/gallery', label: 'Gallery' },
   { to: '/blogs', label: 'Blogs' },
-  { to: '/contact', label: 'Contact Us' },
+  { to: '/programs', label: 'THERAKids Academy' },
 ];
 
 const Header = ({ onBookAppointment }) => {

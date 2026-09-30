@@ -61,18 +61,38 @@
   padding-bottom: var(--spacing-xl);
 }
 
-/* Two-up featured blog grid */
+/* Three-per-row blog grid. Cards keep a fixed size; a partial last row (2 or
+   1 cards) is centered with the same card size via inline flex, matching the
+   client brief. */
 .blogs-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 2rem;
-  max-width: 960px;
+  max-width: 1240px;
   margin: 0 auto;
+}
+
+.blogs-grid > div {
+  flex: 0 0 calc((100% - 4rem) / 3);
+  width: calc((100% - 4rem) / 3);
+}
+
+@media (max-width: 992px) {
+  .blogs-grid > div {
+    flex-basis: calc((100% - 2rem) / 2);
+    width: calc((100% - 2rem) / 2);
+  }
 }
 
 @media (max-width: 768px) {
   .blogs-grid {
-    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .blogs-grid > div {
+    flex-basis: 100%;
+    width: 100%;
     max-width: 440px;
   }
 }
@@ -160,21 +180,15 @@
   .featured-image-wrapper {
     min-height: 200px;
   }
-}
-
-/* Mobile: tighter under-hero whitespace + compact blog cards */
-@media (max-width: 768px) {
-  .blogs-page > .container.py-12 {
+}  /* Mobile: tighter under-hero whitespace + compact blog cards */
+  @media (max-width: 768px) {
+    .blogs-page > .container.py-12 {
     padding-top: 1.25rem;
     padding-bottom: 1.25rem;
   }
 
   .blogs-page .standard-blogs-section.section-padding.pt-4 {
     padding-top: 1rem;
-  }
-
-  .blogs-grid {
-    gap: 1.25rem;
   }
 
   .blog-card-image {

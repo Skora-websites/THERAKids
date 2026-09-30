@@ -3,24 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import TiltCard from './TiltCard';
 import API_URL from '../config';
-import fallbackServices from '../data/fallbackServices';
 import './RelatedServices.css';
 
 const SERVICE_ICONS = ['🗣️', '✋', '🏃', '📚', '🎨', '💬', '🧩', '🎒'];
 
 const RelatedServices = ({ currentService }) => {
   const navigate = useNavigate();
-  const [services, setServices] = useState(fallbackServices);
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
     fetch(`${API_URL}/api/services`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (!cancelled && Array.isArray(data) && data.length > 0) setServices(data);
+        if (!cancelled && Array.isArray(data)) setServices(data);
       })
       .catch(() => {
-        // API unreachable - the shared static fallback list stays in place
+        // API unreachable - nothing renders rather than hardcoded content
       });
     return () => {
       cancelled = true;
@@ -50,7 +49,10 @@ const RelatedServices = ({ currentService }) => {
             We offer a comprehensive range of therapy services to support your child's development. Discover how our other specialties can help.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-8 related-services-grid" data-reveal-group>
+      {/* Single-wave seams: the white top wave carves this band out of the page
+          above; below, the site-wide CTASection's own top wave (white, or lilac
+          on /conditions) carves this edge — no bottom wave here. */}
+      <div className="grid grid-cols-2 gap-8 related-services-grid" data-reveal-group>
           {relatedServices.map((service) => (
             <TiltCard key={service.id} maxTilt={6}>
               <div
@@ -61,7 +63,7 @@ const RelatedServices = ({ currentService }) => {
                 }}
               >
                 <div className="related-service-image">
-                  <img src={service.image} alt={service.name} />
+                  <img src={service.image} alt={`${service.name} therapy for children at TheraKids Noida`} loading="lazy" />
                   <div className="related-service-icon">{service.icon}</div>
                 </div>
                 <div className="related-service-content">
@@ -75,11 +77,6 @@ const RelatedServices = ({ currentService }) => {
             </TiltCard>
           ))}
         </div>
-      </div>
-      <div className="cloud-divider cloud-bottom fill-white">
-        <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-          <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-        </svg>
       </div>
     </section>
   );

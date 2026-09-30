@@ -11,7 +11,10 @@ const jwt = require('jsonwebtoken');
 const sanitizeHtml = require('sanitize-html');
 
 const app = express();
-const PORT = process.env.PORT || 5005; // 5000 is reserved by Windows on some machines
+// 5000 is reserved by Windows on some machines; PORT=0 (exported by some dev
+// environments) would bind an ephemeral port, so anything unusable falls back.
+const DEFAULT_PORT = 5005;
+const PORT = Number(process.env.PORT) > 0 ? Number(process.env.PORT) : DEFAULT_PORT;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
 // Middleware
@@ -34,6 +37,30 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) cb(null, true);
     else cb(new Error('Only image files are allowed'));
+  },
+  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB
+});
+
+// Resume uploads from the public career form: PDF/DOC/DOCX only, 5 MB max.
+// Extension whitelist backs the MIME check (some OSes report docx oddly).
+const RESUME_MIMES = new Set([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+]);
+const RESUME_EXTS = new Set(['.pdf', '.doc', '.docx']);
+const resumeUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      cb(null, `resume-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`);
+    }
+  }),
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    if (RESUME_MIMES.has(file.mimetype) && RESUME_EXTS.has(ext)) cb(null, true);
+    else cb(new Error('Resume must be a PDF, DOC or DOCX file'));
   },
   limits: { fileSize: 5 * 1024 * 1024 } // 5 MB
 });
@@ -65,6 +92,56 @@ const authenticateToken = (req, res, next) => {
 // PUBLIC API ROUTES
 // ==========================================
 
+// Programs page (academics section): modules + their resources, benefits
+// and grouped YouTube videos. Single round-trip for the whole section.
+app.get('/api/programs/academics', async (req, res) => {
+  try {
+    const [modules] = await pool.query(
+      'SELECT * FROM program_modules WHERE is_active = 1 ORDER BY display_order ASC, id ASC'
+    );
+    const [resources] = await pool.query(
+      'SELECT id, module_id, title, resource_type, url, description, display_order FROM program_resources WHERE is_active = 1 ORDER BY display_order ASC, id ASC'
+    );
+    const [benefits] = await pool.query(
+      'SELECT benefit FROM program_benefits WHERE is_active = 1 ORDER BY display_order ASC, id ASC'
+    );
+    const [videos] = await pool.query(
+      'SELECT id, group_name, title, url, length_label, views_label FROM program_videos WHERE is_active = 1 ORDER BY group_name ASC, display_order ASC, id ASC'
+    );
+    const byModule = new Map(modules.map((m) => [m.id, []]));
+    for (const r of resources) {
+      if (byModule.has(r.module_id)) byModule.get(r.module_id).push(r);
+    }
+    const groups = [];
+    const groupIndex = new Map();
+    for (const v of videos) {
+      if (!groupIndex.has(v.group_name)) {
+        groupIndex.set(v.group_name, { group: v.group_name, videos: [] });
+        groups.push(groupIndex.get(v.group_name));
+      }
+      groupIndex.get(v.group_name).videos.push({
+        id: v.id,
+        title: v.title,
+        url: v.url,
+        length: v.length_label,
+        views: v.views_label,
+      });
+    }
+    res.json({
+      modules: modules.map((m) => ({
+        id: m.id,
+        title: m.title,
+        duration: m.duration,
+        topics: typeof m.topics === 'string' ? JSON.parse(m.topics) : m.topics || [],
+        resources: byModule.get(m.id) || [],
+      })),
+      benefits: benefits.map((b) => b.benefit),
+      videoGroups: groups,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 app.get('/api/settings', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT setting_key, setting_value FROM site_settings');
@@ -81,15 +158,6 @@ app.get('/api/settings', async (req, res) => {
 app.get('/api/services', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC');
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/doctors', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM doctors WHERE is_active = 1 ORDER BY display_order ASC');
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -137,10 +205,11 @@ app.get('/api/services/:slug', async (req, res) => {
 // FAQs for a page — ?page=home or ?page=<service slug>. Omit ?page= for all active rows.
 app.get('/api/faqs', async (req, res) => {
   try {
-    const page = req.query.page;
-    const [rows] = page
-      ? await pool.query('SELECT * FROM faqs WHERE page_key = ? AND is_active = 1 ORDER BY display_order ASC, id ASC', [page])
-      : await pool.query('SELECT * FROM faqs WHERE is_active = 1 ORDER BY page_key ASC, display_order ASC, id ASC');
+    // FAQs live on the home page only (page_key='home'); the table keeps the
+    // page_key column for future needs, but only home rows are served.
+    const [rows] = await pool.query(
+      "SELECT * FROM faqs WHERE page_key = 'home' AND is_active = 1 ORDER BY display_order ASC, id ASC"
+    );
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -226,6 +295,55 @@ app.get('/api/seo', async (req, res) => {
   }
 });
 
+// Our Process (Home page steps) — admin-managed
+app.get('/api/process-steps', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM process_steps WHERE is_active = 1 ORDER BY display_order ASC');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Conditions We Treat — admin-managed
+app.get('/api/conditions', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM conditions_data WHERE is_active = 1 ORDER BY display_order ASC');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Founders / leadership bios (Home founders grid + About page)
+app.get('/api/founders', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM founders WHERE is_active = 1 ORDER BY display_order ASC');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Generic per-page content blocks (JSON in the `content` column), e.g. the About
+// page mission/values. Keyed by a stable `page_key`.
+app.get('/api/page-content/:page', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT `key`, content FROM page_content WHERE page_key = ? AND is_active = 1 ORDER BY display_order ASC, id ASC', [req.params.page]);
+    const out = {};
+    for (const row of rows) {
+      try {
+        out[row.key] = typeof row.content === 'string' ? JSON.parse(row.content) : row.content;
+      } catch {
+        out[row.key] = row.content;
+      }
+    }
+    res.json(out);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/testimonials', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY display_order ASC');
@@ -233,6 +351,52 @@ app.get('/api/testimonials', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+// Messages from the public Contact page form - stored for the admin
+// "Messages" panel (separate table/resource from appointment requests).
+app.post('/api/contact', async (req, res) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Name, email and message are required.' });
+  }
+  try {
+    await pool.query(
+      'INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)',
+      [name, email, message]
+    );
+    res.status(201).json({ message: 'Message received' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Applications from the public Programs page (job openings, internships,
+// certification) - stored for the admin "Job Applications" panel. Accepts
+// multipart/form-data with an optional "resume" file (PDF/DOC/DOCX, 5 MB max).
+app.post('/api/job-applications', (req, res) => {
+  resumeUpload.single('resume')(req, res, async (err) => {
+    if (err) {
+      const msg = err.code === 'LIMIT_FILE_SIZE'
+        ? 'Resume is too large — the maximum file size is 5 MB.'
+        : err.message;
+      return res.status(400).json({ error: msg });
+    }
+    // Multer parses text fields in multipart bodies into req.body
+    const { name, email, phone, position, experience, cover_note } = req.body;
+    if (!name || !email || !phone || !position) {
+      return res.status(400).json({ error: 'Name, email, phone and position are required.' });
+    }
+    try {
+      await pool.query(
+        'INSERT INTO job_applications (name, email, phone, position, experience, cover_note, resume_path) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [name, email, phone, position, experience || null, cover_note || null, req.file ? `/uploads/${req.file.filename}` : null]
+      );
+      res.status(201).json({ message: 'Application received' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 });
 
 app.post('/api/appointments', async (req, res) => {
@@ -279,14 +443,9 @@ app.get('/api/admin/me', authenticateToken, (req, res) => {
 // Whitelisted editable columns per resource (guards against SQL injection
 // of column names; values are always parameterized)
 const RESOURCES = {
-  doctors: {
-    table: 'doctors',
-    fields: ['name', 'designation', 'specialisation', 'profile_image', 'short_bio', 'full_bio', 'qualifications', 'display_order', 'is_active'],
-    orderBy: 'display_order ASC, id ASC'
-  },
   services: {
     table: 'services',
-    fields: ['name', 'slug', 'hero_title', 'short_description', 'full_description', 'image', 'benefits', 'page_sections', 'display_order', 'is_active', 'meta_title', 'meta_keywords', 'meta_description', 'canonical_url'],
+    fields: ['name', 'slug', 'hero_title', 'short_description', 'full_description', 'image', 'benefits', 'display_order', 'is_active', 'meta_title', 'meta_keywords', 'meta_description', 'canonical_url'],
     orderBy: 'display_order ASC, id ASC'
   },
   gallery: {
@@ -309,6 +468,26 @@ const RESOURCES = {
     fields: ['page_key', 'question', 'answer', 'display_order', 'is_active'],
     orderBy: 'display_order ASC, id ASC'
   },
+  process_steps: {
+    table: 'process_steps',
+    fields: ['step', 'title', 'description', 'image', 'tone', 'display_order', 'is_active'],
+    orderBy: 'display_order ASC, id ASC'
+  },
+  conditions: {
+    table: 'conditions_data',
+    fields: ['name', 'short_name', 'description', 'focus_areas', 'image', 'display_order', 'is_active'],
+    orderBy: 'display_order ASC, id ASC'
+  },
+  founders: {
+    table: 'founders',
+    fields: ['name', 'role', 'title_line', 'subtitle_line', 'profile_image', 'paragraphs', 'closing_line', 'display_order', 'is_active'],
+    orderBy: 'display_order ASC, id ASC'
+  },
+  page_content: {
+    table: 'page_content',
+    fields: ['page_key', 'key', 'content', 'display_order', 'is_active'],
+    orderBy: 'page_key ASC, display_order ASC, id ASC'
+  },
   // Per-route SEO for the pages without a resource of their own (the admin "SEO"
   // tab). Rows are seeded by scripts/migrate-seo.js, so creating/deleting pages
   // here is blocked — admins only edit the meta values.
@@ -319,11 +498,47 @@ const RESOURCES = {
     noCreate: true,
     noDelete: true
   },
+  // URL key uses a hyphen to match /api/admin/contact-messages (the list GET is
+  // overridden by the dedicated counts+filter route above).
+  'contact-messages': {
+    table: 'contact_messages',
+    fields: ['status'], // created via the public form; admin manages status / deletes
+    orderBy: 'created_at DESC, id DESC',
+    noCreate: true
+  },
   appointments: {
     table: 'appointments',
     fields: ['status'], // created via public form; admin can only update status / delete
     orderBy: 'created_at DESC',
     noCreate: true
+  },
+  // URL key uses a hyphen to match /api/admin/job-applications (the list GET is
+  // overridden by the dedicated counts+filter route above).
+  'job-applications': {
+    table: 'job_applications',
+    fields: ['status'], // created via the public form; admin manages status / deletes
+    orderBy: 'created_at DESC, id DESC',
+    noCreate: true
+  },
+  program_modules: {
+    table: 'program_modules',
+    fields: ['title', 'duration', 'topics', 'display_order', 'is_active'],
+    orderBy: 'display_order ASC, id ASC'
+  },
+  program_resources: {
+    table: 'program_resources',
+    fields: ['module_id', 'title', 'resource_type', 'url', 'description', 'display_order', 'is_active'],
+    orderBy: 'module_id ASC, display_order ASC, id ASC'
+  },
+  program_benefits: {
+    table: 'program_benefits',
+    fields: ['benefit', 'display_order', 'is_active'],
+    orderBy: 'display_order ASC, id ASC'
+  },
+  program_videos: {
+    table: 'program_videos',
+    fields: ['group_name', 'title', 'url', 'length_label', 'views_label', 'display_order', 'is_active'],
+    orderBy: 'group_name ASC, display_order ASC, id ASC'
   }
 };
 
@@ -332,11 +547,11 @@ app.get('/api/admin/stats', authenticateToken, async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT
-        (SELECT COUNT(*) FROM doctors) AS doctors,
         (SELECT COUNT(*) FROM services) AS services,
         (SELECT COUNT(*) FROM blogs WHERE status = 'published') AS blogs,
         (SELECT COUNT(*) FROM appointments) AS appointments,
-        (SELECT COUNT(*) FROM appointments WHERE status = 'New') AS newAppointments
+        (SELECT COUNT(*) FROM appointments WHERE status = 'New') AS newAppointments,
+        (SELECT COUNT(*) FROM job_applications WHERE status = 'New') AS newJobApplications
     `);
     res.json(rows[0]);
   } catch (error) {
@@ -378,6 +593,33 @@ app.post('/api/admin/upload', authenticateToken, (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file provided (field name: "image")' });
     res.status(201).json({ url: `/uploads/${req.file.filename}` });
   });
+});
+
+// Download a job application's resume (admin only). Files live in /uploads but
+// are served through this route so access stays behind the admin token.
+app.get('/api/admin/job-applications/:id/resume', authenticateToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT resume_path, name FROM job_applications WHERE id = ?', [req.params.id]);
+    if (rows.length === 0 || !rows[0].resume_path) {
+      return res.status(404).json({ error: 'No resume attached to this application' });
+    }
+    const filename = path.basename(rows[0].resume_path); // no traversal
+    const absolute = path.join(uploadsDir, filename);
+    if (!fs.existsSync(absolute)) {
+      return res.status(404).json({ error: 'Resume file is missing on the server' });
+    }
+    const ext = path.extname(filename).toLowerCase();
+    const mime = ext === '.pdf'
+      ? 'application/pdf'
+      : ext === '.doc'
+        ? 'application/msword'
+        : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    res.setHeader('Content-Type', mime);
+    res.setHeader('Content-Disposition', `attachment; filename="resume-${rows[0].name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}${ext}"`);
+    res.sendFile(absolute);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Change admin password
@@ -457,8 +699,21 @@ const blogSanitizeOptions = {
 
 const sanitizeBlogContent = (html) => sanitizeHtml(String(html), blogSanitizeOptions);
 
+// Columns typed JSON in the schema (MariaDB attaches a json_valid CHECK, so an
+// empty string must become NULL instead)
+const JSON_FIELDS = {
+  services: ['benefits'],
+  conditions: ['focus_areas'],
+  founders: ['paragraphs'],
+  page_content: ['content'],
+  program_modules: ['topics']
+};
+
 // Per-resource/field value hook for the generic CRUD handlers
 const sanitizeValue = (resource, field, value) => {
+  if (JSON_FIELDS[resource]?.includes(field) && value === '') {
+    return null;
+  }
   if (resource === 'blogs' && field === 'content' && typeof value === 'string') {
     return sanitizeBlogContent(value);
   }
@@ -467,11 +722,13 @@ const sanitizeValue = (resource, field, value) => {
 
 // Columns that may hold /uploads/ paths, per resource
 const IMAGE_FIELDS = {
-  doctors: ['profile_image'],
   services: ['image'],
   gallery: ['image_path'],
   blogs: ['featured_image'],
-  testimonials: ['image']
+  testimonials: ['image'],
+  process_steps: ['image'],
+  conditions: ['image'],
+  founders: ['profile_image']
 };
 
 // Strictly-shaped upload paths only (no traversal, no external URLs)
@@ -549,6 +806,64 @@ app.get('/api/admin/appointments', authenticateToken, async (req, res) => {
   }
 });
 
+// Contact messages list for the admin view: supports an optional ?status= filter
+// and returns per-status counts. Registered BEFORE the generic /api/admin/:resource
+// list route, which it overrides for GET (PUT/DELETE fall through to the generic
+// handler using the RESOURCES['contact-messages'] config).
+app.get('/api/admin/contact-messages', authenticateToken, async (req, res) => {
+  const status = req.query.status;
+  const params = [];
+  let where = '';
+  if (status && status !== 'all') {
+    where = 'WHERE status = ?';
+    params.push(status);
+  }
+  try {
+    const [messages] = await pool.query(
+      `SELECT * FROM contact_messages ${where} ORDER BY created_at DESC, id DESC`,
+      params
+    );
+    const [statusRows] = await pool.query('SELECT status, COUNT(*) AS n FROM contact_messages GROUP BY status');
+    const counts = { all: 0 };
+    for (const r of statusRows) {
+      counts[r.status] = r.n;
+      counts.all += r.n;
+    }
+    res.json({ messages, counts });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Job applications list for the admin view: optional ?status= filter and
+// per-status counts. Registered BEFORE the generic /api/admin/:resource list
+// route; PUT/DELETE fall through to the generic handler using the
+// RESOURCES['job-applications'] config.
+app.get('/api/admin/job-applications', authenticateToken, async (req, res) => {
+  const status = req.query.status;
+  const params = [];
+  let where = '';
+  if (status && status !== 'all') {
+    where = 'WHERE status = ?';
+    params.push(status);
+  }
+  try {
+    const [applications] = await pool.query(
+      `SELECT * FROM job_applications ${where} ORDER BY created_at DESC, id DESC`,
+      params
+    );
+    const [statusRows] = await pool.query('SELECT status, COUNT(*) AS n FROM job_applications GROUP BY status');
+    const counts = { all: 0 };
+    for (const r of statusRows) {
+      counts[r.status] = r.n;
+      counts.all += r.n;
+    }
+    res.json({ applications, counts });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // List (includes inactive/draft records, unlike the public endpoints)
 app.get('/api/admin/:resource', authenticateToken, async (req, res) => {
   const cfg = RESOURCES[req.params.resource];
@@ -616,6 +931,20 @@ app.delete('/api/admin/:resource/:id', authenticateToken, async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+});
+
+// Unknown API routes -> JSON 404 (must come after all /api routes and before the SPA fallback)
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: `Not found: ${req.method} ${req.originalUrl}` });
+});
+
+// Body-parse errors and anything else thrown -> JSON instead of an HTML error page
+app.use((err, req, res, next) => {
+  if (err && err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+  console.error(err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 // Start Server

@@ -19,9 +19,11 @@ async function main() {
     let inserted = 0;
     for (const b of BLOGS) {
       const seoTitle = `${b.title} | TheraKids`;
+      // meta_description is deliberately NOT set here: it is admin-authored only,
+      // and BlogPost.jsx already falls back to a content excerpt at render time.
       const [result] = await pool.query(
-        `INSERT INTO blogs (title, slug, excerpt, content, featured_image, author, category, seo_title, meta_description, status, published_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'published', ?)
+        `INSERT INTO blogs (title, slug, excerpt, content, featured_image, author, category, seo_title, status, published_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'published', ?)
          ON DUPLICATE KEY UPDATE
            title = VALUES(title),
            excerpt = VALUES(excerpt),
@@ -30,10 +32,9 @@ async function main() {
            author = VALUES(author),
            category = VALUES(category),
            seo_title = VALUES(seo_title),
-           meta_description = VALUES(meta_description),
            status = 'published',
            published_at = VALUES(published_at)`,
-        [b.title, b.slug, b.excerpt, b.content.trim(), b.featured_image, b.author, b.category, seoTitle, b.excerpt, b.published_at]
+        [b.title, b.slug, b.excerpt, b.content.trim(), b.featured_image, b.author, b.category, seoTitle, b.published_at]
       );
       inserted += result.affectedRows;
       console.log(`${result.affectedRows === 1 ? 'inserted' : 'updated'}: ${b.slug}`);

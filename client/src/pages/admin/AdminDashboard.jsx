@@ -47,10 +47,9 @@ const RESOURCES = {
       { key: 'short_description', label: 'Short Description', type: 'textarea', full: true },
       { key: 'full_description', label: 'Full Description (paragraphs separated by a blank line)', type: 'textarea', full: true },
       { key: 'benefits', label: 'Benefits (JSON array, e.g. ["A","B"])', type: 'textarea', full: true },
-      { key: 'page_sections', label: 'Page Sections (JSON array of content bands: cards | lists | tags | prose)', type: 'textarea', full: true, rows: 8 },
-      { key: 'meta_title', label: 'Meta Title', section: 'SEO Settings', full: true, counter: 60, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
-      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true },
-      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 160 },
+      { key: 'meta_title', label: 'Meta Title', section: 'SEO Settings', full: true, counter: 100, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
+      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true, counter: 100 },
+      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 500 },
       { key: 'canonical_url', label: 'Canonical URL (optional, overrides the default page URL)', full: true }
     ]
   },
@@ -79,9 +78,9 @@ const RESOURCES = {
       { key: 'featured_image', label: 'Featured Image', type: 'image', full: true },
       { key: 'excerpt', label: 'Excerpt', type: 'textarea', full: true },
       { key: 'content', label: 'Content', type: 'richtext', full: true },
-      { key: 'meta_title', label: 'Meta Title', section: 'SEO Settings', full: true, counter: 60, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
-      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true },
-      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 160 },
+      { key: 'meta_title', label: 'Meta Title', section: 'SEO Settings', full: true, counter: 100, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
+      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true, counter: 100 },
+      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 500 },
       { key: 'canonical_url', label: 'Canonical URL (optional, overrides the default page URL)', full: true }
     ]
   },
@@ -105,9 +104,9 @@ const RESOURCES = {
     fields: [
       { key: 'page_key', label: 'Page (route path)', required: true, readOnly: true, hint: 'Route this meta applies to. Seeded with the page and not editable.' },
       { key: 'label', label: 'Admin Label (how the page is named in the list)' },
-      { key: 'meta_title', label: 'Meta Title', section: 'Meta Tags', full: true, counter: 60, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
-      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true },
-      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 160 },
+      { key: 'meta_title', label: 'Meta Title', section: 'Meta Tags', full: true, counter: 100, hint: 'Becomes the <title> tag exactly as typed, with no site name appended.' },
+      { key: 'meta_keywords', label: 'Meta Keywords (comma-separated)', full: true, counter: 100 },
+      { key: 'meta_description', label: 'Meta Description', type: 'textarea', full: true, rows: 3, counter: 500 },
       { key: 'canonical_url', label: 'Canonical URL (optional, overrides the default page URL)', full: true }
     ],
     noCreate: true,
@@ -115,13 +114,116 @@ const RESOURCES = {
   },
   faqs: {
     title: 'Manage FAQs',
+    note: 'FAQs appear on the HOME page only. Rows with other page keys are kept in the table but are no longer served anywhere.',
     columns: ['id', 'page_key', 'question', 'is_active'],
     fields: [
-      { key: 'page_key', label: 'Page ("home" or a service slug, e.g. speech-therapy)', required: true },
+      { key: 'page_key', label: 'Page (use "home")', required: true, hint: 'Only "home" rows are shown on the site.' },
       { key: 'display_order', label: 'Display Order', type: 'number' },
       { key: 'is_active', label: 'Active', type: 'checkbox' },
       { key: 'question', label: 'Question', required: true, full: true },
       { key: 'answer', label: 'Answer', type: 'textarea', full: true, rows: 4 }
+    ]
+  },
+  process_steps: {
+    title: 'Manage Process Steps',
+    columns: ['id', 'step', 'title', 'tone', 'display_order', 'is_active'],
+    fields: [
+      { key: 'step', label: 'Step Number (badge on the photo, e.g. 1)' },
+      { key: 'title', label: 'Title', required: true },
+      { key: 'tone', label: 'Badge Color', type: 'select', options: ['peach', 'lilac'] },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' },
+      { key: 'image', label: 'Image', type: 'image', full: true },
+      { key: 'description', label: 'Description', type: 'textarea', full: true, rows: 2 }
+    ]
+  },
+  conditions: {
+    title: 'Manage Conditions We Treat',
+    columns: ['id', 'name', 'short_name', 'display_order', 'is_active'],
+    fields: [
+      { key: 'name', label: 'Full Name', required: true, full: true },
+      { key: 'short_name', label: 'Short Name' },
+      { key: 'description', label: 'Description', type: 'textarea', full: true, rows: 3 },
+      { key: 'focus_areas', label: 'Focus Areas (JSON array, e.g. ["Social Skills","Sensory Regulation"])', type: 'textarea', full: true },
+      { key: 'image', label: 'Image', type: 'image', full: true },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' }
+    ]
+  },
+  founders: {
+    title: 'Manage Founders',
+    columns: ['id', 'name', 'role', 'display_order', 'is_active'],
+    fields: [
+      { key: 'name', label: 'Name', required: true },
+      { key: 'role', label: 'Role (e.g. Founder & Chairman)' },
+      { key: 'title_line', label: 'Title Line (shown under the name)' },
+      { key: 'subtitle_line', label: 'Subtitle Line (optional second line)' },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' },
+      { key: 'profile_image', label: 'Profile Image', type: 'image', full: true },
+      { key: 'paragraphs', label: 'Bio Paragraphs (JSON array of strings, e.g. ["First paragraph.","Second paragraph."])', type: 'textarea', full: true, rows: 8 },
+      { key: 'closing_line', label: 'Closing Line (bold closing statement)', type: 'textarea', full: true, rows: 2 }
+    ]
+  },
+  page_content: {
+    title: 'Manage Page Content',
+    note: 'Generic JSON content blocks per page (e.g. the About mission/values). The page renders whatever each key contains, so edit the JSON structure exactly as shown.',
+    columns: ['id', 'page_key', 'key', 'display_order', 'is_active'],
+    fields: [
+      { key: 'page_key', label: 'Page (e.g. about)', required: true },
+      { key: 'key', label: 'Content Key (e.g. about_intro)', required: true },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' },
+      { key: 'content', label: 'Content (JSON object)', type: 'textarea', required: true, full: true, rows: 10 }
+    ]
+  },
+  // Academy page (/programs) — academics section (certification curriculum, videos)
+  program_modules: {
+    title: 'Manage Academy Modules',
+    columns: ['id', 'title', 'duration', 'display_order', 'is_active'],
+    fields: [
+      { key: 'title', label: 'Module Title', required: true, full: true },
+      { key: 'duration', label: 'Duration (e.g. 4 weeks)' },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' },
+      { key: 'topics', label: 'Topics (JSON array, e.g. ["Topic A","Topic B"])', type: 'textarea', full: true, rows: 4 }
+    ]
+  },
+  program_resources: {
+    title: 'Manage Module Resources',
+    note: 'Resources shown under each module. Videos: paste a YouTube link (plays in-page). Documents: upload a PDF via the URL field format /uploads/... (renders in-page) or paste any link (opens in the viewer).',
+    columns: ['id', 'module_id', 'title', 'resource_type', 'is_active'],
+    fields: [
+      { key: 'module_id', label: 'Module', type: 'remote-select', required: true, optionsResource: 'program_modules', optionsValue: 'id', optionsLabel: 'title', placeholder: 'Select a module…' },
+      { key: 'title', label: 'Resource Title', required: true },
+      { key: 'resource_type', label: 'Type', type: 'select', options: ['video', 'document', 'link', 'worksheet'] },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' },
+      { key: 'url', label: 'URL (YouTube link, /uploads/file.pdf, or external link)', full: true, hint: 'YouTube links play in a modal. PDFs and images open in the in-page viewer. Other URLs open in a new tab from the viewer.' },
+      { key: 'description', label: 'Short Description', type: 'textarea', full: true, rows: 2 }
+    ]
+  },
+  program_benefits: {
+    title: 'Manage Academy Benefits',
+    columns: ['id', 'benefit', 'display_order', 'is_active'],
+    fields: [
+      { key: 'benefit', label: 'Benefit', required: true, full: true },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' }
+    ]
+  },
+  program_videos: {
+    title: 'Manage YouTube Videos',
+    note: 'Videos shown in the THERAKids on YouTube section, grouped by the Group name. Each video opens in an in-page player.',
+    columns: ['id', 'group_name', 'title', 'display_order', 'is_active'],
+    fields: [
+      { key: 'group_name', label: 'Group (e.g. Live Sessions & Webinars)', required: true },
+      { key: 'title', label: 'Video Title', required: true },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' },
+      { key: 'url', label: 'YouTube URL', required: true, full: true, hint: 'Any YouTube link shape works: watch?v=…, youtu.be/…, shorts/…' },
+      { key: 'length_label', label: 'Length Label (e.g. 45 min)' },
+      { key: 'views_label', label: 'Views Label (e.g. 2.3K views)' }
     ]
   }
 };
@@ -224,11 +326,11 @@ const Overview = () => {
   if (!stats) return <div className="admin-loading">Loading stats...</div>;
 
   const cards = [
-    { label: 'Total Doctors', value: stats.doctors },
     { label: 'Total Services', value: stats.services },
     { label: 'Published Blogs', value: stats.blogs },
     { label: 'Appointments', value: stats.appointments },
-    { label: 'New Appointments', value: stats.newAppointments }
+    { label: 'New Appointments', value: stats.newAppointments },
+    { label: 'New Job Applications', value: stats.newJobApplications }
   ];
 
   return (
@@ -278,6 +380,10 @@ const CrudManager = ({ resource }) => {
   const [editing, setEditing] = useState(null); // null | 'new' | row object
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
+  // remote-select: options fetched from another admin resource (e.g. the
+  // module picker on a resource row)
+  const remoteField = cfg.fields.find(f => f.type === 'remote-select');
+  const [remoteOptions, setRemoteOptions] = useState([]);
   // Slug auto-fill lock. Programmatic fills go through setForm (setting .value
   // fires no input event), so only a REAL edit of the slug field fires the
   // change handler below and locks it. On the edit form a saved slug counts as
@@ -292,10 +398,31 @@ const CrudManager = ({ resource }) => {
     load();
   }, [load]);
 
+  useEffect(() => {
+    if (!remoteField) return undefined;
+    let cancelled = false;
+    adminFetch(`/${remoteField.optionsResource}`)
+      .then(list => {
+        if (!cancelled) {
+          setRemoteOptions(list.map(r => ({ value: String(r[remoteField.optionsValue]), label: r[remoteField.optionsLabel] })));
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [remoteField]);
+
   const openCreate = () => { setForm(emptyForm(cfg.fields)); setEditing('new'); setSlugManual(false); };
   const openEdit = (row) => {
     const f = {};
-    for (const field of cfg.fields) f[field.key] = row[field.key] ?? (field.type === 'checkbox' ? false : '');
+    for (const field of cfg.fields) {
+      let value = row[field.key] ?? (field.type === 'checkbox' ? false : '');
+      // JSON columns (arrays/objects) must be stringified before landing in a
+      // textarea/input, otherwise they render as "[object Object]".
+      if (value !== null && typeof value === 'object' && field.type !== 'richtext' && field.type !== 'image') {
+        value = JSON.stringify(value, null, 2);
+      }
+      f[field.key] = value;
+    }
     const datetimeField = cfg.fields.find(x => x.type === 'datetime-local' && f[x.key]);
     if (datetimeField) {
       // convert "2026-08-10 09:00:00" to datetime-local format
@@ -322,7 +449,7 @@ const CrudManager = ({ resource }) => {
       });
       return;
     }
-    setForm(prev => ({ ...prev, [field.key]: field.type === 'number' ? Number(value) : value }));
+    setForm(prev => ({ ...prev, [field.key]: field.type === 'number' && value !== '' ? Number(value) : value }));
   };
 
   const handleSave = async (e) => {
@@ -332,6 +459,11 @@ const CrudManager = ({ resource }) => {
     try {
       const payload = { ...form };
       if (payload.published_at === '') delete payload.published_at;
+      // An emptied number field holds '' while typing; null saves cleanly on
+      // nullable INT columns (strict mode rejects the empty string).
+      for (const f of cfg.fields) {
+        if (f.type === 'number' && payload[f.key] === '') payload[f.key] = null;
+      }
       if (editing === 'new') {
         await adminFetch(`/${resource}`, { method: 'POST', body: JSON.stringify(payload) });
       } else {
@@ -383,7 +515,16 @@ const CrudManager = ({ resource }) => {
             )}
             {rows && rows.map(row => (
               <tr key={row.id}>
-                {cfg.columns.map(col => <td key={col}>{displayCell(col, row[col])}</td>)}
+                {cfg.columns.map(col => (
+                  <td key={col}>
+                    {displayCell(
+                      col,
+                      remoteField && col === remoteField.key
+                        ? remoteOptions.find(o => o.value === String(row[col]))?.label ?? row[col]
+                        : row[col]
+                    )}
+                  </td>
+                ))}
                 <td className="actions-cell">
                   <button className="btn btn-outline btn-sm" onClick={() => openEdit(row)}>Edit</button>
                   {!cfg.noDelete && (
@@ -400,7 +541,7 @@ const CrudManager = ({ resource }) => {
         <div className="admin-modal-backdrop" onClick={() => setEditing(null)}>
           <form className="admin-modal" onClick={e => e.stopPropagation()} onSubmit={handleSave}>
             <div className="admin-modal-header">
-              <h3>(editing === 'new' ? 'Add' : 'Edit') + ' ' + cfg.title.replace('Manage ', '')</h3>
+              <h3>{(editing === 'new' ? 'Add' : 'Edit') + ' ' + cfg.title.replace('Manage ', '')}</h3>
               <button type="button" className="admin-modal-close" onClick={() => setEditing(null)}>&times;</button>
             </div>
             <div className="form-grid">
@@ -446,6 +587,17 @@ const CrudManager = ({ resource }) => {
                             onChange={e => handleFieldChange(f, e.target.value)}
                           >
                             {f.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                          </select>
+                        ) : f.type === 'remote-select' ? (
+                          <select
+                            value={String(form[f.key] ?? '')}
+                            required={f.required}
+                            onChange={e => handleFieldChange(f, e.target.value)}
+                          >
+                            <option value="" disabled>{f.placeholder || 'Select…'}</option>
+                            {remoteOptions.map(opt => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
                           </select>
                         ) : (
                           <input
@@ -677,6 +829,334 @@ const AppointmentsManager = () => {
 };
 
 // ==========================================
+// Contact Messages (from the public Contact page form;
+// stored in contact_messages, separate from appointments)
+// ==========================================
+
+const MESSAGE_STATUSES = ['New', 'In Progress', 'Resolved'];
+
+const MessagesManager = () => {
+  const [data, setData] = useState(null); // { messages, counts }
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [expandedId, setExpandedId] = useState(null);
+
+  const load = useCallback(async () => {
+    try {
+      const qs = filter !== 'all' ? `?status=${encodeURIComponent(filter)}` : '';
+      setData(await adminFetch(`/contact-messages${qs}`));
+    } catch (err) {
+      setError(err.message);
+    }
+  }, [filter]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const setStatus = async (row, status) => {
+    setError(null);
+    try {
+      await adminFetch(`/contact-messages/${row.id}`, { method: 'PUT', body: JSON.stringify({ status }) });
+      await load();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDelete = async (row) => {
+    if (!window.confirm(`Delete message from "${row.name}"? This cannot be undone.`)) return;
+    setError(null);
+    try {
+      await adminFetch(`/contact-messages/${row.id}`, { method: 'DELETE' });
+      setExpandedId(null);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  if (data === null && !error) return <div className="admin-loading">Loading...</div>;
+
+  const messages = data?.messages ?? [];
+  const counts = data?.counts ?? {};
+
+  return (
+    <div className="admin-crud">
+      <div className="crud-header">
+        <h2>Contact Messages</h2>
+      </div>
+
+      {error && <div className="admin-error">{error}</div>}
+
+      <div className="appt-toolbar">
+        <div className="appt-filters" role="tablist">
+          {['all', ...MESSAGE_STATUSES].map(s => (
+            <button
+              key={s}
+              className={`appt-tab ${filter === s ? 'active' : ''}`}
+              onClick={() => { setFilter(s); setExpandedId(null); }}
+            >
+              {s === 'all' ? 'All' : s}
+              <span className="appt-tab-count">{counts[s] ?? 0}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="crud-table-wrapper">
+        <table className="crud-table">
+          <thead>
+            <tr>
+              <th>Received</th><th>From</th><th>Message</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {messages.length === 0 && (
+              <tr><td colSpan="5" className="empty-row">No {filter !== 'all' ? filter.toLowerCase() + ' ' : ''}messages yet.</td></tr>
+            )}
+            {messages.map(row => (
+              <React.Fragment key={row.id}>
+                <tr className={expandedId === row.id ? 'appt-row-expanded' : ''}>
+                  <td>{formatDateTime(row.created_at)}</td>
+                  <td>
+                    {row.name}<br /><span className="cell-sub">{row.email}</span>
+                  </td>
+                  <td className="messages-preview-cell">
+                    {String(row.message || '').length > 90
+                      ? `${String(row.message).slice(0, 90)}…`
+                      : row.message}
+                  </td>
+                  <td>
+                    <select
+                      className={`status-select status-${String(row.status).toLowerCase().replace(/\s+/g, '-')}`}
+                      value={row.status}
+                      onChange={e => setStatus(row, e.target.value)}
+                    >
+                      {MESSAGE_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </td>
+                  <td className="actions-cell">
+                    <a
+                      className="btn btn-outline btn-sm"
+                      href={`mailto:${row.email}?subject=${encodeURIComponent(`Re: your message to TheraKids #${row.id}`)}`}
+                    >
+                      Reply
+                    </a>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(row)}>Delete</button>
+                  </td>
+                </tr>
+                {expandedId === row.id && (
+                  <tr className="appt-detail-row">
+                    <td colSpan="5">
+                      <div className="appt-detail">
+                        <div className="appt-detail-block" style={{ gridColumn: '1 / -1' }}>
+                          <h4>Full message</h4>
+                          <p style={{ whiteSpace: 'pre-wrap' }}>{row.message}</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// Job Applications (from the public Programs page:
+// job openings, internships, certification)
+// ==========================================
+
+const JOB_STATUSES = ['New', 'Contacted', 'Rejected', 'Hired'];
+
+const JobApplicationsManager = () => {
+  const [data, setData] = useState(null); // { applications, counts }
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [expandedId, setExpandedId] = useState(null);
+
+  const load = useCallback(async () => {
+    try {
+      const qs = filter !== 'all' ? `?status=${encodeURIComponent(filter)}` : '';
+      setData(await adminFetch(`/job-applications${qs}`));
+    } catch (err) {
+      setError(err.message);
+    }
+  }, [filter]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const setStatus = async (row, status) => {
+    setError(null);
+    try {
+      await adminFetch(`/job-applications/${row.id}`, { method: 'PUT', body: JSON.stringify({ status }) });
+      await load();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDelete = async (row) => {
+    if (!window.confirm(`Delete application from "${row.name}"? This cannot be undone.`)) return;
+    setError(null);
+    try {
+      await adminFetch(`/job-applications/${row.id}`, { method: 'DELETE' });
+      setExpandedId(null);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // The resume endpoint is token-protected, so it must be fetched with the
+  // Bearer header and handed to the browser as a blob download.
+  const downloadResume = async (row) => {
+    setError(null);
+    try {
+      const token = localStorage.getItem('admin_token');
+      const res = await fetch(`${API_URL}/api/admin/job-applications/${row.id}/resume`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Could not download the resume');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = row.resume_path.split('/').pop() || 'resume';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  if (data === null && !error) return <div className="admin-loading">Loading...</div>;
+
+  const applications = data?.applications ?? [];
+  const counts = data?.counts ?? {};
+
+  return (
+    <div className="admin-crud">
+      <div className="crud-header">
+        <h2>Job Applications</h2>
+      </div>
+
+      {error && <div className="admin-error">{error}</div>}
+
+      <div className="appt-toolbar">
+        <div className="appt-filters" role="tablist">
+          {['all', ...JOB_STATUSES].map(s => (
+            <button
+              key={s}
+              className={`appt-tab ${filter === s ? 'active' : ''}`}
+              onClick={() => { setFilter(s); setExpandedId(null); }}
+            >
+              {s === 'all' ? 'All' : s}
+              <span className="appt-tab-count">{counts[s] ?? 0}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="crud-table-wrapper">
+        <table className="crud-table">
+          <thead>
+            <tr>
+              <th>Received</th><th>Applicant</th><th>Position</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {applications.length === 0 && (
+              <tr><td colSpan="5" className="empty-row">No {filter !== 'all' ? filter.toLowerCase() + ' ' : ''}applications yet.</td></tr>
+            )}
+            {applications.map(row => (
+              <React.Fragment key={row.id}>
+                <tr className={expandedId === row.id ? 'appt-row-expanded' : ''}>
+                  <td>{formatDateTime(row.created_at)}</td>
+                  <td>
+                    {row.name}<br /><span className="cell-sub">{row.email}</span>
+                  </td>
+                  <td className="messages-preview-cell">
+                    {row.position}
+                    {row.experience && <><br /><span className="cell-sub">{row.experience}</span></>}
+                  </td>
+                  <td>
+                    <select
+                      className={`status-select status-${String(row.status).toLowerCase().replace(/\s+/g, '-')}`}
+                      value={row.status}
+                      onChange={e => setStatus(row, e.target.value)}
+                    >
+                      {JOB_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </td>
+                  <td className="actions-cell">
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => setExpandedId(expandedId === row.id ? null : row.id)}
+                    >
+                      {expandedId === row.id ? 'Hide' : 'View'}
+                    </button>
+                    <a
+                      className="btn btn-outline btn-sm"
+                      href={`mailto:${row.email}?subject=${encodeURIComponent(`Re: your application to TheraKids #${row.id}`)}`}
+                    >
+                      Reply
+                    </a>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(row)}>Delete</button>
+                  </td>
+                </tr>
+                {expandedId === row.id && (
+                  <tr className="appt-detail-row">
+                    <td colSpan="5">
+                      <div className="appt-detail">
+                        <div className="appt-detail-block">
+                          <h4>Phone</h4>
+                          <p><a href={`tel:${row.phone}`}>{row.phone}</a></p>
+                        </div>
+                        <div className="appt-detail-block">
+                          <h4>Experience</h4>
+                          <p>{row.experience || '—'}</p>
+                        </div>
+                        <div className="appt-detail-block" style={{ gridColumn: '1 / -1' }}>
+                          <h4>Cover note</h4>
+                          <p style={{ whiteSpace: 'pre-wrap' }}>{row.cover_note || '—'}</p>
+                        </div>
+                        {row.resume_path && (
+                          <div className="appt-detail-block" style={{ gridColumn: '1 / -1' }}>
+                            <h4>Resume</h4>
+                            <p>
+                              <button
+                                type="button"
+                                className="btn btn-outline btn-sm"
+                                onClick={() => downloadResume(row)}
+                              >
+                                Download resume
+                              </button>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
 // Site Settings editor
 // ==========================================
 
@@ -718,11 +1198,20 @@ const SettingsManager = () => {
           {Object.entries(values).map(([key, value]) => (
             <div className="form-field full" key={key}>
               <label>{key.replace(/_/g, ' ')}</label>
-              <input
-                type="text"
-                value={value ?? ''}
-                onChange={e => setValues({ ...values, [key]: e.target.value })}
-              />
+              {/* Long-form keys (descriptions, notes) get a textarea; the rest stay single-line */}
+              {key === 'home_video_description' ? (
+                <textarea
+                  rows={3}
+                  value={value ?? ''}
+                  onChange={e => setValues({ ...values, [key]: e.target.value })}
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={value ?? ''}
+                  onChange={e => setValues({ ...values, [key]: e.target.value })}
+                />
+              )}
             </div>
           ))}
           <div className="admin-modal-footer">
@@ -854,7 +1343,17 @@ const AdminDashboard = () => {
           <NavLink to="/admin/dashboard/seo" className={({isActive}) => isActive ? 'active' : ''}>SEO</NavLink>
           <NavLink to="/admin/dashboard/testimonials" className={({isActive}) => isActive ? 'active' : ''}>Testimonials</NavLink>
           <NavLink to="/admin/dashboard/faqs" className={({isActive}) => isActive ? 'active' : ''}>FAQs</NavLink>
+          <NavLink to="/admin/dashboard/process-steps" className={({isActive}) => isActive ? 'active' : ''}>Process Steps</NavLink>
+          <NavLink to="/admin/dashboard/conditions" className={({isActive}) => isActive ? 'active' : ''}>Conditions</NavLink>
+          <NavLink to="/admin/dashboard/founders" className={({isActive}) => isActive ? 'active' : ''}>Founders</NavLink>
+          <NavLink to="/admin/dashboard/page-content" className={({isActive}) => isActive ? 'active' : ''}>Page Content</NavLink>
+          <NavLink to="/admin/dashboard/program-modules" className={({isActive}) => isActive ? 'active' : ''}>Program Modules</NavLink>
+          <NavLink to="/admin/dashboard/program-resources" className={({isActive}) => isActive ? 'active' : ''}>Module Resources</NavLink>
+          <NavLink to="/admin/dashboard/program-benefits" className={({isActive}) => isActive ? 'active' : ''}>Program Benefits</NavLink>
+          <NavLink to="/admin/dashboard/program-videos" className={({isActive}) => isActive ? 'active' : ''}>YouTube Videos</NavLink>
           <NavLink to="/admin/dashboard/appointments" className={({isActive}) => isActive ? 'active' : ''}>Appointments</NavLink>
+          <NavLink to="/admin/dashboard/messages" className={({isActive}) => isActive ? 'active' : ''}>Messages</NavLink>
+          <NavLink to="/admin/dashboard/job-applications" className={({isActive}) => isActive ? 'active' : ''}>Job Applications</NavLink>
           <NavLink to="/admin/dashboard/settings" className={({isActive}) => isActive ? 'active' : ''}>Site Settings</NavLink>
           <NavLink to="/admin/dashboard/password" className={({isActive}) => isActive ? 'active' : ''}>Change Password</NavLink>
         </nav>
@@ -872,7 +1371,17 @@ const AdminDashboard = () => {
           <Route path="seo" element={<CrudManager key="page_seo" resource="page_seo" />} />
           <Route path="testimonials" element={<CrudManager key="testimonials" resource="testimonials" />} />
           <Route path="faqs" element={<CrudManager key="faqs" resource="faqs" />} />
+          <Route path="process-steps" element={<CrudManager key="process_steps" resource="process_steps" />} />
+          <Route path="conditions" element={<CrudManager key="conditions" resource="conditions" />} />
+          <Route path="founders" element={<CrudManager key="founders" resource="founders" />} />
+          <Route path="page-content" element={<CrudManager key="page_content" resource="page_content" />} />
+          <Route path="program-modules" element={<CrudManager key="program_modules" resource="program_modules" />} />
+          <Route path="program-resources" element={<CrudManager key="program_resources" resource="program_resources" />} />
+          <Route path="program-benefits" element={<CrudManager key="program_benefits" resource="program_benefits" />} />
+          <Route path="program-videos" element={<CrudManager key="program_videos" resource="program_videos" />} />
           <Route path="appointments" element={<AppointmentsManager />} />
+          <Route path="messages" element={<MessagesManager />} />
+          <Route path="job-applications" element={<JobApplicationsManager />} />
           <Route path="settings" element={<SettingsManager />} />
           <Route path="password" element={<ChangePassword />} />
         </Routes>
