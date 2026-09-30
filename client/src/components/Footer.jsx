@@ -59,16 +59,16 @@ const SOCIAL_LINKS = [
 ];
 
 /* "Covered us" trust strip the client asked for. Official logo files live in
-   public/images/partners/ (Amar Ujala, YourStory, Josh Talks); the local media
-   outlets (Noida Today, Greater Noida News, Delhi NCR Times) render as styled
-   wordmark badges until the client supplies their logo files. */
+   public/images/partners/ (Amar Ujala, YourStory, Josh Talks, Delhi NCR Times);
+   the remaining local media outlets (Noida Today, Greater Noida News) render as
+   styled wordmark badges until the client supplies their logo files. */
 const MEDIA_PARTNERS = [
   { name: 'Amar Ujala', src: '/images/partners/amar-ujala-logo.png', href: 'https://www.amarujala.com/', height: 30 },
   { name: 'YourStory', src: '/images/partners/yourstory-logo.png', href: 'https://yourstory.com/companies/therakids-noida', height: 32 },
   { name: 'Josh Talks', src: '/images/partners/josh-talks-logo.svg', href: 'https://www.joshtalks.com/', height: 30 },
+  { name: 'Delhi NCR Times', src: '/images/partners/delhi-ncr-times-logo.png', href: 'https://delhincrtimes.com/', height: 30 },
   { name: 'Noida Today', badge: 'Noida Today', href: 'https://www.noidatoday.in/' },
   { name: 'Greater Noida News', badge: 'Greater Noida News', href: 'https://www.greaternoidanews.com/' },
-  { name: 'Delhi NCR Times', badge: 'Delhi NCR Times', href: 'https://delhincrtimes.com/' },
 ];
 
 const Footer = () => {
