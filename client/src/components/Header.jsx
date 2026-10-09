@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { to: '/about', label: 'About Us' },
   { to: '/services', label: 'Our Services' },
   { to: '/conditions', label: 'Conditions We Treat' },
-  { to: '/gallery', label: 'Gallery' },
+  { to: '/jobs', label: 'Careers' },
   { to: '/blogs', label: 'Blogs' },
   { to: '/programs', label: 'THERAKids Academy' },
 ];

@@ -98,13 +98,11 @@ const Home = () => {
     excerpt: b.excerpt || b.short_description || ''
   })));
   const [founders, setFounders] = useState(FALLBACK_DATA.founders);
-  // Loading gate for the remaining DB sections (testimonials/founders/blogs).
-  const [loading, setLoading] = useState(true);
   // Free-screening lead popup: opens ~10s after the home page loads, on EVERY
   // visit/reload (never permanently suppressed) - client requirement.
   const [leadPopupOpen, setLeadPopupOpen] = useState(false);
 
-  const { setIsModalOpen, settings } = useAppContext();
+  const { setIsModalOpen, setIsFreeAssessmentOpen, setIsOnlineTherapyOpen, settings } = useAppContext();
   const navigate = useNavigate();
   const heroRef = useRef(null);
   const pageRef = useRef(null);
@@ -146,8 +144,6 @@ const Home = () => {
         }
       } catch {
         // API unreachable - static fallback data keeps every section populated
-      } finally {
-        if (!cancelled) setLoading(false);
       }
     };
     load();
@@ -268,30 +264,27 @@ const Home = () => {
             <p className="label-md text-navy uppercase tracking-widest">How we can work together</p>
             <h2 className="headline-xl text-navy">Intervention Programs We Offer</h2>
           </div>
-          {loading ? (
-            <div className="body-md text-navy-light text-center" style={{ padding: '2rem 0' }}>Loading services…</div>
-          ) : (
-            <div className="grid grid-cols-4 gap-6 services-grid-expanded" data-reveal-group>
-              {/* Show 8 programs so the 4-col grid forms two complete rows. Static section:
-                  content is hardcoded here, not fetched from the services API. */}
-              {STATIC_SERVICES.map((service, index) => {
-                const decorated = decorateService(service, index);
-                return (
-                  <div key={decorated.name}>
-                    <TiltCard maxTilt={8}>
-                      <div className="card pastel-card service-gradient-card">
-                        <div className="pastel-icon-wrapper mb-4 mx-auto">
-                          {decorated.icon}
-                        </div>
-                        <h3 className="headline-sm text-navy mb-2 text-center">{decorated.name}</h3>
-                        <p className="body-sm text-navy-light text-center">{decorated.short_description}</p>
+          <div className="grid grid-cols-4 gap-6 services-grid-expanded" data-reveal-group>
+            {/* Show 8 programs so the 4-col grid forms two complete rows. Static section:
+                content is hardcoded here, not fetched from the services API — so it renders
+                immediately and is never gated on a network call. */}
+            {STATIC_SERVICES.map((service, index) => {
+              const decorated = decorateService(service, index);
+              return (
+                <div key={decorated.name}>
+                  <TiltCard maxTilt={8}>
+                    <div className="card pastel-card service-gradient-card">
+                      <div className="pastel-icon-wrapper mb-4 mx-auto">
+                        {decorated.icon}
                       </div>
-                    </TiltCard>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                      <h3 className="headline-sm text-navy mb-2 text-center">{decorated.name}</h3>
+                      <p className="body-sm text-navy-light text-center">{decorated.short_description}</p>
+                    </div>
+                  </TiltCard>
+                </div>
+              );
+            })}
+          </div>
 
           {/* Inline CTA Section */}
           <div className="mt-12" data-reveal>
@@ -358,58 +351,50 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Meet Our Founders (White) - portraits come from the founders table.
-          The section (and its reveal animations) renders only once the API data
-          has loaded, so GSAP never registers triggers on placeholder children. */}
-      {founders.length > 0 && (
-        <section className="bg-white section-padding relative overflow-hidden">
-          {/* Single-wave seams: the lilac Process band's bottom wave already
-              carves this section's top edge, so only the bottom seam needs a
-              wave here (peach, into Testimonials). */}
-          <div className="cloud-divider cloud-bottom fill-pastel-peach">
-            <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-              <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-            </svg>
+      {/* Hero Video Section (White) — split layout: copy left, video right.
+          Sits FIRST in the band run (client brief: Video > Testimonials > Founders).
+          The player embeds the client's YouTube walkthrough (privacy-enhanced,
+          no cookies); title/description still come from site_settings. */}
+      <section className="bg-white section-padding relative overflow-hidden">
+        {/* The lilac Process band's bottom wave already carves this section's
+            top edge; the peach cloud below feeds the white→peach seam into
+            Testimonials. */}
+        <div className="container video-split z-10 relative">
+          <div className="video-copy" data-reveal>
+            <p className="label-md text-navy uppercase tracking-widest">Inside THERAKids</p>
+            <h2 className="headline-xl text-navy mb-4">{settings.home_video_title || 'Step Inside THERAKids'}</h2>
+            <p className="body-lg text-navy-light video-sub">
+              {settings.home_video_description ||
+                'A two-minute look at our centers, our therapists, and the joyful progress children make here every day.'}
+            </p>
           </div>
-          <div className="container grid grid-cols-2 gap-12 items-center z-10 relative">
-            <div data-reveal>
-              <h2 className="headline-xl text-navy mb-6">Meet Our Founders</h2>
-              <p className="body-lg text-navy-light mb-4">
-                At THERAkids, we are dedicated to empowering children aged 0-18 to reach their full potential through our specialized multidisciplinary approach to pediatric care and development.
-              </p>
-              <p className="body-lg text-navy-light mb-8">
-                Meet the founders whose vision and dedication continue to guide our team of passionate professionals in providing personalized, holistic therapies for every child.
-              </p>
-              <button className="btn btn-outline border-navy text-navy" onClick={() => {
-                navigate('/about');
-                window.scrollTo(0, 0);
-              }}>Learn more</button>
-            </div>
+          <div className="video-frame-wrapper" data-reveal>
+            <iframe
+              className="home-hero-video"
+              src="https://www.youtube-nocookie.com/embed/yT4-WhH_zvw?rel=0&modestbranding=1"
+              title="Inside THERAKids"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
 
-            <div className="founders-img-grid" data-reveal-group>
-              {founders.map((founder) => (
-                <figure key={founder.id} className="founder-polaroid">
-                  <div className="polaroid-frame">
-                    <img
-                      src={founder.profile_image}
-                      alt={`Therapy center co-founder ${founder.name} - ${founder.role} at TheraKids pediatric therapy center Noida`}
-                      className="founder-polaroid-img"
-                      loading="lazy"
-                    />
-                  </div>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+        {/* Peach cloud below carves the white→peach seam into Testimonials. */}
+        <div className="cloud-divider cloud-bottom fill-pastel-peach">
+          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
+            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
+          </svg>
+        </div>
+      </section>
 
       {/* Testimonials (Peach), rendered only when the API returns rows */}
       {testimonials.length > 0 && (
         <section className="bg-pastel-peach section-padding relative overflow-hidden">
-          {/* Single-wave seams: the white Founders band's bottom wave already
-              carves this section's top edge (peach), and the white Hero Video
-              band below contributes its own white top wave. */}
+          {/* Single-wave seams: the white Hero Video band's bottom wave already
+              carves this section's top edge (peach); the peach Testimonials band
+              below feeds its own white bottom wave into the Founders band. */}
           <div className="container z-10 relative">
             <div className="section-header center mb-12" data-reveal>
               <p className="label-md text-navy uppercase tracking-widest">Happy families</p>
@@ -454,49 +439,58 @@ const Home = () => {
         </section>
       )}
 
-      {/* Hero Video Section (White) — split layout: copy left, video right.
-          Placed AFTER Testimonials so the band rhythm stays a strict
-          peach→white→lilac→white alternation down to the peach CTA.
-          Title/description/video come from site_settings so the client can
-          swap them in the admin panel. */}
-      <section className="bg-white section-padding relative overflow-hidden">
-        {/* Testimonials' white bottom wave carves the peach→white seam above;
-            the lilac cloud below feeds the white→lilac seam into FAQ. */}
-        <div className="container video-split z-10 relative">
-          <div className="video-copy" data-reveal>
-            <p className="label-md text-navy uppercase tracking-widest">Inside THERAKids</p>
-            <h2 className="headline-xl text-navy mb-4">{settings.home_video_title || 'Step Inside THERAKids'}</h2>
-            <p className="body-lg text-navy-light video-sub">
-              {settings.home_video_description ||
-                'A two-minute look at our centers, our therapists, and the joyful progress children make here every day.'}
-            </p>
+      {/* Meet Our Founders (White) - portraits come from the founders table.
+          Sits AFTER Testimonials (client brief: Video > Testimonials > Founders).
+          The section (and its reveal animations) renders only once the API data
+          has loaded, so GSAP never registers triggers on placeholder children. */}
+      {founders.length > 0 && (
+        <section className="bg-white section-padding relative overflow-hidden">
+          {/* Single-wave seams: the peach Testimonials band's bottom wave already
+              carves this section's top edge (white). The wave below is LILAC so it
+              reads as the FAQ band's own colour rising out of the white band — a
+              white fill here would be invisible on the white background. */}
+          <div className="cloud-divider cloud-bottom fill-pastel-lilac">
+            <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
+              <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
+            </svg>
           </div>
-          <div className="video-frame-wrapper" data-reveal>
-            <video
-              className="home-hero-video"
-              src={settings.home_video_url || '/videos/hero-video.mp4'}
-              poster="/images/hero_doctor_kid.jpg"
-              controls
-              preload="metadata"
-              playsInline
-            >
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
+          <div className="container grid grid-cols-2 gap-12 items-center z-10 relative">
+            <div data-reveal>
+              <h2 className="headline-xl text-navy mb-6">Meet Our Founders</h2>
+              <p className="body-lg text-navy-light mb-4">
+                At THERAkids, we are dedicated to empowering children aged 0-18 to reach their full potential through our specialized multidisciplinary approach to pediatric care and development.
+              </p>
+              <p className="body-lg text-navy-light mb-8">
+                Meet the founders whose vision and dedication continue to guide our team of passionate professionals in providing personalized, holistic therapies for every child.
+              </p>
+              <button className="btn btn-outline border-navy text-navy" onClick={() => {
+                navigate('/about');
+                window.scrollTo(0, 0);
+              }}>Learn more</button>
+            </div>
 
-        {/* Lilac cloud below carves the white→lilac seam into the FAQ band. */}
-        <div className="cloud-divider cloud-bottom fill-pastel-lilac">
-          <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
-            <path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1550,0 1800,60 C2050,120 2250,0 2400,60 L2400,120 L0,120 Z" />
-          </svg>
-        </div>
-      </section>
+            <div className="founders-img-grid" data-reveal-group>
+              {founders.map((founder) => (
+                <figure key={founder.id} className="founder-polaroid">
+                  <div className="polaroid-frame">
+                    <img
+                      src={founder.profile_image}
+                      alt={`Therapy center co-founder ${founder.name} - ${founder.role} at TheraKids pediatric therapy center Noida`}
+                      className="founder-polaroid-img"
+                      loading="lazy"
+                    />
+                  </div>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* FAQ Section (Lilac) - home-page FAQs only (faqs table, page_key='home') */}
       {faqs.length > 0 && (
         <section className="bg-pastel-lilac section-padding relative overflow-hidden">
-          {/* Single-wave seams: the Video band's lilac bottom wave already
+          {/* Single-wave seams: the lilac wave on the white Founders band above
               carves this section's top edge, so only the bottom seam needs a
               wave here (white, into Blog). */}
           <div className="container z-10 relative">
@@ -588,7 +582,18 @@ const Home = () => {
               so its wave doesn't show up in the in-page seam audit). */}
         </section>
       )}
-      <LeadPopup open={leadPopupOpen} onClose={() => setLeadPopupOpen(false)} />
+      <LeadPopup
+        open={leadPopupOpen}
+        onClose={() => setLeadPopupOpen(false)}
+        onFreeAssessment={() => {
+          setLeadPopupOpen(false);
+          setIsFreeAssessmentOpen(true);
+        }}
+        onOnlineTherapy={() => {
+          setLeadPopupOpen(false);
+          setIsOnlineTherapyOpen(true);
+        }}
+      />
     </div>
   );
 };

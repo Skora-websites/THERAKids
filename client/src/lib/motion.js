@@ -87,7 +87,15 @@ export const initScrollReveals = (scope) => {
   const ctx = gsap.context(() => {
     const q = gsap.utils.selector(scope);
 
+    // A child of a [data-reveal-group] is already tweened by its group below.
+    // Animating it TWICE breaks the reveal: the second from() is created after
+    // the first has already applied its hidden start values, so it captures
+    // opacity 0 as its END state — when its trigger fires it snaps the card
+    // back to hidden and it never comes back ("appears then disappears").
+    const isGroupChild = (el) => el.parentElement?.matches('[data-reveal-group]') === true;
+
     q('[data-reveal]').forEach((el) => {
+      if (isGroupChild(el)) return;
       gsap.from(el, {
         ...REVEAL_DEFAULTS,
         scrollTrigger: { trigger: el, start: 'top 85%', once: true },

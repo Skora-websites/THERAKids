@@ -31,7 +31,7 @@ console.log('Desktop 1440px:', JSON.stringify(desktop));
 // 2. Small phone 360px: overflow + theme switcher size on every page
 const small = await browser.newPage();
 await small.setViewport({ width: 360, height: 780, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
-const paths = ['/', '/about', '/services', '/conditions', '/gallery', '/blogs', '/contact', '/services/speech-therapy', '/admin'];
+const paths = ['/', '/about', '/services', '/conditions', '/jobs', '/blogs', '/contact', '/services/speech-therapy', '/admin'];
 let allClean = true;
 for (const p of paths) {
   await small.goto('http://localhost:5173' + p, { waitUntil: 'networkidle2', timeout: 30000 });

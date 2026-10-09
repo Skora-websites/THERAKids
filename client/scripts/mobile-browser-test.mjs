@@ -11,7 +11,7 @@ const PAGES = [
   ['About', '/about'],
   ['Services', '/services'],
   ['Conditions', '/conditions'],
-  ['Gallery', '/gallery'],
+  ['Careers', '/jobs'],
   ['Blogs', '/blogs'],
   ['BlogPost', '/blogs/speech-milestones-toddlers'],
   ['Contact', '/contact'],

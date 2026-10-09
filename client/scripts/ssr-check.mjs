@@ -15,10 +15,11 @@ const pages = [
   ['About', '/src/pages/About.jsx', '/about'],
   ['Services', '/src/pages/Services.jsx', '/services'],
   ['Conditions', '/src/pages/Conditions.jsx', '/conditions'],
-  ['Gallery', '/src/pages/Gallery.jsx', '/gallery'],
+  ['Jobs', '/src/pages/Jobs.jsx', '/jobs'],
   ['Blogs', '/src/pages/Blogs.jsx', '/blogs'],
   ['BlogPost', '/src/pages/BlogPost.jsx', '/blogs/sample-slug', '/blogs/:slug'],
   ['Contact', '/src/pages/Contact.jsx', '/contact'],
+  ['Programs', '/src/pages/Programs.jsx', '/programs'],
   ['ServiceDetail', '/src/pages/ServiceDetail.jsx', '/services/speech-therapy', '/services/:slug'],
   ['AdminLogin', '/src/pages/admin/AdminLogin.jsx', '/admin'],
   // Mounted under the same parent pattern App.jsx uses, because AdminDashboard's inner

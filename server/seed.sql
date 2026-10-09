@@ -240,7 +240,7 @@ INSERT IGNORE INTO page_seo (page_key, label) VALUES
 ('/about', 'About'),
 ('/services', 'Services listing'),
 ('/conditions', 'Conditions'),
-('/gallery', 'Gallery'),
+('/jobs', 'Careers'),
 ('/blogs', 'Blogs listing'),
 ('/contact', 'Contact');
 -- ==========================================

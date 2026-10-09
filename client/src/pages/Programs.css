@@ -248,19 +248,20 @@
 }
 
 .module-topics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  list-style: disc;
+  margin: 0 0 1rem;
+  padding: 0 0 0 1.15rem;
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--color-on-surface);
 }
 
+/* Plain list item (not a pill) — the ::marker bullet carries the indent */
 .topic-chip {
-  background: var(--color-badge-lilac-bg);
-  color: var(--color-navy);
-  border-radius: var(--radius-full);
-  padding: 0.3rem 0.8rem;
-  font-size: 0.78rem;
-  font-weight: 600;
+  display: list-item;
+  color: inherit;
+  font-weight: 400;
 }
 
 .module-res-label {
@@ -765,6 +766,12 @@
   flex-shrink: 0;
   margin-top: 0.15rem;
   color: var(--color-cta-primary);
+}
+
+/* Watch / read action pinned to the card bottom (flex column card) */
+.story-watch {
+  margin-top: auto;
+  align-self: flex-start;
 }
 
 /* ------------------------ Insights section --------------------------- */

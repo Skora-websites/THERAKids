@@ -5,33 +5,20 @@ import './LeadPopup.css';
 
 /* Home-page lead-generation popup (free screening / assessment funnel).
  *
- * Funnel: Website → Popup → Free Screening/Assessment Form (Google Forms,
- * handled directly by the reception team) → Screening → Paid Full Assessment
- * → Therapy.
+ * Funnel: Website → Popup → Free Screening/Assessment Form or Online Therapy
+ * Form (both in-site popups) → Screening → Paid Full Assessment → Therapy.
  *
  * Behaviour (per client brief):
  *  - shows ~7 seconds after the Home page opens;
  *  - appears on EVERY open/reload of the home page - deliberately not
  *    suppressed by localStorage, so it is never permanently hidden;
- *  - two buttons handing off to the client's Google Forms.
+ *  - two buttons opening the two popup forms (handled by the parent, Home).
  *
- * The two Google Form URLs come from client/.env:
- *   VITE_FREE_ASSESSMENT_FORM / VITE_ONLINE_THERAPY_FORM
- * Until they are set, the buttons point at the Google Forms homepage so the
- * flow can still be reviewed end to end - swap in the real links when the
- * client shares them.
+ * `onFreeAssessment` / `onOnlineTherapy` are supplied by the parent so the
+ * forms themselves can live at the layout level (shared across pages).
  */
 
-const FORM_URLS = {
-  freeAssessment:
-    import.meta.env.VITE_FREE_ASSESSMENT_FORM ||
-    'https://docs.google.com/forms',
-  onlineTherapy:
-    import.meta.env.VITE_ONLINE_THERAPY_FORM ||
-    'https://docs.google.com/forms',
-};
-
-const LeadPopup = ({ open, onClose }) => {
+const LeadPopup = ({ open, onClose, onFreeAssessment, onOnlineTherapy }) => {
   const [visible, setVisible] = useState(false); // drives the entrance animation
   const closeBtnRef = useRef(null);
 
@@ -96,22 +83,20 @@ const LeadPopup = ({ open, onClose }) => {
           </p>
 
           <div className="lead-popup-actions">
-            <a
+            <button
+              type="button"
               className="lead-popup-btn lead-popup-btn-primary"
-              href={FORM_URLS.freeAssessment}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={onFreeAssessment}
             >
               Free Assessment <span className="lead-popup-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a
+            </button>
+            <button
+              type="button"
               className="lead-popup-btn lead-popup-btn-secondary"
-              href={FORM_URLS.onlineTherapy}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={onOnlineTherapy}
             >
               Online Therapy <span className="lead-popup-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
+            </button>
           </div>
 
           <p className="label-sm lead-popup-note">

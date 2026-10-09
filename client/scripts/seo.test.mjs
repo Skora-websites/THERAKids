@@ -25,7 +25,7 @@ const STATIC_TITLE = 'TheraKids Noida | Occupational Therapy, Speech Therapy, Ph
 const STATIC_KEYWORDS = 'occupational therapy noida, speech therapy noida, physical therapy noida, pediatric therapy, child development center, autism therapy, ADHD therapy, special education noida';
 const STATIC_DESC = 'TheraKids Noida offers world-class Occupational therapy, physical therapy, speech therapy, and Counseling to child/kids in Noida, Delhi NCR under the supervision of highly trained specialists.';
 
-const ROUTES = ['/', '/about', '/services', '/conditions', '/gallery', '/blogs', '/contact'];
+const ROUTES = ['/', '/about', '/services', '/conditions', '/jobs', '/blogs', '/contact'];
 
 /* ------------------------------ tiny harness ------------------------------ */
 const sections = [];
@@ -261,8 +261,8 @@ await check('home keeps the static index.html tags while its SEO row is empty', 
   assert(tags.canonical === 'https://therakidsnoida.com/', `canonical = "${tags.canonical}"`);
 });
 
-await check('other empty rows keep their defaults too (/contact, /gallery)', async () => {
-  for (const path of ['/contact', '/gallery']) {
+await check('other empty rows keep their defaults too (/contact, /jobs)', async () => {
+  for (const path of ['/contact', '/jobs']) {
     await gotoPage(page, path);
     const tags = await headTags(page);
     assert(tags.title === STATIC_TITLE, `${path} title = "${tags.title}"`);

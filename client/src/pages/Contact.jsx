@@ -3,19 +3,22 @@ import PageHero from '../components/PageHero';
 import { useAppContext } from '../context/AppContext';
 import { initScrollReveals } from '../lib/motion';
 import { usePageSeo } from '../hooks/usePageSeo';
-import { CONTACT_FALLBACKS, OFFICIAL_PHONES, splitPhones, telHref } from '../lib/contact';
+import { CONTACT_FALLBACKS, OFFICIAL_PHONES, parseCenters, splitPhones, telHref } from '../lib/contact';
 import API_URL from '../config';
 import './Contact.css';
 
 const Contact = () => {
-  usePageSeo('/contact');
+  usePageSeo('/contact', {
+    title: 'Contact TheraKids Noida | Book a Consultation',
+    description: 'Get in touch with TheraKids Noida — call, WhatsApp or visit our Sector 22 and Greater Noida West centers to book your child\'s consultation.',
+  });
   // Contact details come from admin (Site Settings) via /api/settings, with the
   // official details from lib/contact.js as fallback while it loads.
   const { settings } = useAppContext();
   const phones = splitPhones(settings.phone || CONTACT_FALLBACKS.phone);
   const email = settings.email || CONTACT_FALLBACKS.email;
   const primaryPhone = OFFICIAL_PHONES[0];
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
@@ -43,7 +46,7 @@ const Contact = () => {
         const data = await response.json().catch(() => ({}));
         throw new Error(data.error || 'Could not send your message. Please try again.');
       }
-      setFormData({ name: '', email: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', message: '' });
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 8000);
     } catch (err) {
@@ -98,9 +101,28 @@ const Contact = () => {
 
             <div className="contact-item">
               <h4 className="label-lg">Our Centers</h4>
-              <p className="body-md"><strong>Noida:</strong><br/>{settings.address1}</p>
-              <br/>
-              <p className="body-md"><strong>Greater Noida West:</strong><br/>{settings.address2}</p>
+              {parseCenters(settings).map((c, i) => (
+                <React.Fragment key={c.name}>
+                  {i > 0 && <br />}
+                  <p className="body-md">
+                    {c.map_url ? (
+                      <>
+                        <strong>
+                          <a href={c.map_url} target="_blank" rel="noopener noreferrer" className="contact-phone-link">{c.name}</a>
+                        </strong>
+                        <br />
+                        {c.address}
+                      </>
+                    ) : (
+                      <>
+                        <strong>{c.name}:</strong>
+                        <br />
+                        {c.address}
+                      </>
+                    )}
+                  </p>
+                </React.Fragment>
+              ))}
             </div>
 
             <div className="contact-item">
@@ -132,6 +154,17 @@ const Contact = () => {
                   required 
                   value={formData.email} 
                   onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="label-sm">Mobile Number</label>
+                <input
+                  type="tel"
+                  className="input-field"
+                  required
+                  placeholder="+91 98765 43210"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
                 />
               </div>
               <div className="form-group">

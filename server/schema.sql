@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
+  phone VARCHAR(50) NULL,
   message TEXT NOT NULL,
   status ENUM('New', 'In Progress', 'Resolved') DEFAULT 'New',
   created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
@@ -285,6 +286,18 @@ INSERT IGNORE INTO site_settings (setting_key, setting_value) VALUES
 ('hours_sat', 'Saturday: 9:00 AM - 2:00 PM'),
 ('hours_sun', 'Sunday: Closed'),
 ('whatsapp', '919899338813'),
+-- Google Maps deep links (one per centre; footer + contact page)
+('map_url_noida', 'https://www.google.com/maps/search/?api=1&query=THERAKids%20Foundation%2C%20G-10%2C%20Block%20G%2C%20Sector%2022%2C%20Noida%2C%20Uttar%20Pradesh%20201301'),
+('map_url_greater_noida', 'https://www.google.com/maps/search/?api=1&query=THERAKids%20Foundation%2C%20173%20Itehara%2C%20Near%20NX-One%20Society%2C%20Greater%20Noida%20West%2C%20Uttar%20Pradesh%20201306'),
+-- Social media profile URLs (footer icons + structured data)
+('social_facebook', 'https://www.facebook.com/therakidsnoida'),
+('social_instagram', 'https://www.instagram.com/therakids_noida/'),
+('social_youtube', 'https://www.youtube.com/@therakids_noida'),
+('social_twitter', 'https://www.x.com/therakids_noida'),
+('social_linkedin', 'https://www.linkedin.com/company/therakidsnoida/home/'),
+-- Centres (JSON array): drives the footer/contact addresses + map links and the
+-- centres editor in Site Settings. Add a row per centre when a new one opens.
+('centers', '[{"name":"Noida","address":"G-10, Block G, Sector 22, Noida - 201301","map_url":"https://www.google.com/maps/search/?api=1&query=THERAKids%20Foundation%2C%20G-10%2C%20Block%20G%2C%20Sector%2022%2C%20Noida%2C%20Uttar%20Pradesh%20201301"},{"name":"Gr. Noida West","address":"173, Itehara, Near NX-One Society, Greater Noida West - 201306","map_url":"https://www.google.com/maps/search/?api=1&query=THERAKids%20Foundation%2C%20173%20Itehara%2C%20Near%20NX-One%20Society%2C%20Greater%20Noida%20West%2C%20Uttar%20Pradesh%20201306"}]'),
 -- Home page hero-video section (admin "Site Settings")
 ('home_video_url', '/videos/hero-video.mp4'),
 ('home_video_title', 'Step Inside THERAKids'),

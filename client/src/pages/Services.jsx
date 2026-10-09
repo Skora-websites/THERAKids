@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, ArrowRight } from 'lucide-react';
 import API_URL from '../config';
+import CaseStories from '../components/CaseStories';
 import InlineCTA from '../components/InlineCTA';
 import PageHero from '../components/PageHero';
 import Pagination from '../components/Pagination';
@@ -36,13 +37,30 @@ const STATIC_ASSESSMENT_CARDS = [
 ];
 
 // Detail pages are rendered from the DB by ServiceDetail (/services/:slug)
+/* Online Therapy always leads the listing (client brief). Shown from static
+   copy until the row exists in the admin-managed services table; if the DB
+   already has the slug, that row wins but is still sorted first. */
+const ONLINE_THERAPY = {
+  id: 901,
+  slug: 'online-therapy',
+  name: 'Online Therapy',
+  short_description: 'Live one-to-one sessions with our therapists, from the comfort of your home.',
+  image: '/images/services/counseling.jpg',
+};
+
 const Services = () => {
   // Listing meta from the admin "SEO" tab; each /services/:slug page has its own
   // meta fields in the Services panel instead.
-  usePageSeo('/services');
+  usePageSeo('/services', {
+    title: 'Therapy Services for Kids in Noida | TheraKids',
+    description: 'Explore TheraKids therapy services in Noida — occupational therapy, speech therapy, physiotherapy, special education, behaviour modification and more for children.',
+  });
   const [services, setServices] = useState(FALLBACK_DATA.services);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  // Online Therapy pinned to the top of the list, whatever order the API returns.
+  const onlineService = services.find((s) => s.slug === 'online-therapy') || ONLINE_THERAPY;
+  const visibleServices = [onlineService, ...services.filter((s) => s.slug !== 'online-therapy')];
   const pageRef = useRef(null);
   const gridTopRef = useRef(null);
   const navigate = useNavigate();
@@ -113,7 +131,7 @@ const Services = () => {
             <div ref={gridTopRef} />
             <div className="services-compact-grid" data-reveal-group>
               {/* Compact cards — long descriptions, benefits & page content live on /services/:slug */}
-              {services.slice((page - 1) * SERVICES_PER_PAGE, page * SERVICES_PER_PAGE).map((service) => (
+              {visibleServices.slice((page - 1) * SERVICES_PER_PAGE, page * SERVICES_PER_PAGE).map((service) => (
                 <div key={service.id} className="services-compact-cell">
                   <button
                     type="button"
@@ -144,7 +162,7 @@ const Services = () => {
             </div>
             <Pagination
               page={page}
-              total={services.length}
+              total={visibleServices.length}
               perPage={SERVICES_PER_PAGE}
               onChange={(next) => {
                 setPage(next);
@@ -190,6 +208,9 @@ const Services = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonials — moved here from the THERAKids Academy page. */}
+      <CaseStories />
 
     </div>
   );

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import API_URL from '../config';
 import { initScrollReveals } from '../lib/motion';
 import { setSeo, resetSeo, makeExcerpt } from '../lib/seo';
+import { BLOG_POST_KEYWORDS_FALLBACK } from '../lib/seoKeywords';
 import { FALLBACK_DATA } from '../data/fallbackData';
 import './Blogs.css';
 
@@ -22,7 +23,7 @@ const BlogPost = () => {
   useEffect(() => {
     if (status !== 'ok' || !blog) return undefined;
     const metaTitle = (blog.meta_title || '').trim();
-    const keywords = (blog.meta_keywords || '').trim();
+    const keywords = (blog.meta_keywords || '').trim() || BLOG_POST_KEYWORDS_FALLBACK;
     const metaDescription = (blog.meta_description || '').trim();
     setSeo({
       title: metaTitle || blog.title || '',
@@ -46,7 +47,10 @@ const BlogPost = () => {
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
-      setStatus('loading');
+      // Only show the full-page loader when there is no static fallback copy to
+      // render instantly. For posts that DO have fallback copy we keep showing it
+      // and let the fetch swap/refresh it in place.
+      if (!fallbackBlog) setStatus('loading');
       try {
         const response = await fetch(`${API_URL}/api/blogs/${slug}`);
         if (response.ok) {
@@ -63,6 +67,7 @@ const BlogPost = () => {
       } catch {
         // API unreachable - keep showing the static fallback copy
         if (!cancelled && !fallbackBlog) setStatus('error');
+        else if (!cancelled && fallbackBlog) setStatus('ok');
       }
     };
     load();

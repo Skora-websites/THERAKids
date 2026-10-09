@@ -6,6 +6,7 @@ import RelatedServices from '../components/RelatedServices';
 import StructuredData from '../components/StructuredData';
 import { initScrollReveals, createFloatLoop } from '../lib/motion';
 import { setSeo, resetSeo, stripHtml } from '../lib/seo';
+import { SERVICE_KEYWORDS, SERVICE_META, genericServiceKeywords } from '../lib/seoKeywords';
 import { useAppContext } from '../context/AppContext';
 import API_URL from '../config';
 import { FALLBACK_DATA } from '../data/fallbackData';
@@ -35,15 +36,24 @@ const ServiceDetail = () => {
 
   /* Per-service SEO, edited in the Services panel (not the SEO tab): <title> is the
      meta title verbatim, falling back to the service name; keywords/description fall
-     back to the short description; an empty field is left alone so the site-wide
-     tags survive. */
+     back to the researched defaults in lib/seoKeywords (or the short description);
+     an empty field is left alone so the site-wide tags survive. */
   useEffect(() => {
     if (!service) return undefined;
     const field = (value) => (value || '').trim();
     const tags = {};
-    const title = field(service.meta_title) || field(service.name);
-    const keywords = field(service.meta_keywords);
-    const description = field(service.meta_description) || stripHtml(service.short_description);
+    const title =
+      field(service.meta_title) ||
+      SERVICE_META[service.slug]?.title ||
+      field(service.name);
+    const keywords =
+      field(service.meta_keywords) ||
+      SERVICE_KEYWORDS[service.slug] ||
+      genericServiceKeywords(service.name);
+    const description =
+      field(service.meta_description) ||
+      SERVICE_META[service.slug]?.description ||
+      stripHtml(service.short_description);
     const canonical = field(service.canonical_url);
     if (title) tags.title = title;
     if (keywords) tags.keywords = keywords;

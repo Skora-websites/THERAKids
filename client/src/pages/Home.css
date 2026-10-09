@@ -941,6 +941,15 @@
     var(--color-navy);
 }
 
+/* YouTube embed: fill the framed stage edge-to-edge (object-fit/background
+   above only apply to the old <video> element, so the iframe overrides them). */
+iframe.home-hero-video {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: var(--color-navy);
+}
+
 .video-frame-note {
   position: absolute;
   top: 1.5rem;

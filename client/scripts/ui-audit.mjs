@@ -13,7 +13,7 @@ const pages = [
   ['About', '/src/pages/About.jsx', '/about', '*'],
   ['Services', '/src/pages/Services.jsx', '/services', '*'],
   ['Conditions', '/src/pages/Conditions.jsx', '/conditions', '*'],
-  ['Gallery', '/src/pages/Gallery.jsx', '/gallery', '*'],
+  ['Jobs', '/src/pages/Jobs.jsx', '/jobs', '*'],
   ['Blogs', '/src/pages/Blogs.jsx', '/blogs', '*'],
   ['Contact', '/src/pages/Contact.jsx', '/contact', '*'],
   // ServiceDetail renders its hero/bands client-side after /api/services resolves,
@@ -22,7 +22,7 @@ const pages = [
   ['AdminLogin', '/src/pages/admin/AdminLogin.jsx', '/admin', '*'],
 ];
 
-const HERO_PAGES = ['Home', 'About', 'Services', 'Conditions', 'Gallery', 'Blogs', 'Contact'];
+const HERO_PAGES = ['Home', 'About', 'Services', 'Conditions', 'Jobs', 'Blogs', 'Contact'];
 const THERAPY_PAGES = []; // therapy hero/breadcrumb checks live on in the browser tests
 
 let failures = 0;

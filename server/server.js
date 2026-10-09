@@ -248,7 +248,7 @@ app.get('/sitemap.xml', async (req, res) => {
       { loc: '/about', priority: '0.8' },
       { loc: '/services', priority: '0.9' },
       { loc: '/conditions', priority: '0.7' },
-      { loc: '/gallery', priority: '0.6' },
+      { loc: '/jobs', priority: '0.7' },
       { loc: '/blogs', priority: '0.8' },
       { loc: '/contact', priority: '0.7' }
     ];
@@ -356,16 +356,36 @@ app.get('/api/testimonials', async (req, res) => {
 // Messages from the public Contact page form - stored for the admin
 // "Messages" panel (separate table/resource from appointment requests).
 app.post('/api/contact', async (req, res) => {
-  const { name, email, message } = req.body;
+  const { name, email, phone, message } = req.body;
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Name, email and message are required.' });
   }
   try {
     await pool.query(
-      'INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)',
-      [name, email, message]
+      'INSERT INTO contact_messages (name, email, phone, message) VALUES (?, ?, ?, ?)',
+      [name, email, phone || null, message]
     );
     res.status(201).json({ message: 'Message received' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Free screening / assessment requests from the home-page lead popup - stored
+// for the admin (same "Messages" panel as contact_messages, marked as a
+// screening request in the message body).
+app.post('/api/free-assessment', async (req, res) => {
+  const { parent_name, child_name, child_age, phone, email, concern } = req.body;
+  if (!parent_name || !child_name || !phone) {
+    return res.status(400).json({ error: 'Parent name, child name and phone are required.' });
+  }
+  const message = `FREE SCREENING REQUEST\n\nChild: ${child_name} (Age: ${child_age || 'N/A'})\n\nConcern: ${concern || 'Not specified'}\n\nParent/Guardian: ${parent_name}\nPhone: ${phone}\nEmail: ${email || 'Not provided'}`;
+  try {
+    await pool.query(
+      'INSERT INTO contact_messages (name, email, phone, message) VALUES (?, ?, ?, ?)',
+      [parent_name, email || null, phone, message]
+    );
+    res.status(201).json({ message: 'Screening request received' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

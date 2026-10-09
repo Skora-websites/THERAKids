@@ -4,7 +4,7 @@ const BASE = process.argv[2] || 'http://localhost:5173';
 const EDGE = process.env.BROWSER_PATH
   || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 
-const PAGES = ['/', '/about', '/blogs', '/conditions', '/contact', '/gallery', '/services'];
+const PAGES = ['/', '/about', '/blogs', '/conditions', '/contact', '/jobs', '/services'];
 // Phone, tall phone, landscape phone, tablet portrait/landscape, laptop ratios, desktop.
 const VIEWPORTS = [
   [360, 800], [390, 844], [844, 390], [768, 1024], [1024, 768],

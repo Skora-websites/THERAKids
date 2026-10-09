@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import InlineCTA from '../components/InlineCTA';
+import CaseStories from '../components/CaseStories';
 import PageHero from '../components/PageHero';
 import API_URL from '../config';
 import { initScrollReveals, createFloatLoop } from '../lib/motion';
 import { usePageSeo } from '../hooks/usePageSeo';
+import { CONDITION_KEYWORDS } from '../lib/seoKeywords';
 import { FALLBACK_DATA } from '../data/fallbackData';
 import './Conditions.css';
 // The condition cards reuse the service-detail layout classes defined in Services.css
@@ -80,7 +82,11 @@ const parseFocusAreas = (raw) => {
 };
 
 const Conditions = () => {
-  usePageSeo('/conditions');
+  usePageSeo('/conditions', {
+    title: 'Developmental Conditions We Treat | TheraKids Noida',
+    keywords: CONDITION_KEYWORDS,
+    description: 'TheraKids Noida evaluates and treats developmental conditions in children — autism spectrum, ADHD, sensory processing disorder, speech delays, cerebral palsy and more.',
+  });
   const pageRef = useRef(null);
   const [conditions, setConditions] = useState(FALLBACK_DATA.conditions);
   const [loading, setLoading] = useState(false);
@@ -190,6 +196,9 @@ const Conditions = () => {
           )}
         </div>
       </section>
+
+      {/* Testimonials — moved here from the THERAKids Academy page. */}
+      <CaseStories />
     </div>
   );
 };

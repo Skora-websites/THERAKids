@@ -1,7 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { NavLink, Routes, Route, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard, Stethoscope, Image as ImageIcon, FileText, Star, HelpCircle,
+  ListOrdered, Puzzle, Users, FolderOpen, FileStack, GraduationCap, BadgeCheck,
+  PlayCircle, CalendarDays, Mail, Briefcase, Settings, KeyRound, ExternalLink,
+  Menu, X, LogOut,
+} from 'lucide-react';
 import API_URL from '../../config';
 import RichTextEditor from '../../components/RichTextEditor';
+import Logo from '../../components/Logo';
 import { invalidatePageSeo } from '../../hooks/usePageSeo';
 import './AdminDashboard.css';
 
@@ -326,21 +333,27 @@ const Overview = () => {
   if (!stats) return <div className="admin-loading">Loading stats...</div>;
 
   const cards = [
-    { label: 'Total Services', value: stats.services },
-    { label: 'Published Blogs', value: stats.blogs },
-    { label: 'Appointments', value: stats.appointments },
-    { label: 'New Appointments', value: stats.newAppointments },
-    { label: 'New Job Applications', value: stats.newJobApplications }
+    { label: 'Total Services', value: stats.services, icon: Stethoscope, tone: 'peach' },
+    { label: 'Published Blogs', value: stats.blogs, icon: FileText, tone: 'lilac' },
+    { label: 'Appointments', value: stats.appointments, icon: CalendarDays, tone: 'mint' },
+    { label: 'New Appointments', value: stats.newAppointments, icon: CalendarDays, tone: 'amber' },
+    { label: 'New Job Applications', value: stats.newJobApplications, icon: Briefcase, tone: 'sky' }
   ];
 
   return (
     <div className="admin-overview">
-      <h2>Dashboard Overview</h2>
+      <div className="admin-page-heading">
+        <h2>Dashboard Overview</h2>
+        <p className="admin-page-sub">Everything happening across the TheraKids site.</p>
+      </div>
       <div className={`stats-grid ${cards.length > 4 ? 'stats-grid-5' : ''}`}>
         {cards.map(c => (
-          <div className="stat-card" key={c.label}>
-            <h3>{c.label}</h3>
-            <p className="headline-xl">{c.value}</p>
+          <div className={`stat-card tone-${c.tone}`} key={c.label}>
+            <div className="stat-icon"><c.icon size={19} aria-hidden="true" /></div>
+            <div className="stat-body">
+              <h3>{c.label}</h3>
+              <p className="headline-xl">{c.value}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -496,7 +509,10 @@ const CrudManager = ({ resource }) => {
   return (
     <div className="admin-crud">
       <div className="crud-header">
-        <h2>{cfg.title}</h2>
+        <div className="admin-page-heading">
+          <h2>{cfg.title}</h2>
+          {rows && <p className="admin-page-sub">{rows.length} {rows.length === 1 ? 'record' : 'records'}</p>}
+        </div>
         {!cfg.noCreate && <button className="btn btn-primary btn-sm" onClick={openCreate}>+ Add New</button>}
       </div>
 
@@ -1167,8 +1183,48 @@ const SettingsManager = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    adminFetch('/settings').then(setValues).catch(e => setError(e.message));
+    adminFetch('/settings').then(data => {
+      // Prefill the centres editor from the legacy address keys when the
+      // `centers` JSON setting does not exist yet (first run after this update).
+      if (data && !data.centers) {
+        const seeded = [
+          { name: 'Noida', address: data.address1 || '', map_url: data.map_url_noida || '' },
+          { name: 'Gr. Noida West', address: data.address2 || '', map_url: data.map_url_greater_noida || '' },
+        ].filter(c => c.address || c.map_url);
+        if (seeded.length > 0) data.centers = JSON.stringify(seeded);
+      }
+      setValues(data);
+    }).catch(e => setError(e.message));
   }, []);
+
+  /* Centres editor state lives in values.centers (JSON string). Legacy keys
+   * (address1/address2/map_url_*) are synced on save so any consumer that has
+   * not moved to parseCenters() yet keeps working. */
+  const readCenters = () => {
+    try {
+      const rows = JSON.parse(values?.centers || '[]');
+      return Array.isArray(rows) ? rows : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const writeCenters = (rows) => {
+    setValues({ ...values, centers: JSON.stringify(rows) });
+  };
+
+  const addCenter = () => {
+    writeCenters([...readCenters(), { name: '', address: '', map_url: '' }]);
+  };
+
+  const updateCenter = (index, key, value) => {
+    const rows = readCenters().map((c, i) => (i === index ? { ...c, [key]: value } : c));
+    writeCenters(rows);
+  };
+
+  const removeCenter = (index) => {
+    writeCenters(readCenters().filter((_, i) => i !== index));
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -1176,7 +1232,17 @@ const SettingsManager = () => {
     setError(null);
     setSaved(false);
     try {
-      await adminFetch('/settings', { method: 'PUT', body: JSON.stringify(values) });
+      // Sync the legacy single-centre keys from the centres list so older
+      // consumers (and a fresh DB on a new server) keep rendering correctly.
+      const centers = readCenters().filter(c => (c.address || c.map_url));
+      const payload = {
+        ...values,
+        address1: centers[0]?.address || '',
+        address2: centers[1]?.address || '',
+        map_url_noida: centers[0]?.map_url || '',
+        map_url_greater_noida: centers[1]?.map_url || '',
+      };
+      await adminFetch('/settings', { method: 'PUT', body: JSON.stringify(payload) });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
@@ -1188,33 +1254,166 @@ const SettingsManager = () => {
 
   if (values === null && !error) return <div className="admin-loading">Loading...</div>;
 
+  /* Friendly field definitions: label + hint + input type per setting key.
+   * Keys present in the DB but not listed here still render (generic group at
+   * the bottom) so nothing the backend adds ever becomes uneditable. */
+  const SECTIONS = [
+    {
+      title: 'Contact Information',
+      hint: 'Shown in the footer, contact page and appointment modal. Phone numbers can be separated with " / ".',
+      fields: [
+        { key: 'phone', label: 'Phone Number(s)', type: 'tel', hint: 'Both numbers, separated by " / " — they render as tappable tel: links.', full: true },
+        { key: 'whatsapp', label: 'WhatsApp Number', type: 'tel', hint: 'Country code, no "+" (e.g. 919899338813). Used by the chat button and appointment handoff.', full: true },
+        { key: 'email', label: 'Email Address', type: 'email' },
+      ],
+    },
+    {
+      title: 'Opening Hours',
+      hint: 'Free text — keep the "Mon-Fri: 8:00 AM - 6:00 PM" style so the hours also parse into the site\u2019s structured data.',
+      fields: [
+        { key: 'hours_week', label: 'Weekdays (Mon–Fri)' },
+        { key: 'hours_sat', label: 'Saturday' },
+        { key: 'hours_sun', label: 'Sunday' },
+      ],
+    },
+    {
+      title: 'Social Media',
+      hint: 'Full profile URLs. These drive the footer icons and the site\u2019s SEO structured data. Leave blank to hide a network.',
+      fields: [
+        { key: 'social_facebook', label: 'Facebook', type: 'url', placeholder: 'https://www.facebook.com/…' },
+        { key: 'social_instagram', label: 'Instagram', type: 'url', placeholder: 'https://www.instagram.com/…' },
+        { key: 'social_youtube', label: 'YouTube', type: 'url', placeholder: 'https://www.youtube.com/…' },
+        { key: 'social_twitter', label: 'X (Twitter)', type: 'url', placeholder: 'https://www.x.com/…' },
+      ],
+    },
+    {
+      title: 'Home Page Video Section',
+      hint: 'The "Step Inside THERAKids" block on the home page.',
+      fields: [
+        { key: 'home_video_url', label: 'Video URL or Path', type: 'text', hint: 'An uploaded file path (/videos/hero-video.mp4) or any https:// link.', full: true },
+        { key: 'home_video_title', label: 'Section Title', type: 'text', full: true },
+        { key: 'home_video_description', label: 'Section Description', type: 'textarea', rows: 3, full: true },
+      ],
+    },
+  ];
+
+  const knownKeys = new Set(SECTIONS.flatMap(s => s.fields.map(f => f.key)));
+  const extraKeys = Object.keys(values).filter(k => !knownKeys.has(k));
+
+  const renderField = (key, { label, type = 'text', hint, placeholder, rows } = {}) => (
+    <div className={`form-field ${hint ? 'full' : ''}`} key={key}>
+      <label htmlFor={`setting-${key}`}>{label}</label>
+      {type === 'textarea' ? (
+        <textarea
+          id={`setting-${key}`}
+          rows={rows || 3}
+          value={values[key] ?? ''}
+          placeholder={placeholder}
+          onChange={e => setValues({ ...values, [key]: e.target.value })}
+        />
+      ) : (
+        <input
+          id={`setting-${key}`}
+          type={type}
+          value={values[key] ?? ''}
+          placeholder={placeholder}
+          onChange={e => setValues({ ...values, [key]: e.target.value })}
+        />
+      )}
+      {hint && <p className="field-hint">{hint}</p>}
+    </div>
+  );
+
   return (
     <div className="admin-crud">
-      <div className="crud-header"><h2>Site Settings</h2></div>
+      <div className="crud-header">
+        <div className="admin-page-heading">
+          <h2>Site Settings</h2>
+          <p className="admin-page-sub">Contact details, maps, socials, hours and the home video — everywhere on the site updates when you save.</p>
+        </div>
+      </div>
       {error && <div className="admin-error">{error}</div>}
-      {saved && <div className="admin-success">Settings saved.</div>}
+      {saved && <div className="admin-success">Settings saved — the site updates immediately.</div>}
       {values && (
-        <form className="crud-table-wrapper settings-form" onSubmit={handleSave}>
-          {Object.entries(values).map(([key, value]) => (
-            <div className="form-field full" key={key}>
-              <label>{key.replace(/_/g, ' ')}</label>
-              {/* Long-form keys (descriptions, notes) get a textarea; the rest stay single-line */}
-              {key === 'home_video_description' ? (
-                <textarea
-                  rows={3}
-                  value={value ?? ''}
-                  onChange={e => setValues({ ...values, [key]: e.target.value })}
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={value ?? ''}
-                  onChange={e => setValues({ ...values, [key]: e.target.value })}
-                />
-              )}
+        <form onSubmit={handleSave}>
+          {/* Centres — dynamic list so a new centre can be added any time */}
+          <div className="settings-section">
+            <div className="settings-section-head">
+              <h3>Our Centres</h3>
+              <p>Each centre appears in the footer, contact page and search-engine data with its own Google Maps link. Add one row per centre — use the exact share link from Google Maps.</p>
+            </div>
+            {readCenters().map((c, i) => (
+              <div className="center-editor" key={i}>
+                <div className="center-editor-head">
+                  <span className="center-editor-index">Centre {i + 1}</span>
+                  {readCenters().length > 1 && (
+                    <button type="button" className="btn btn-danger btn-sm" onClick={() => removeCenter(i)}>
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <div className="form-grid">
+                  <div className="form-field">
+                    <label htmlFor={`center-name-${i}`}>Centre Name (e.g. Noida)</label>
+                    <input
+                      id={`center-name-${i}`}
+                      type="text"
+                      value={c.name || ''}
+                      placeholder="Sector 22, Noida"
+                      onChange={e => updateCenter(i, 'name', e.target.value)}
+                    />
+                  </div>
+                  <div className="form-field full">
+                    <label htmlFor={`center-address-${i}`}>Full Address</label>
+                    <textarea
+                      id={`center-address-${i}`}
+                      rows={2}
+                      value={c.address || ''}
+                      placeholder="G-10, Block G, Sector 22, Noida - 201301"
+                      onChange={e => updateCenter(i, 'address', e.target.value)}
+                    />
+                  </div>
+                  <div className="form-field full">
+                    <label htmlFor={`center-map-${i}`}>Google Maps Link</label>
+                    <input
+                      id={`center-map-${i}`}
+                      type="url"
+                      value={c.map_url || ''}
+                      placeholder="https://www.google.com/maps/…"
+                      onChange={e => updateCenter(i, 'map_url', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button type="button" className="btn btn-outline btn-sm" onClick={addCenter}>
+              + Add Another Centre
+            </button>
+          </div>
+
+          {SECTIONS.map(section => (
+            <div className="settings-section" key={section.title}>
+              <div className="settings-section-head">
+                <h3>{section.title}</h3>
+                <p>{section.hint}</p>
+              </div>
+              <div className="form-grid">
+                {section.fields.map(f => renderField(f.key, f))}
+              </div>
             </div>
           ))}
-          <div className="admin-modal-footer">
+          {extraKeys.length > 0 && (
+            <div className="settings-section">
+              <div className="settings-section-head">
+                <h3>Other Settings</h3>
+                <p>Advanced keys present in the database. Rename nothing unless you know what consumes them.</p>
+              </div>
+              <div className="form-grid">
+                {extraKeys.map(key => renderField(key, { label: key.replace(/_/g, ' ') }))}
+              </div>
+            </div>
+          )}
+          <div className="admin-modal-footer settings-save-row">
             <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? 'Saving...' : 'Save Settings'}
             </button>
@@ -1316,6 +1515,7 @@ const ChangePassword = () => {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false); // mobile drawer
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -1329,39 +1529,121 @@ const AdminDashboard = () => {
     navigate('/admin');
   };
 
+  // Close the mobile drawer whenever the route changes
+  useEffect(() => setMenuOpen(false), [navigate]);
+
+  // Sidebar structure: groups with lucide icons keep 20 flat links scannable.
+  const NAV_GROUPS = [
+    {
+      label: null,
+      items: [{ to: '/admin/dashboard', end: true, icon: LayoutDashboard, label: 'Overview' }],
+    },
+    {
+      label: 'Website Content',
+      items: [
+        { to: '/admin/dashboard/services', icon: Stethoscope, label: 'Services' },
+        { to: '/admin/dashboard/gallery', icon: ImageIcon, label: 'Gallery' },
+        { to: '/admin/dashboard/blogs', icon: FileText, label: 'Blogs' },
+        { to: '/admin/dashboard/testimonials', icon: Star, label: 'Testimonials' },
+        { to: '/admin/dashboard/faqs', icon: HelpCircle, label: 'FAQs' },
+        { to: '/admin/dashboard/process-steps', icon: ListOrdered, label: 'Process Steps' },
+        { to: '/admin/dashboard/conditions', icon: Puzzle, label: 'Conditions' },
+        { to: '/admin/dashboard/founders', icon: Users, label: 'Founders' },
+        { to: '/admin/dashboard/page-content', icon: FileStack, label: 'Page Content' },
+        { to: '/admin/dashboard/seo', icon: BadgeCheck, label: 'SEO' },
+      ],
+    },
+    {
+      label: 'THERAKids Academy',
+      items: [
+        { to: '/admin/dashboard/program-modules', icon: GraduationCap, label: 'Program Modules' },
+        { to: '/admin/dashboard/program-resources', icon: FolderOpen, label: 'Module Resources' },
+        { to: '/admin/dashboard/program-benefits', icon: BadgeCheck, label: 'Program Benefits' },
+        { to: '/admin/dashboard/program-videos', icon: PlayCircle, label: 'YouTube Videos' },
+      ],
+    },
+    {
+      label: 'Inbox',
+      items: [
+        { to: '/admin/dashboard/appointments', icon: CalendarDays, label: 'Appointments' },
+        { to: '/admin/dashboard/messages', icon: Mail, label: 'Messages' },
+        { to: '/admin/dashboard/job-applications', icon: Briefcase, label: 'Job Applications' },
+      ],
+    },
+    {
+      label: 'System',
+      items: [
+        { to: '/admin/dashboard/settings', icon: Settings, label: 'Site Settings' },
+        { to: '/admin/dashboard/password', icon: KeyRound, label: 'Change Password' },
+      ],
+    },
+  ];
+
+  const renderNav = () => (
+    <nav className="admin-nav">
+      {NAV_GROUPS.map((group, gi) => (
+        <div className="admin-nav-group" key={group.label || `g${gi}`}>
+          {group.label && <p className="admin-nav-heading">{group.label}</p>}
+          {group.items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+            >
+              <item.icon size={17} aria-hidden="true" />
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </div>
+      ))}
+    </nav>
+  );
+
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar">
+      {/* Mobile top bar with drawer toggle */}
+      <div className="admin-mobilebar">
+        <button
+          type="button"
+          className="admin-burger"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu size={20} />
+        </button>
+        <Logo className="admin-mobilebar-logo" />
+      </div>
+      {menuOpen && <div className="admin-drawer-overlay" onClick={() => setMenuOpen(false)} />}
+
+      <aside className={`admin-sidebar ${menuOpen ? 'open' : ''}`}>
         <div className="admin-sidebar-header">
-          <h2 className="headline-sm" style={{color: 'var(--color-primary)'}}>TheraKids Admin</h2>
+          <Logo className="admin-sidebar-logo" />
+          <button
+            type="button"
+            className="admin-sidebar-close"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
         </div>
-        <nav className="admin-nav">
-          <NavLink to="/admin/dashboard" end className={({isActive}) => isActive ? 'active' : ''}>Overview</NavLink>
-          <NavLink to="/admin/dashboard/services" className={({isActive}) => isActive ? 'active' : ''}>Services</NavLink>
-          <NavLink to="/admin/dashboard/gallery" className={({isActive}) => isActive ? 'active' : ''}>Gallery</NavLink>
-          <NavLink to="/admin/dashboard/blogs" className={({isActive}) => isActive ? 'active' : ''}>Blogs</NavLink>
-          <NavLink to="/admin/dashboard/seo" className={({isActive}) => isActive ? 'active' : ''}>SEO</NavLink>
-          <NavLink to="/admin/dashboard/testimonials" className={({isActive}) => isActive ? 'active' : ''}>Testimonials</NavLink>
-          <NavLink to="/admin/dashboard/faqs" className={({isActive}) => isActive ? 'active' : ''}>FAQs</NavLink>
-          <NavLink to="/admin/dashboard/process-steps" className={({isActive}) => isActive ? 'active' : ''}>Process Steps</NavLink>
-          <NavLink to="/admin/dashboard/conditions" className={({isActive}) => isActive ? 'active' : ''}>Conditions</NavLink>
-          <NavLink to="/admin/dashboard/founders" className={({isActive}) => isActive ? 'active' : ''}>Founders</NavLink>
-          <NavLink to="/admin/dashboard/page-content" className={({isActive}) => isActive ? 'active' : ''}>Page Content</NavLink>
-          <NavLink to="/admin/dashboard/program-modules" className={({isActive}) => isActive ? 'active' : ''}>Program Modules</NavLink>
-          <NavLink to="/admin/dashboard/program-resources" className={({isActive}) => isActive ? 'active' : ''}>Module Resources</NavLink>
-          <NavLink to="/admin/dashboard/program-benefits" className={({isActive}) => isActive ? 'active' : ''}>Program Benefits</NavLink>
-          <NavLink to="/admin/dashboard/program-videos" className={({isActive}) => isActive ? 'active' : ''}>YouTube Videos</NavLink>
-          <NavLink to="/admin/dashboard/appointments" className={({isActive}) => isActive ? 'active' : ''}>Appointments</NavLink>
-          <NavLink to="/admin/dashboard/messages" className={({isActive}) => isActive ? 'active' : ''}>Messages</NavLink>
-          <NavLink to="/admin/dashboard/job-applications" className={({isActive}) => isActive ? 'active' : ''}>Job Applications</NavLink>
-          <NavLink to="/admin/dashboard/settings" className={({isActive}) => isActive ? 'active' : ''}>Site Settings</NavLink>
-          <NavLink to="/admin/dashboard/password" className={({isActive}) => isActive ? 'active' : ''}>Change Password</NavLink>
-        </nav>
+        {renderNav()}
         <div className="admin-sidebar-footer">
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          <a
+            className="view-site-link"
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink size={15} aria-hidden="true" /> View site
+          </a>
+          <button className="logout-btn" onClick={handleLogout}>
+            <LogOut size={15} aria-hidden="true" /> Logout
+          </button>
         </div>
       </aside>
-      
+
       <main className="admin-main-content">
         <Routes>
           <Route path="/" element={<Overview />} />

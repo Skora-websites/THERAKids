@@ -5,7 +5,7 @@ import About from './pages/About';
 import Services from './pages/Services';
 import ServiceDetail from './pages/ServiceDetail';
 import Conditions from './pages/Conditions';
-import Gallery from './pages/Gallery';
+import Jobs from './pages/Jobs';
 import Blogs from './pages/Blogs';
 import BlogPost from './pages/BlogPost';
 import Contact from './pages/Contact';
@@ -36,7 +36,9 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/services/:slug" element={<ServiceDetailRoute />} />
             <Route path="/conditions" element={<Conditions />} />
-            <Route path="/gallery" element={<Gallery />} />
+            {/* Careers (job portal). The old gallery moved into /about. */}
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/gallery" element={<Navigate to="/about" replace />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blogs/:slug" element={<BlogPost />} />
             <Route path="/programs" element={<Programs />} />

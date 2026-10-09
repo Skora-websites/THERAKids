@@ -1,16 +1,20 @@
 import React from 'react';
 import { OFFICIAL_WHATSAPP } from '../lib/contact';
+import { useAppContext } from '../context/AppContext';
 import './WhatsAppButton.css';
 
 /* Floating WhatsApp chat button (bottom-right, site-wide). Opens a chat with
- * the centre's WhatsApp number — the same source of truth the appointment
- * modal hands off to (lib/contact). Pure <a> link: works on a static
- * frontend-only deploy with no backend involved. */
-const CHAT_URL = `https://wa.me/${OFFICIAL_WHATSAPP}?text=${encodeURIComponent(
-  'Hi TheraKids! I would like to know more about your services.'
-)}`;
+ * the centre's WhatsApp number — the admin Site Settings `whatsapp` value when
+ * it has loaded, else the official number (lib/contact). Pure <a> link: works
+ * on a static frontend-only deploy with no backend involved. */
+const WhatsAppButton = () => {
+  const { settings } = useAppContext();
+  const number = (settings.whatsapp || '').trim() || OFFICIAL_WHATSAPP;
+  const CHAT_URL = `https://wa.me/${number}?text=${encodeURIComponent(
+    'Hi TheraKids! I would like to know more about your services.'
+  )}`;
 
-const WhatsAppButton = () => (
+  return (
   <a
     className="whatsapp-float"
     href={CHAT_URL}
@@ -25,6 +29,7 @@ const WhatsAppButton = () => (
     </svg>
     <span className="whatsapp-float-label">Chat with us</span>
   </a>
-);
+  );
+};
 
 export default WhatsAppButton;

@@ -6,6 +6,7 @@ import PageHero from '../components/PageHero';
 import Pagination from '../components/Pagination';
 import TiltCard from '../components/TiltCard';
 import { initScrollReveals } from '../lib/motion';
+import { BLOG_KEYWORDS } from '../lib/seoKeywords';
 import { usePageSeo } from '../hooks/usePageSeo';
 import { FALLBACK_DATA } from '../data/fallbackData';
 import './Blogs.css';
@@ -13,7 +14,7 @@ import './Blogs.css';
 const BLOGS_PER_PAGE = 6;
 
 // Default meta for the listing page (spec: "sensible defaults")
-const LISTING_KEYWORDS = 'THERAKids blog, pediatric therapy, occupational therapy, speech therapy, child development, parenting tips';
+const LISTING_KEYWORDS = BLOG_KEYWORDS;
 const LISTING_DESCRIPTION = 'Practical articles for parents on child development, therapy milestones, sensory play, communication and family support from the THERAKids team.';
 
 const Blogs = () => {
@@ -25,7 +26,11 @@ const Blogs = () => {
 
   /* Listing meta: the admin "SEO" tab row for /blogs, falling back to the built-in
      defaults. Individual posts carry their own meta (see BlogPost). */
-  usePageSeo('/blogs', { keywords: LISTING_KEYWORDS, description: LISTING_DESCRIPTION });
+  usePageSeo('/blogs', {
+    title: 'Parenting & Therapy Insights | TheraKids Noida Blog',
+    keywords: LISTING_KEYWORDS,
+    description: LISTING_DESCRIPTION,
+  });
 
   /* GSAP scroll reveals for the blog grid - waits for the DB rows so the
      triggers are registered on the real grid children */

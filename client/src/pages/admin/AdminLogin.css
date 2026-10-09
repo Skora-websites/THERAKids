@@ -1,52 +1,241 @@
+/* Admin login — split screen: brand story left, sign-in card right. Uses the
+   site's existing CSS variables so it follows the active theme automatically. */
+
 .admin-login-page {
   min-height: 100vh;
   display: flex;
+  background-color: var(--color-surface-container-low);
+}
+
+/* ===== Left brand panel ===== */
+
+.admin-login-brand {
+  flex: 1 1 52%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3.5rem 4rem;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 520px at -10% -20%, var(--color-primary-container, #ffe3c2) 0%, transparent 60%),
+    radial-gradient(760px 540px at 110% 115%, var(--color-secondary-container, #e7dcff) 0%, transparent 55%),
+    var(--color-surface-container-lowest, #fff);
+}
+
+.admin-login-brand-inner {
+  max-width: 460px;
+  margin: auto 0;
+}
+
+.admin-login-logo {
+  width: 190px;
+  height: auto;
+}
+
+.admin-login-tagline {
+  margin: 0.75rem 0 0 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+
+.admin-login-brand-copy h1 {
+  margin: 2.25rem 0 1rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+  line-height: 1.18;
+  color: var(--color-on-background);
+}
+
+.admin-login-brand-copy p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-on-surface-variant);
+}
+
+.admin-login-points {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.admin-login-points li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-on-surface);
+}
+
+.admin-login-points li span {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+}
+
+.admin-login-brand-foot {
+  margin: 2rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-on-surface-variant);
+}
+
+/* ===== Right sign-in panel ===== */
+
+.admin-login-panel {
+  flex: 1 1 48%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-surface-container-low);
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
 }
 
 .admin-login-card {
   background-color: var(--color-surface-container-lowest);
-  padding: 3rem;
-  border-radius: var(--radius-lg);
+  padding: 2.75rem 2.5rem;
+  border-radius: var(--radius-lg, 20px);
+  border: 1px solid var(--color-outline-variant);
   box-shadow: var(--shadow-modal);
   width: 100%;
   max-width: 420px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.1rem;
 }
 
-.admin-logo-placeholder {
-  font-family: var(--font-heading);
-  font-size: 24px;
+.admin-login-mobile-logo {
+  display: none;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.admin-login-logo-sm {
+  width: 150px;
+  height: auto;
+}
+
+.admin-login-eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
   font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--color-primary);
-  text-align: center;
-  margin-bottom: 1rem;
 }
 
 .admin-login-card h2 {
-  text-align: center;
+  margin: 0 0 0.5rem;
+  text-align: left;
 }
 
 .login-error {
   background-color: var(--color-error-container);
   color: var(--color-on-error-container);
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
   font-size: 13px;
-  text-align: center;
+  border-left: 3px solid var(--color-error, #b3261e);
 }
 
 .admin-login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.15rem;
 }
 
-.admin-login-form .btn {
-  margin-top: 1rem;
+.admin-login-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-login-form label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+}
+
+/* Icon input: icon left, optional reveal toggle right */
+.admin-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.admin-input-wrap > svg:first-child {
+  position: absolute;
+  left: 0.9rem;
+  color: var(--color-on-surface-variant);
+  pointer-events: none;
+}
+
+.admin-input-wrap .input-field {
+  width: 100%;
+  padding-left: 2.6rem;
+}
+
+.admin-password-toggle {
+  position: absolute;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+}
+
+.admin-password-toggle:hover {
+  color: var(--color-primary);
+  background: var(--color-surface-container-low);
+}
+
+.admin-login-btn {
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-block: 0.8rem;
+}
+
+.admin-login-help {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--color-on-surface-variant);
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 900px) {
+  .admin-login-brand {
+    display: none;
+  }
+
+  .admin-login-card {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    padding: 1rem;
+  }
+
+  .admin-login-mobile-logo {
+    display: flex;
+  }
+
+  .admin-login-card h2,
+  .admin-login-eyebrow {
+    text-align: center;
+  }
 }

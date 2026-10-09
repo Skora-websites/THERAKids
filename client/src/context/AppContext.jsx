@@ -1,14 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import API_URL from '../config';
+import { SETTINGS_FALLBACKS } from '../lib/contact';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  // Contact info comes solely from the site_settings table via /api/settings.
-  // Components render placeholders until the fetch resolves.
-  const [settings, setSettings] = useState({});
+  // Contact info comes from the site_settings table via /api/settings.
+  // Seeded with the official fallbacks so every settings-driven section renders
+  // on a frontend-only deploy; admin values overwrite when /api answers.
+  const [settings, setSettings] = useState(SETTINGS_FALLBACKS);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Lead funnel popups: the free screening form and the online-therapy form.
+  const [isFreeAssessmentOpen, setIsFreeAssessmentOpen] = useState(false);
+  const [isOnlineTherapyOpen, setIsOnlineTherapyOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -28,7 +33,17 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   return (
-    <AppContext.Provider value={{ settings, isModalOpen, setIsModalOpen }}>
+    <AppContext.Provider
+      value={{
+        settings,
+        isModalOpen,
+        setIsModalOpen,
+        isFreeAssessmentOpen,
+        setIsFreeAssessmentOpen,
+        isOnlineTherapyOpen,
+        setIsOnlineTherapyOpen,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

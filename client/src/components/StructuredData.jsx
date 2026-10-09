@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import API_URL from '../config';
-import { CONTACT_FALLBACKS } from '../lib/contact';
+import { CONTACT_FALLBACKS, SOCIAL_FALLBACKS, MAPS_FALLBACKS, parseCenters } from '../lib/contact';
 
 const SITE_URL = 'https://therakidsnoida.com';
 // Settings shape built from the official contact constants (used until /api/settings
@@ -13,16 +13,10 @@ const CONTACT_FALLBACKS_SETTINGS = {
 };
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-// Official social profiles and Maps deep link (mirrored in the footer);
-// sameAs helps search engines connect the brand across platforms.
-const SOCIAL_PROFILES = [
-  'https://www.facebook.com/therakidsnoida',
-  'https://www.instagram.com/therakids_noida/',
-  'https://www.youtube.com/@therakids_noida',
-  'https://x.com/therakids_noida'
-];
-const MAPS_URL =
-  'https://www.google.com/maps/search/?api=1&query=THERAKids%20Foundation%2C%20G-10%2C%20Block%20G%2C%20Sector%2022%2C%20Noida%2C%20Uttar%20Pradesh%20201301';
+// Official social profiles and Maps deep links — defaults mirroring lib/contact;
+// the Organization schema upgrades to the admin-edited settings when they answer.
+const SOCIAL_PROFILES = Object.values(SOCIAL_FALLBACKS);
+const MAPS_URL = MAPS_FALLBACKS.noida;
 
 // "Mon-Fri" / "Saturday" → [day names] (≥3-char prefix match, e.g. Mon → Monday)
 const parseDayPart = (dayPart) => {
@@ -104,7 +98,8 @@ const OrganizationSchema = () => {
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`,
     description: 'TheraKids Noida - pediatric therapy and child development services in Noida and Greater Noida, Delhi NCR.',
-    address: [settings.address1, settings.address2]
+    address: parseCenters(settings)
+      .map((c) => c.address)
       .filter(Boolean)
       .map((addr) => {
         const parsed = splitAddress(addr);
@@ -115,7 +110,14 @@ const OrganizationSchema = () => {
       .filter(Boolean),
     telephone: (settings.phone || '').split('/').map(firstPhone).filter(Boolean),
     email: settings.email ? [settings.email] : undefined,
-    sameAs: SOCIAL_PROFILES
+    sameAs: [
+      settings.social_facebook,
+      settings.social_instagram,
+      settings.social_youtube,
+      settings.social_twitter,
+    ].filter(Boolean).length
+      ? [settings.social_facebook, settings.social_instagram, settings.social_youtube, settings.social_twitter].filter(Boolean)
+      : SOCIAL_PROFILES
   };
   return <JsonLd schema={schema} />;
 };
@@ -145,7 +147,8 @@ const StructuredData = ({ type, data }) => {
         const hours = [s.hours_week, s.hours_sat, s.hours_sun]
           .map(parseHoursLine)
           .filter(Boolean);
-        const address = splitAddress(s.address1);
+        const firstCenter = parseCenters(s)[0];
+        const address = splitAddress(firstCenter?.address || s.address1);
         return {
           '@context': 'https://schema.org',
           '@type': 'MedicalBusiness',
@@ -166,7 +169,7 @@ const StructuredData = ({ type, data }) => {
             : undefined,
           openingHoursSpecification: hours,
           geo: { '@type': 'GeoCoordinates', latitude: 28.5802, longitude: 77.334 },
-          hasMap: MAPS_URL,
+          hasMap: firstCenter?.map_url || MAPS_URL,
           medicalSpecialty: [
             'Pediatric Occupational Therapy',
             'Pediatric Speech Therapy',

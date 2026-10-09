@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import API_URL from '../config';
 import { OFFICIAL_WHATSAPP } from '../lib/contact';
+import { useAppContext } from '../context/AppContext';
 import { FALLBACK_DATA } from '../data/fallbackData';
 import './AppointmentModal.css';
-
-const WHATSAPP_NUMBER = OFFICIAL_WHATSAPP;
 
 // Seconds the success screen stays open before auto-dismissing
 const AUTO_CLOSE_SECONDS = 15;
 // Circumference of the countdown ring (r = 15.5 in the SVG below)
 const RING_CIRCUMFERENCE = 97.4;
 
-const AppointmentModal = ({ onClose }) => {
+// variant: 'appointment' (default) or 'online' — the Online Therapy popup reuses
+// this same form with the service pre-selected and online-specific copy.
+const AppointmentModal = ({ onClose, variant = 'appointment' }) => {
+  const isOnline = variant === 'online';
   const [formData, setFormData] = useState({
     parent_name: '',
     child_name: '',
     child_age: '',
     phone: '',
     email: '',
-    service_id: '',
+    service_id: isOnline ? '901' : '', // online-therapy fallback id (re-matched by slug below)
     preferred_date: '',
     preferred_time: '',
     additional_info: ''
@@ -37,6 +39,11 @@ const AppointmentModal = ({ onClose }) => {
   const [autoClose, setAutoClose] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(null);
 
+  // WhatsApp handoff number: the admin Site Settings `whatsapp` value when
+  // loaded, else the official number from lib/contact.
+  const { settings } = useAppContext();
+  const WHATSAPP_NUMBER = (settings.whatsapp || '').trim() || OFFICIAL_WHATSAPP;
+
   // Services come from the DB (static fallback first so the list always has options);
   // the modal shows real names and sends a real service_id (or null).
   const [services, setServices] = useState(FALLBACK_DATA.services);
@@ -46,14 +53,22 @@ const AppointmentModal = ({ onClose }) => {
         const response = await fetch(`${API_URL}/api/services`);
         if (response.ok) {
           const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) setServices(data);
+          if (Array.isArray(data) && data.length > 0) {
+            setServices(data);
+            // Keep the pre-selected Online Therapy in sync with the real row id,
+            // which may differ from the static fallback (901).
+            if (isOnline) {
+              const online = data.find((s) => s.slug === 'online-therapy');
+              if (online) setFormData((prev) => ({ ...prev, service_id: String(online.id) }));
+            }
+          }
         }
       } catch {
         // API unreachable - the static fallback service list stays
       }
     };
     load();
-  }, []);
+  }, [isOnline]);
 
   // Countdown effect - a self-chaining 1s timeout so each tick re-renders the ring.
   // Fires onClose when the timer reaches zero.
@@ -77,8 +92,11 @@ const AppointmentModal = ({ onClose }) => {
     setError(null);
 
     try {
-      // Resolve the selected option back to a services.id (FK constraint on appointments.service_id)
-      const selected = services.find((s) => String(s.id) === String(formData.service_id));
+      // Resolve the selected option back to a services.id (FK constraint on appointments.service_id).
+      // The value can be a numeric id (services from the API) or the 'online-therapy' slug.
+      const selected = services.find(
+        (s) => String(s.id) === String(formData.service_id) || s.slug === String(formData.service_id)
+      );
 
       // API call to store in DB - service_id is a nullable FK, so send null when not chosen
       const response = await fetch(`${API_URL}/api/appointments`, {
@@ -94,7 +112,8 @@ const AppointmentModal = ({ onClose }) => {
       }
 
       // Generate WhatsApp message
-      const message = `NEW APPOINTMENT REQUEST\n\nParent/Guardian:\n${formData.parent_name}\n\nChild:\n${formData.child_name}\n\nChild Age:\n${formData.child_age}\n\nPhone:\n${formData.phone}\n\nEmail:\n${formData.email}\n\nService:\n${selected ? selected.name : 'Not specified'}\n\nPreferred Date:\n${formData.preferred_date}\n\nPreferred Time:\n${formData.preferred_time}\n\nAdditional Information:\n${formData.additional_info || 'None'}\n`;
+      const heading = isOnline ? 'ONLINE THERAPY REQUEST' : 'NEW APPOINTMENT REQUEST';
+      const message = `${heading}\n\nParent/Guardian:\n${formData.parent_name}\n\nChild:\n${formData.child_name}\n\nChild Age:\n${formData.child_age}\n\nPhone:\n${formData.phone}\n\nEmail:\n${formData.email}\n\nService:\n${selected ? selected.name : 'Online Therapy'}\n\nPreferred Date:\n${formData.preferred_date}\n\nPreferred Time:\n${formData.preferred_time}\n\nAdditional Information:\n${formData.additional_info || 'None'}\n`;
 
       setConfirmedService(selected ? selected.name : formData.service_id || 'Not specified');
 
@@ -188,8 +207,12 @@ const AppointmentModal = ({ onClose }) => {
           </div>
         ) : (
         <>
-        <h2 className="headline-md modal-title">Book an Appointment</h2>
-        <p className="body-sm modal-subtitle">We are here to support your child's journey. Let us know how we can help.</p>
+        <h2 className="headline-md modal-title">{isOnline ? 'Book an Online Therapy Session' : 'Book an Appointment'}</h2>
+        <p className="body-sm modal-subtitle">
+          {isOnline
+            ? 'Live one-to-one sessions with our therapists, from the comfort of your home. Tell us a little about your child and we will call to plan the first session.'
+            : "We are here to support your child's journey. Let us know how we can help."}
+        </p>
 
         {error && <div className="modal-error">{error}</div>}
 
@@ -222,7 +245,7 @@ const AppointmentModal = ({ onClose }) => {
           <div className="form-group col-span-2">
             <label className="label-sm">Therapy / Service Interested In</label>
             <select name="service_id" className="input-field" value={formData.service_id} onChange={handleChange}>
-              <option value="">Select a service...</option>
+              {!isOnline && <option value="">Select a service...</option>}
               {services.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
@@ -251,7 +274,11 @@ const AppointmentModal = ({ onClose }) => {
 
           <div className="form-group col-span-2 submit-container">
             <button type="submit" className="btn btn-primary full-width" disabled={isSubmitting}>
-              {isSubmitting ? 'Processing...' : 'Submit Request via WhatsApp'}
+              {isSubmitting
+                ? 'Processing...'
+                : isOnline
+                  ? 'Request Online Session via WhatsApp'
+                  : 'Submit Request via WhatsApp'}
             </button>
           </div>
         </form>

@@ -3,13 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import TiltCard from './TiltCard';
 import API_URL from '../config';
+import { FALLBACK_DATA } from '../data/fallbackData';
 import './RelatedServices.css';
 
 const SERVICE_ICONS = ['🗣️', '✋', '🏃', '📚', '🎨', '💬', '🧩', '🎒'];
 
 const RelatedServices = ({ currentService }) => {
   const navigate = useNavigate();
-  const [services, setServices] = useState([]);
+  // Static fallback first so the "Explore More" band renders on frontend-only
+  // deploys (Vercel, no backend); the API response replaces it when /api answers.
+  const [services, setServices] = useState(FALLBACK_DATA.services);
 
   useEffect(() => {
     let cancelled = false;
@@ -19,7 +22,7 @@ const RelatedServices = ({ currentService }) => {
         if (!cancelled && Array.isArray(data)) setServices(data);
       })
       .catch(() => {
-        // API unreachable - nothing renders rather than hardcoded content
+        // API unreachable - the static fallback services keep the band populated
       });
     return () => {
       cancelled = true;

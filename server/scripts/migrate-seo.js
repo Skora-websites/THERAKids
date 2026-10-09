@@ -48,7 +48,7 @@ const PAGES = [
   ['/about', 'About'],
   ['/services', 'Services listing'],
   ['/conditions', 'Conditions'],
-  ['/gallery', 'Gallery'],
+  ['/jobs', 'Careers'],
   ['/blogs', 'Blogs listing'],
   ['/contact', 'Contact']
 ];
@@ -74,6 +74,19 @@ const run = async () => {
 
   await pool.query(CREATE_PAGE_SEO);
   console.log('\npage_seo table ready');
+
+  // The old /gallery route now redirects to /about: retire its row (or
+  // repurpose it as the new /jobs Careers row on databases missing that key).
+  const [jobsRows] = await pool.query("SELECT COUNT(*) AS c FROM page_seo WHERE page_key = '/jobs'");
+  if (jobsRows[0].c > 0) {
+    const [removed] = await pool.query("DELETE FROM page_seo WHERE page_key = '/gallery'");
+    if (removed.affectedRows) console.log(`  - /gallery row retired (${removed.affectedRows})`);
+  } else {
+    const [renamed] = await pool.query(
+      "UPDATE page_seo SET page_key = '/jobs', label = 'Careers' WHERE page_key = '/gallery'"
+    );
+    if (renamed.affectedRows) console.log('  ~ /gallery row became /jobs');
+  }
 
   console.log('page rows:');
   for (const [pageKey, label] of PAGES) {

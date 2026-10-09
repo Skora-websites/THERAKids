@@ -196,6 +196,12 @@
 
 .lead-popup-btn {
   flex: 1;
+  /* Native <button> UA border (2px outset) renders as a second dark ring
+     outside the pill's own gradient — kill it and its platform appearance. */
+  border: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;

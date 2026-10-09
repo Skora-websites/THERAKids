@@ -103,24 +103,26 @@ const PageHero = ({
         <div className="page-hero-visual relative" data-hero="visual">
           {/* Peach-pink under-blob tucked under the photo's edge, as on the home hero */}
           <div className="page-hero-sweep" aria-hidden="true" />
-          <div className={`page-hero-img-window blob-mask-${blob}`}>
-            {imageZoom < 1 && (
-              <img src={image} alt="" aria-hidden="true" className="page-hero-img page-hero-img-backdrop" />
-            )}
-            <img
-              src={image}
-              alt={imageAlt}
-              className="page-hero-img page-hero-img-parallax"
-              style={{
-                objectPosition: imagePosition || '50% 50%',
-                ...(imageZoom < 1
-                  ? { objectFit: 'contain' }
-                  : imageZoom > 1
-                    ? { transform: `scale(${Math.min(2, imageZoom)})`, transformOrigin: imagePosition || '50% 50%' }
-                    : {}),
-              }}
-            />
-          </div>
+          {image ? (
+            <div className={`page-hero-img-window blob-mask-${blob}`}>
+              {imageZoom < 1 && (
+                <img src={image} alt="" aria-hidden="true" className="page-hero-img page-hero-img-backdrop" />
+              )}
+              <img
+                src={image}
+                alt={imageAlt}
+                className="page-hero-img page-hero-img-parallax"
+                style={{
+                  objectPosition: imagePosition || '50% 50%',
+                  ...(imageZoom < 1
+                    ? { objectFit: 'contain' }
+                    : imageZoom > 1
+                      ? { transform: `scale(${Math.min(2, imageZoom)})`, transformOrigin: imagePosition || '50% 50%' }
+                      : {}),
+                }}
+              />
+            </div>
+          ) : null}
           {scriptNote && (
             <div className={`hero-script-note note-${notePosition}`} aria-hidden="true">
               {scriptNote}

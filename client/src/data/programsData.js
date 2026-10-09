@@ -1,6 +1,7 @@
-// Static placeholder data for the Programs page (/programs).
-// Shaped to mirror future DB rows so the admin panel can take over later;
-// all content is dummy for now.
+// Static data for the Programs page (/programs) and the shared sections it
+// feeds (testimonials on Services/Conditions). The certification syllabus and
+// the parent testimonials are OFFICIAL content taken from the client's own
+// documents; job openings stay placeholder data until the admin panel takes over.
 
 /* ------------------------------------------------------------------ */
 /* Certification program                                               */
@@ -9,9 +10,9 @@
 export const CERTIFICATION = {
   name: 'Academic Certification in Child Therapy',
   duration: '6 months',
-  format: 'Hybrid (Online + Hands-on)',
+  format: 'Offline (In-Person)',
   intro:
-    'A structured, mentor-led path from child-development theory to supervised clinical practice — designed for aspiring child therapists.',
+    'A structured, mentor-led path from child-development theory to supervised clinical practice — taught offline at our Noida centre. This page lists the official syllabus: five modules, week by week; schedules and fees are shared on request.',
   benefits: [
     'Industry-recognized certification',
     'Hands-on experience with real cases',
@@ -20,58 +21,34 @@ export const CERTIFICATION = {
     'Continuing education credits',
     'Access to professional network',
   ],
-  // Each module carries its own resources — they expand inline under the
-  // module card (user decision: no separate filterable resource list).
+  // OFFICIAL syllabus (client course document) — titles, topics and durations
+  // are published exactly as given. The website shows the syllabus only; there
+  // are no downloadable module resources.
   modules: [
     {
       title: 'Foundations of Child Development',
       duration: '4 weeks',
-      topics: ['Typical vs Atypical Development', 'Developmental Milestones', 'Assessment Principles'],
-      resources: [
-        { title: 'Milestone Charts Library', type: 'PDF Guides' },
-        { title: 'Observation Checklists', type: 'Worksheet' },
-        { title: 'Case Walkthrough: Reading Development Red Flags', type: 'Video' },
-      ],
+      topics: ['Developmental Milestones & Domains', 'Typical vs. Atypical Development', 'Developmental Delays & Early Concerns'],
     },
     {
-      title: 'Therapeutic Approaches',
-      duration: '6 weeks',
-      topics: ['OT Basics', 'Speech Therapy Fundamentals', 'Behavioral Interventions'],
-      resources: [
-        { title: 'Intro to Sensory Integration', type: 'Video' },
-        { title: 'Speech Stimulation Activities Handbook', type: 'PDF Guide' },
-        { title: 'Behavior Intervention Plan Templates', type: 'Templates' },
-      ],
+      title: 'Developmental Disorders & Therapeutic Approaches',
+      duration: '5 weeks',
+      topics: ['Autism, ADHD & Intellectual Disability', 'Learning & Developmental Difficulties', 'Behavioural Concerns & Therapeutic Approaches'],
     },
     {
-      title: 'Assessment & Documentation',
+      title: 'Assessment, Behaviour & Intervention Planning',
       duration: '4 weeks',
-      topics: ['Standardized Assessments', 'Progress Monitoring', 'Report Writing'],
-      resources: [
-        { title: 'Assessment Tools Library', type: 'Tool Library' },
-        { title: 'Progress Tracking Sheets', type: 'Templates' },
-        { title: 'Sample Reports & Scoring Rubrics', type: 'Worksheet' },
-      ],
+      topics: ['Developmental & Behavioural Assessment', 'Assessment Tools & Observation', 'Goal Setting & Intervention Planning', 'Documentation & Progress Tracking'],
     },
     {
-      title: 'Family-Centered Practice',
+      title: 'Parent Training & Family-Centred Practice',
       duration: '3 weeks',
-      topics: ['Parent Counseling', 'Home Programs', 'Cultural Sensitivity'],
-      resources: [
-        { title: 'Parent Counseling Scripts', type: 'Worksheet' },
-        { title: 'Home Program Builder', type: 'Templates' },
-        { title: 'Case Walkthrough: Building Trust with Families', type: 'Video' },
-      ],
+      topics: ['Parent Counselling & Psychoeducation', 'Parent Training Strategies', 'Home-Based Behaviour Support', 'Generalization Across Settings'],
     },
     {
-      title: 'Hands-on Practicum',
+      title: 'Practical Training & Supervised Case Work',
       duration: '8 weeks',
-      topics: ['Supervised Clinical Experience', 'Case Studies', 'Professional Ethics'],
-      resources: [
-        { title: 'Practicum Handbook', type: 'PDF Guide' },
-        { title: 'Case Study Archive', type: 'Worksheet' },
-        { title: 'Ethics & Consent Checklist', type: 'Worksheet' },
-      ],
+      topics: ['Case Observation & Session Planning', 'Therapeutic & Behavioural Techniques', 'Case Discussion & Documentation', 'Supervised Hands-on Practice'],
     },
   ],
 };
@@ -104,179 +81,42 @@ export const INTERNSHIP = {
 };
 
 /* ------------------------------------------------------------------ */
-/* Workshops                                                           */
+/* Official parent testimonials (client "THERAKids — Parent & Child     */
+/* Progress" document). Rendered by CaseStories on the Services &       */
+/* Conditions pages.                                                     */
 /* ------------------------------------------------------------------ */
 
-export const WORKSHOPS = [
+export const PARENT_TESTIMONIALS = [
   {
-    title: 'Sensory Integration Workshop',
-    duration: '2 days',
-    audience: 'Therapists & Educators',
-    description: 'Comprehensive training on sensory processing and integration techniques.',
+    id: 'ishan',
+    video: 'https://youtube.com/shorts/5FNy5lpwxtY?si=f9Z4fKmnysrAEQ9a',
+    childName: 'Ishan',
+    parentName: 'Seema',
+    concern: 'ADHD & ASD',
+    progress: 'Overall improvement',
   },
   {
-    title: 'Parent Training Series',
-    duration: '4 weeks',
-    audience: 'Parents & Caregivers',
-    description: 'Practical strategies for supporting child development at home.',
+    id: 'speech-ot',
+    video: 'https://youtube.com/shorts/J5reXEXfoJY?si=vzwZmIqpyRJTITQE',
+    childName: '', // not mentioned in the document
+    parentName: '',
+    concern: 'Speech & Communication Difficulties + Occupational Therapy Needs',
+    progress: 'Improvement in OT skills and speech/communication abilities',
   },
   {
-    title: 'ABA Fundamentals',
-    duration: '3 days',
-    audience: 'Professionals',
-    description: 'Introduction to Applied Behavior Analysis principles and practices.',
-  },
-  {
-    title: 'Communication Strategies',
-    duration: '1 day',
-    audience: 'Parents & Teachers',
-    description: 'Effective communication techniques for children with special needs.',
-  },
-  {
-    title: 'Assessment & Documentation',
-    duration: '2 days',
-    audience: 'Therapists',
-    description: 'Best practices in assessment tools and progress documentation.',
-  },
-  {
-    title: 'Inclusive Education',
-    duration: '1 day',
-    audience: 'Educators',
-    description: 'Creating inclusive classroom environments for all learners.',
+    id: 'response-commands',
+    video: 'https://youtube.com/shorts/eUyFc-3ECVA?si=Z3H3Dr8s2WmssM8P',
+    childName: '', // not mentioned in the document
+    parentName: '',
+    concern: 'Difficulty with response, following commands, and other developmental skills',
+    progress: 'Significant improvement in name response and command following',
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/* Resources hub (integrated from the reference /resources page)       */
-/* ------------------------------------------------------------------ */
-
-export const VIDEO_GROUPS = [
-  {
-    group: 'Live Sessions & Webinars',
-    icon: 'radio',
-    videos: [
-      { title: 'Understanding Autism Spectrum Disorders', length: '45 min', views: '2.3K' },
-      { title: 'Sensory Integration in Daily Life', length: '38 min', views: '1.8K' },
-      { title: 'Parent Q&A: Speech Development', length: '52 min', views: '3.1K' },
-    ],
-  },
-  {
-    group: 'Therapy Demonstration Videos',
-    icon: 'play',
-    videos: [
-      { title: 'Occupational Therapy Session Demo', length: '25 min', views: '4.2K' },
-      { title: 'Speech Therapy Activities at Home', length: '18 min', views: '5.6K' },
-      { title: 'ABA Techniques for Beginners', length: '32 min', views: '2.9K' },
-    ],
-  },
-  {
-    group: 'Awareness Campaigns',
-    icon: 'megaphone',
-    videos: [
-      { title: 'World Autism Awareness Day 2024', length: '15 min', views: '8.7K' },
-      { title: 'Breaking Myths About Special Needs', length: '22 min', views: '6.4K' },
-    ],
-  },
-  {
-    group: 'Expert Talks with Dr. Akanksha Rana',
-    icon: 'mic',
-    videos: [
-      { title: 'Early Intervention: Why It Matters', length: '28 min', views: '3.8K' },
-      { title: 'Sensory Processing Explained', length: '35 min', views: '4.1K' },
-    ],
-  },
-];
-
-export const EXPERT_ARTICLES = [
-  {
-    title: 'Understanding Dyscalculia',
-    author: 'Dr. Akanksha Rana',
-    date: 'March 15, 2024',
-    readTime: '8 min read',
-    tag: 'Learning Disabilities',
-    excerpt:
-      'Why some children struggle with numbers despite normal intelligence — and the classroom accommodations that genuinely help.',
-  },
-  {
-    title: 'Developing Handwriting Skills in Children with Special Needs',
-    author: 'Ms. Priya Sharma',
-    date: 'March 2, 2024',
-    readTime: '6 min read',
-    tag: 'Occupational Therapy',
-    excerpt:
-      'Fine-motor warm-ups, pencil grips and graded paper choices that turn handwriting practice from a battle into progress.',
-  },
-  {
-    title: "Speech Therapy at Home: A Parent's Guide",
-    author: 'Ms. Anjali Gupta',
-    date: 'February 18, 2024',
-    readTime: '10 min read',
-    tag: 'Speech Therapy',
-    excerpt:
-      'Everyday routines — mealtime, bath time, play — hold the richest language opportunities. Here is how to use them.',
-  },
-  {
-    title: 'Identifying Learning Disabilities: Early Warning Signs',
-    author: 'Ms. Sunita Agarwal',
-    date: 'February 5, 2024',
-    readTime: '7 min read',
-    tag: 'Special Education',
-    excerpt:
-      'The subtle signals — in preschool and early primary years — that deserve a closer look before frustration takes root.',
-  },
-  {
-    title: 'Sensory Diet: Creating the Right Environment',
-    author: 'Dr. Akanksha Rana',
-    date: 'January 22, 2024',
-    readTime: '9 min read',
-    tag: 'Sensory Integration',
-    excerpt:
-      'A personalised schedule of sensory input that helps children stay regulated through school, play and sleep.',
-  },
-  {
-    title: 'Building Social Skills in Children with Autism',
-    author: 'Ms. Deepika Rao',
-    date: 'January 10, 2024',
-    readTime: '11 min read',
-    tag: 'ABA Therapy',
-    excerpt:
-      'From turn-taking games to structured peer groups — a stage-wise approach to teaching connection.',
-  },
-];
-
-export const CASE_STORIES = [
-  {
-    title: "Aarav's Journey: From Non-Verbal to Confident Communicator",
-    family: 'Sharma Family',
-    condition: 'Autism Spectrum Disorder',
-    outcome: 'Significant improvement in communication and social skills',
-    duration: '12 min',
-    type: 'Video Testimonial',
-  },
-  {
-    title: "Mehak's Progress: Overcoming Learning Challenges",
-    family: 'Verma Family',
-    condition: 'Learning Disability',
-    outcome: 'Academic success and improved self-confidence',
-    duration: '8 min',
-    type: 'Read Story',
-  },
-  {
-    title: "Rohan's Transformation: Managing ADHD Successfully",
-    family: 'Gupta Family',
-    condition: 'ADHD',
-    outcome: 'Better focus, improved behavior, and academic progress',
-    duration: '10 min',
-    type: 'Video Testimonial',
-  },
-  {
-    title: "Kiara's Milestones: Finding Her Words",
-    family: 'Nair Family',
-    condition: 'Speech Delay',
-    outcome: 'Age-appropriate speech and fearless storytelling',
-    duration: '9 min',
-    type: 'Read Story',
-  },
+/* "Parents review" links from the same document (open externally). */
+export const PARENT_REVIEW_LINKS = [
+  'https://share.google/P5Js4P6puAJpwlEo2',
+  'https://share.google/menz1oDIvSdsppG7D',
 ];
 
 /* ------------------------------------------------------------------ */
@@ -286,16 +126,16 @@ export const CASE_STORIES = [
 export const JOB_OPENINGS = [
   {
     id: 1,
-    title: 'Senior Occupational Therapist',
+    title: 'Occupational Therapist',
     department: 'Therapy',
     location: 'Noida',
     type: 'Full-time',
-    experience: '5+ years',
+    experience: '1+ year',
     description:
       'Lead a varied pediatric OT caseload — sensory integration, fine-motor and self-care programs — while mentoring juniors.',
     requirements: [
       'BOT with recognized certification',
-      '5+ years pediatric experience',
+      '1+ year pediatric experience',
       'Sensory integration training preferred',
     ],
   },
@@ -305,27 +145,27 @@ export const JOB_OPENINGS = [
     department: 'Therapy',
     location: 'Greater Noida West',
     type: 'Full-time',
-    experience: '3+ years',
+    experience: '1+ year',
     description:
       'Design and deliver speech-language intervention for children with delays, autism and apraxia, in clinic and via parent coaching.',
     requirements: [
       'MASLP / BASLP qualification',
-      '3+ years pediatric practice',
+      '1+ year pediatric practice',
       'Experience with AAC a plus',
     ],
   },
   {
     id: 3,
-    title: 'Special Education Teacher',
+    title: 'Special Educator',
     department: 'Education',
     location: 'Both Centers',
     type: 'Full-time',
-    experience: '2+ years',
+    experience: '1+ year',
     description:
       'Build individualized education plans and work closely with therapists so every child’s school skills keep pace with therapy goals.',
     requirements: [
       'B.Ed (Special Education)',
-      '2+ years with diverse learners',
+      '1+ year with diverse learners',
       'Familiarity with IEP frameworks',
     ],
   },
@@ -335,12 +175,12 @@ export const JOB_OPENINGS = [
     department: 'Therapy',
     location: 'Noida',
     type: 'Full-time',
-    experience: '2+ years',
+    experience: '1+ year',
     description:
       'Implement 1:1 ABA programs — skill acquisition and behavior-reduction plans — under BCBA-supervised case direction.',
     requirements: [
       'Psychology / ABA background',
-      '2+ years working with autistic children',
+      '1+ year working with autistic children',
       'Data-driven and patient approach',
     ],
   },
@@ -350,27 +190,27 @@ export const JOB_OPENINGS = [
     department: 'Assessment',
     location: 'Both Centers',
     type: 'Part-time',
-    experience: '5+ years',
+    experience: '1+ year',
     description:
       'Conduct developmental and psycho-educational assessments, score and interpret standardized tools, and guide families through findings.',
     requirements: [
       'M.Phil / MA Clinical Psychology',
-      '5+ years child assessment experience',
+      '1+ year child assessment experience',
       'Strong report-writing skills',
     ],
   },
   {
     id: 6,
-    title: 'Program Coordinator',
+    title: 'Coordinator',
     department: 'Operations',
     location: 'Noida',
     type: 'Full-time',
-    experience: '3+ years',
+    experience: '1+ year',
     description:
       'Keep the clinic humming — scheduling, parent communication, vendor and event coordination across both centers.',
     requirements: [
       'Any graduation; admin experience valued',
-      '3+ years coordination role',
+      '1+ year coordination role',
       'Warm, organized communicator',
     ],
   },
