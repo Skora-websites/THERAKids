@@ -22,7 +22,11 @@ const EDGE = process.env.EDGE_PATH || 'C:\\Program Files (x86)\\Microsoft\\Edge\
 // Static head shipped in index.html — the home page must keep these while its SEO
 // row is empty (and after an admin clears the fields again).
 const STATIC_TITLE = 'TheraKids Noida | Occupational Therapy, Speech Therapy, Physical Therapy for Kids';
-const STATIC_KEYWORDS = 'occupational therapy noida, speech therapy noida, physical therapy noida, pediatric therapy, child development center, autism therapy, ADHD therapy, special education noida';
+// Researched fallbacks (mirrors index.html's static keywords + the per-service
+// meta fallbacks in src/lib/seoKeywords.js — the site always emits proper meta
+// even when the admin row/fields are empty; admin values still win).
+import { SERVICE_META as SERVICE_FALLBACKS } from '../src/lib/seoKeywords.js';
+const STATIC_KEYWORDS = 'occupational therapy noida, speech therapy for kids noida, pediatric therapy noida, child development center noida, autism therapy for kids noida, adhd treatment for children delhi ncr, speech delay therapy noida, early intervention for toddlers noida, special education noida, best child therapist near me, therapy center greater noida west, TheraKids';
 const STATIC_DESC = 'TheraKids Noida offers world-class Occupational therapy, physical therapy, speech therapy, and Counseling to child/kids in Noida, Delhi NCR under the supervision of highly trained specialists.';
 
 const ROUTES = ['/', '/about', '/services', '/conditions', '/jobs', '/blogs', '/contact'];
@@ -53,7 +57,9 @@ const login = async (page) => {
   const inputs = await page.$$('form input');
   await inputs[0].type('admin');
   await inputs[1].type('admin123');
-  await page.click('form button');
+  // Submit button specifically: the password-visibility toggle (type="button")
+  // sits before it inside the same form and would swallow this click.
+  await page.click('form button[type="submit"]');
   await page.waitForFunction(() => location.pathname.indexOf('/admin/dashboard') === 0, { timeout: 15000 });
 };
 
@@ -261,12 +267,25 @@ await check('home keeps the static index.html tags while its SEO row is empty', 
   assert(tags.canonical === 'https://therakidsnoida.com/', `canonical = "${tags.canonical}"`);
 });
 
-await check('other empty rows keep their defaults too (/contact, /jobs)', async () => {
-  for (const path of ['/contact', '/jobs']) {
+await check('other empty rows fall back to each page defaults (/contact, /jobs)', async () => {
+  // Pages that pass their own fallbacks to usePageSeo() keep the researched
+  // title/description; keywords come from the static index.html head.
+  const PAGE_FALLBACKS = {
+    '/contact': {
+      title: 'Contact TheraKids Noida | Book a Consultation',
+      description: "Get in touch with TheraKids Noida — call, WhatsApp or visit our Sector 22 and Greater Noida West centers to book your child's consultation.",
+    },
+    '/jobs': {
+      title: 'Careers at THERAKids | Job Openings in Noida',
+      description: 'Open roles at THERAKids Noida — occupational therapy, speech therapy, special education, ABA and coordinator positions, plus the THERAKids Internship Program.',
+    },
+  };
+  for (const [path, exp] of Object.entries(PAGE_FALLBACKS)) {
     await gotoPage(page, path);
     const tags = await headTags(page);
-    assert(tags.title === STATIC_TITLE, `${path} title = "${tags.title}"`);
-    assert(tags.description === STATIC_DESC, `${path} description lost`);
+    assert(tags.title === exp.title, `${path} title = "${tags.title}"`);
+    assert(tags.description === exp.description, `${path} description = "${tags.description}"`);
+    assert(tags.keywords === STATIC_KEYWORDS, `${path} keywords = "${tags.keywords}"`);
     assert(tags.canonical === `https://therakidsnoida.com${path}`, `${path} canonical = "${tags.canonical}"`);
   }
 });
@@ -328,7 +347,7 @@ await check('the Services form carries the meta fields', async () => {
   await page.waitForSelector('.admin-modal', { hidden: true });
 });
 
-await check('empty service meta falls back to the service name and short description', async () => {
+await check('empty service meta falls back to the researched per-service defaults', async () => {
   const res = await apiJson(
     `/api/admin/services/${serviceBefore.id}`,
     authed(token, { meta_title: '', meta_keywords: '', meta_description: '' })
@@ -336,8 +355,15 @@ await check('empty service meta falls back to the service name and short descrip
   assert(res.status === 200, `PUT failed with ${res.status}`);
   await gotoPage(page, `/services/${serviceBefore.slug}`);
   const tags = await headTags(page);
-  assert(tags.title === serviceBefore.name, `title = "${tags.title}", expected the service name`);
+  const fallback = SERVICE_FALLBACKS[serviceBefore.slug];
+  assert(
+    tags.title === (fallback?.title || serviceBefore.name),
+    `title = "${tags.title}", expected "${fallback?.title || serviceBefore.name}"`
+  );
   assert(tags.description && tags.description.length > 20, `description = "${tags.description}"`);
+  if (fallback?.description) {
+    assert(tags.description === fallback.description, `description = "${tags.description}"`);
+  }
   assert(!tags.description.includes('<'), 'description still contains markup');
 });
 

@@ -12,7 +12,9 @@
   background-color: rgb(20 16 44 / 45%);
   backdrop-filter: blur(4px);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  /* Composited layer so the fade can't be stalled by the heavy gradient card */
+  will-change: opacity;
+  transition: opacity 0.25s ease;
 }
 
 .lead-popup-backdrop.is-visible {
@@ -28,7 +30,8 @@
   text-align: center;
   overflow: hidden;
   transform: translateY(24px) scale(0.96);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   background:
     radial-gradient(140% 120% at 8% 0%, rgb(214 199 255 / 85%) 0%, transparent 46%),
     radial-gradient(130% 110% at 96% 4%, rgb(255 205 220 / 90%) 0%, transparent 48%),
@@ -44,7 +47,9 @@
   transform: translateY(0) scale(1);
 }
 
-/* Glossy sweep: a soft diagonal sheen drifting across the panel */
+/* Glossy sweep: a soft diagonal sheen drifting across the panel. Kept very
+   subtle (low white alpha, slow pass) so it never washes out the card copy —
+   a bright repeating sweep read as a rendering glitch. Disabled on phones. */
 .lead-popup-gloss {
   position: absolute;
   inset: -40%;
@@ -53,12 +58,12 @@
     115deg,
     transparent 32%,
     rgb(255 255 255 / 0%) 42%,
-    rgb(255 255 255 / 55%) 50%,
+    rgb(255 255 255 / 18%) 50%,
     rgb(255 255 255 / 0%) 58%,
     transparent 68%
   );
   transform: translateX(-70%) rotate(8deg);
-  animation: lead-popup-sheen 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: lead-popup-sheen 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes lead-popup-sheen {
@@ -189,8 +194,27 @@
 }
 
 @media (max-width: 560px) {
+  .lead-popup {
+    /* Phone screens: the stacked card can exceed the viewport — let the panel
+       scroll instead of clipping the note (and keep it on-screen) */
+    max-height: calc(100vh - 1.25rem);
+    max-height: calc(100dvh - 1.25rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2rem 1.25rem 1.35rem;
+  }
+
   .lead-popup-actions {
     flex-direction: column;
+  }
+
+  .lead-popup-btn {
+    width: 100%;
+  }
+
+  .lead-popup-gloss {
+    /* The drifting sheen repaints the whole card on phones — off there */
+    display: none;
   }
 }
 

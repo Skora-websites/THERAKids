@@ -353,6 +353,18 @@ app.get('/api/testimonials', async (req, res) => {
   }
 });
 
+// "Parent & Child Testimonials" story cards (Services + Conditions pages):
+// video cards play through the in-page media viewer, review cards open their
+// link in a new tab. Edited in the admin "Parent Testimonials" panel.
+app.get('/api/case-stories', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM case_stories WHERE is_active = 1 ORDER BY display_order ASC, id ASC');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Messages from the public Contact page form - stored for the admin
 // "Messages" panel (separate table/resource from appointment requests).
 app.post('/api/contact', async (req, res) => {
@@ -421,6 +433,10 @@ app.post('/api/job-applications', (req, res) => {
 
 app.post('/api/appointments', async (req, res) => {
   const { parent_name, child_name, child_age, phone, email, service_id, preferred_date, preferred_time, additional_info } = req.body;
+  // Friendly 400s instead of a raw SQL error when a client skips validation
+  if (!parent_name || !child_name || !phone || !preferred_date || !preferred_time) {
+    return res.status(400).json({ error: 'Parent name, child name, phone and a preferred date & time are required.' });
+  }
   try {
     await pool.query(
       'INSERT INTO appointments (parent_name, child_name, child_age, phone, email, service_id, preferred_date, preferred_time, additional_info) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -481,6 +497,12 @@ const RESOURCES = {
   testimonials: {
     table: 'testimonials',
     fields: ['name', 'testimonial', 'image', 'designation', 'display_order', 'is_active'],
+    orderBy: 'display_order ASC, id ASC'
+  },
+  // "Parent & Child Testimonials" story cards (public GET /api/case-stories)
+  'case-stories': {
+    table: 'case_stories',
+    fields: ['card_type', 'concern', 'child_name', 'parent_name', 'progress', 'video_url', 'link_url', 'display_order', 'is_active'],
     orderBy: 'display_order ASC, id ASC'
   },
   faqs: {

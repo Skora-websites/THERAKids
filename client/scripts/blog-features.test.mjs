@@ -46,7 +46,9 @@ const login = async (page) => {
   const inputs = await page.$$('form input');
   await inputs[0].type('admin');
   await inputs[1].type('admin123');
-  await page.click('form button');
+  // Submit button specifically: the password-visibility toggle (type="button")
+  // sits before it inside the same form and would swallow this click.
+  await page.click('form button[type="submit"]');
   await page.waitForFunction(() => location.pathname.indexOf('/admin/dashboard') === 0, { timeout: 15000 });
 };
 

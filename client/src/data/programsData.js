@@ -9,7 +9,7 @@
 
 export const CERTIFICATION = {
   name: 'Academic Certification in Child Therapy',
-  duration: '6 months',
+  duration: '1–3 months',
   format: 'Offline (In-Person)',
   intro:
     'A structured, mentor-led path from child-development theory to supervised clinical practice — taught offline at our Noida centre. This page lists the official syllabus: five modules, week by week; schedules and fees are shared on request.',
@@ -59,7 +59,7 @@ export const CERTIFICATION = {
 
 export const INTERNSHIP = {
   title: 'THERAKids Internship Program',
-  duration: '3–6 months',
+  duration: '1–3 months',
   intro:
     'Step into a working multidisciplinary clinic: observe, assist and grow under certified therapists across every domain we practice.',
   domains: [

@@ -1251,6 +1251,13 @@
 /* ----------------------------- Responsive ---------------------------- */
 
 @media (max-width: 1024px) {
+  /* The page-hero grid stacks and centers its text at this width; a flex row
+     ignores text-align, so the CTA pair has to be centered explicitly or it
+     sits ragged-left under centered copy (Careers / Academy heroes). */
+  .programs-hero-actions {
+    justify-content: center;
+  }
+
   .cert-layout,
   .internship-layout {
     grid-template-columns: 1fr;
@@ -1272,6 +1279,22 @@
 }
 
 @media (max-width: 640px) {
+  /* Phones: same treatment as the home hero — full-width stacked buttons with
+     centered labels, so the pair reads as one tap-friendly column. */
+  .programs-hero-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 0.75rem;
+  }
+
+  .programs-hero-actions .prog-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .programs-section {
     padding: 4.5rem 0;
   }

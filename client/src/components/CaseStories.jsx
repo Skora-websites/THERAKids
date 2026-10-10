@@ -1,19 +1,55 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowUpRight, Heart, Play, Quote } from 'lucide-react';
 import { PARENT_TESTIMONIALS, PARENT_REVIEW_LINKS } from '../data/programsData';
 import MediaViewer from './MediaViewer';
+import API_URL from '../config';
 // Story-card styles live with the Programs stylesheet (class-scoped, not page
 // scoped), so the section renders identically wherever it is mounted.
 import '../pages/Programs.css';
 
-/* Official parent testimonials (client "THERAKids — Parent & Child Progress"
-   document) — moved from the THERAKids Academy page onto the Services and
-   Conditions pages per the client brief. Videos play in-page through the site's
-   MediaViewer; the two "Parents review" links open in a new tab.
+/* "Parent & Child Testimonials" story cards (client "THERAKids — Parent &
+   Child Progress" document) — moved from the THERAKids Academy page onto the
+   Services and Conditions pages per the client brief.
+
+   Cards render from the admin panel (case_stories table via
+   GET /api/case-stories): video cards play in-page through the site's
+   MediaViewer, "Parents review" cards open their link in a new tab. The
+   official static list below is the fallback while the API is unreachable or
+   the table is empty, so the section always has content.
    data-reveal / data-reveal-group are picked up by each page's
    initScrollReveals() call. */
 const CaseStories = () => {
   const [viewerItem, setViewerItem] = useState(null);
+  const [videoStories, setVideoStories] = useState(PARENT_TESTIMONIALS);
+  const [reviewLinks, setReviewLinks] = useState(PARENT_REVIEW_LINKS);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_URL}/api/case-stories`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((rows) => {
+        if (cancelled || !Array.isArray(rows) || rows.length === 0) return;
+        const videos = rows.filter((r) => r.card_type !== 'review');
+        const reviews = rows.filter((r) => r.card_type === 'review' && r.link_url);
+        setVideoStories(
+          videos.map((r) => ({
+            id: r.id,
+            video: r.video_url,
+            childName: r.child_name || '',
+            parentName: r.parent_name || '',
+            concern: r.concern || '',
+            progress: r.progress || '',
+          }))
+        );
+        if (reviews.length > 0) setReviewLinks(reviews.map((r) => r.link_url));
+      })
+      .catch(() => {
+        // API unreachable — static fallback stays on screen
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const watch = (t) =>
     setViewerItem({
@@ -33,7 +69,7 @@ const CaseStories = () => {
           </p>
         </div>
         <div className="stories-grid" data-reveal-group>
-          {PARENT_TESTIMONIALS.map((t) => (
+          {videoStories.map((t) => (
             <article key={t.id} className="story-card card-panel">
               <div className="story-top">
                 <span className="story-type is-video">
@@ -52,7 +88,7 @@ const CaseStories = () => {
               </button>
             </article>
           ))}
-          {PARENT_REVIEW_LINKS.map((url) => (
+          {reviewLinks.map((url) => (
             <article key={url} className="story-card card-panel">
               <div className="story-top">
                 <span className="story-type is-story">

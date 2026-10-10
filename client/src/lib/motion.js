@@ -84,6 +84,21 @@ const REVEAL_DEFAULTS = { y: 28, autoAlpha: 0, duration: 0.6, ease: 'power3.out'
 export const initScrollReveals = (scope) => {
   if (prefersReducedMotion() || !scope) return () => {};
 
+  // Element-level guard: an element may only ever be claimed by ONE live init
+  // at a time. Overlapping scopes (or StrictMode double-invocations racing a
+  // second init) used to create a second from() while the first had its hidden
+  // start values applied — the new tween captured translateY(28px) as its END
+  // state, so the card finished "revealed" but stranded 28px low (glitchy
+  // cards). Claiming per element makes a duplicate init a no-op instead.
+  const claimed = new Set();
+  const mine = [];
+  const claim = (el) => {
+    if (claimed.has(el)) return false;
+    claimed.add(el);
+    mine.push(el);
+    return true;
+  };
+
   const ctx = gsap.context(() => {
     const q = gsap.utils.selector(scope);
 
@@ -94,18 +109,27 @@ export const initScrollReveals = (scope) => {
     // back to hidden and it never comes back ("appears then disappears").
     const isGroupChild = (el) => el.parentElement?.matches('[data-reveal-group]') === true;
 
+    // Once a reveal finishes, drop the inline transform/opacity/visibility so a
+    // stale end-value (or a CSS transition fighting GSAP) can never leave the
+    // element parked off-position after the animation completes.
+    const CLEAR = 'transform,opacity,visibility';
+
     q('[data-reveal]').forEach((el) => {
-      if (isGroupChild(el)) return;
+      if (isGroupChild(el) || !claim(el)) return;
       gsap.from(el, {
         ...REVEAL_DEFAULTS,
+        clearProps: CLEAR,
         scrollTrigger: { trigger: el, start: 'top 85%', once: true },
       });
     });
 
     q('[data-reveal-group]').forEach((group) => {
-      gsap.from(group.children, {
+      const targets = [...group.children].filter(claim);
+      if (targets.length === 0) return;
+      gsap.from(targets, {
         ...REVEAL_DEFAULTS,
         stagger: 0.08,
+        clearProps: CLEAR,
         scrollTrigger: { trigger: group, start: 'top 85%', once: true },
       });
     });
@@ -139,7 +163,7 @@ export const initScrollReveals = (scope) => {
       // Stuck hidden and at/above the fold -> reveal now
       if (el.getBoundingClientRect().top <= viewportBottom) {
         rescued.add(el);
-        gsap.to(el, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+        gsap.to(el, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto', clearProps: 'transform,opacity,visibility' });
       }
     });
   };
@@ -160,6 +184,8 @@ export const initScrollReveals = (scope) => {
       img.removeEventListener('load', refresh);
     });
     ctx.revert();
+    // Release this init's claims so a remount can animate the same elements again
+    mine.forEach((el) => claimed.delete(el));
   };
 };
 

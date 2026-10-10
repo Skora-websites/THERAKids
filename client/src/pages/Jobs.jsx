@@ -59,7 +59,7 @@ const Jobs = () => {
   return (
     <div className="programs-page jobs-page" ref={pageRef}>
       <PageHero
-        bg="bg-pastel-lilac"
+        bg="bg-pastel-peach"
         eyebrow="Careers at THERAKids"
         title="Work where it "
         accent="matters."

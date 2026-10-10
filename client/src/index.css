@@ -804,3 +804,38 @@ input, button, textarea, select {
   --shadow-hover: 0px 16px 36px -6px rgba(124, 58, 237, 0.2);
   --shadow-modal: 0px 24px 48px -12px rgba(90, 40, 90, 0.22);
 }
+
+/* ------------------------- Touch-device hover safety -------------------------
+   Hover-lift / zoom animations read as glitchy on touch: the :hover state
+   lingers after a tap, leaving cards lifted or zoomed until the next tap.
+   Keep every card hover transform for real pointers only. */
+@media (hover: none), (pointer: coarse) {
+  html body .job-card:hover,
+  html body .workshop-card:hover,
+  html body .article-card:hover,
+  html body .prog-btn:hover,
+  html body .lead-popup-btn:hover,
+  html body .related-service-card:hover,
+  html body .services-compact-card:hover:not(:disabled),
+  html body .service-detail-card:hover .service-blob,
+  html body .condition-pill:hover,
+  html body .filter-btn:hover,
+  html body .gallery-stage-arrow:hover,
+  html body .about-page .stat-card:hover,
+  html body .team-card:hover,
+  html body .team-value-card:hover,
+  html body .about-youtube-btn:hover {
+    transform: none;
+  }
+
+  html body .related-service-card:hover .related-service-image img,
+  html body .related-service-card:hover .related-service-link,
+  html body .services-compact-card:hover:not(:disabled) .services-compact-media img,
+  html body .services-compact-card:hover:not(:disabled) .services-compact-link svg,
+  html body .gallery-thumb:hover img,
+  html body .yt-row:hover .yt-play,
+  html body .lead-popup-btn:hover .lead-popup-btn-arrow,
+  html body .about-page .stat-card:hover .stat-icon {
+    transform: none;
+  }
+}

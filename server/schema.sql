@@ -272,6 +272,22 @@ CREATE TABLE IF NOT EXISTS appointments (
   FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL
 );
 
+-- "Parent & Child Testimonials" story cards (Services + Conditions pages).
+-- card_type 'video' plays through the in-page media viewer; 'review' opens
+-- link_url in a new tab. Rows are edited in the admin "Parent Testimonials" panel.
+CREATE TABLE IF NOT EXISTS case_stories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  card_type ENUM('video','review') NOT NULL DEFAULT 'video',
+  concern VARCHAR(255) NULL,
+  child_name VARCHAR(150) NULL,
+  parent_name VARCHAR(150) NULL,
+  progress VARCHAR(500) NULL,
+  video_url VARCHAR(500) NULL,
+  link_url VARCHAR(500) NULL,
+  display_order INT DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE
+);
+
 -- Seed initial admin (password: admin123)
 -- Hash generated from bcrypt.hashSync('admin123', 10)
 INSERT IGNORE INTO admins (username, password_hash) VALUES ('admin', '$2b$10$KzDv2GDsDgnkliJdercDNOTrWviU4tOrHnAjxdmi16vTIYXQMMPE2');

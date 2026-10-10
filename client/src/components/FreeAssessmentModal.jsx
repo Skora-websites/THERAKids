@@ -95,27 +95,27 @@ const FreeAssessmentModal = ({ onClose }) => {
 
             <form onSubmit={handleSubmit} className="appointment-form grid grid-cols-2">
               <div className="form-group col-span-2">
-                <label className="label-sm">Parent / Guardian Name</label>
+                <label className="label-sm">Parent / Guardian Name *</label>
                 <input type="text" name="parent_name" className="input-field" required value={formData.parent_name} onChange={handleChange} />
               </div>
 
               <div className="form-group">
-                <label className="label-sm">Child's Name</label>
+                <label className="label-sm">Child's Name *</label>
                 <input type="text" name="child_name" className="input-field" required value={formData.child_name} onChange={handleChange} />
               </div>
 
               <div className="form-group">
-                <label className="label-sm">Child's Age</label>
+                <label className="label-sm">Child's Age *</label>
                 <input type="text" name="child_age" className="input-field" required value={formData.child_age} onChange={handleChange} />
               </div>
 
               <div className="form-group">
-                <label className="label-sm">Phone Number</label>
-                <input type="tel" name="phone" className="input-field" required value={formData.phone} onChange={handleChange} />
+                <label className="label-sm">Phone Number *</label>
+                <input type="tel" name="phone" className="input-field" required pattern="[0-9+()\s-]{10,20}" title="Please enter a valid phone number (at least 10 digits, e.g. 98765 43210)" value={formData.phone} onChange={handleChange} />
               </div>
 
               <div className="form-group">
-                <label className="label-sm">Email Address</label>
+                <label className="label-sm">Email Address *</label>
                 <input type="email" name="email" className="input-field" required value={formData.email} onChange={handleChange} />
               </div>
 

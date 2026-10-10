@@ -153,7 +153,7 @@ const JobApplicationModal = ({ open, position = '', onClose }) => {
               <div className="job-form-row">
                 <label>
                   Phone *
-                  <input required value={form.phone} onChange={setField('phone')} placeholder="+91 98XXX XXXXX" />
+                  <input required pattern="[0-9+()\s-]{10,20}" title="Please enter a valid phone number (at least 10 digits, e.g. 98765 43210)" value={form.phone} onChange={setField('phone')} placeholder="+91 98XXX XXXXX" />
                 </label>
                 <label>
                   Applying For *

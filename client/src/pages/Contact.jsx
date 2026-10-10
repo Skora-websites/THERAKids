@@ -137,7 +137,7 @@ const Contact = () => {
             <h2 className="headline-lg mb-4">Send a Message</h2>
             <form id="contact-form" onSubmit={handleSubmit} className="contact-form">
               <div className="form-group">
-                <label className="label-sm">Your Name</label>
+                <label className="label-sm">Your Name *</label>
                 <input 
                   type="text" 
                   className="input-field" 
@@ -147,7 +147,7 @@ const Contact = () => {
                 />
               </div>
               <div className="form-group">
-                <label className="label-sm">Email Address</label>
+                <label className="label-sm">Email Address *</label>
                 <input 
                   type="email" 
                   className="input-field" 
@@ -157,18 +157,20 @@ const Contact = () => {
                 />
               </div>
               <div className="form-group">
-                <label className="label-sm">Mobile Number</label>
+                <label className="label-sm">Mobile Number *</label>
                 <input
                   type="tel"
                   className="input-field"
                   required
                   placeholder="+91 98765 43210"
+                  pattern="[0-9+()\s-]{10,20}"
+                  title="Please enter a valid phone number (at least 10 digits, e.g. 98765 43210)"
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
                 />
               </div>
               <div className="form-group">
-                <label className="label-sm">How can we help?</label>
+                <label className="label-sm">How can we help? *</label>
                 <textarea 
                   className="input-field" 
                   rows="5" 

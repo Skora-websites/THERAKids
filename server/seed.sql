@@ -335,3 +335,17 @@ INSERT INTO faqs (page_key, question, answer, display_order, is_active) VALUES
 ('home', 'What does Speech Therapy involve?', 'Speech therapy supports children in developing strong communication skills. It addresses articulation, receptive and expressive language, social pragmatic skills, and helps children express their thoughts and articulate words. Our speech-language pathologists also work on non-verbal communication and body language skills.', 3, 1),
 ('home', 'When does my child need Physiotherapy?', 'If your child has difficulty performing basic movements because of an injury or illness, they may need physiotherapy. Delay in learning motor skills is not always considered a problem with movement, but our physiotherapists can help assess whether your child would benefit from therapy to improve mobility, balance, and strength.', 4, 1),
 ('home', 'How do I know which therapy is right for my child?', 'Every child is unique. We begin with a comprehensive assessment to understand your child''s specific needs, strengths, and areas for growth. Based on this evaluation, our multidisciplinary team creates an individualized plan that may include one or more therapy types. Contact us to schedule an initial consultation.', 5, 1);
+
+-- ==========================================
+-- PARENT & CHILD TESTIMONIALS (story cards on Services + Conditions pages)
+-- video cards play in-page; review cards open their link in a new tab.
+-- ==========================================
+
+DELETE FROM case_stories;
+
+INSERT INTO case_stories (card_type, concern, child_name, parent_name, progress, video_url, link_url, display_order, is_active) VALUES
+('video', 'ADHD & ASD', 'Ishan', 'Seema', 'Overall improvement', 'https://youtube.com/shorts/5FNy5lpwxtY?si=f9Z4fKmnysrAEQ9a', NULL, 1, 1),
+('video', 'Speech & Communication Difficulties + Occupational Therapy Needs', NULL, NULL, 'Improvement in OT skills and speech/communication abilities', 'https://youtube.com/shorts/J5reXEXfoJY?si=vzwZmIqpyRJTITQE', NULL, 2, 1),
+('video', 'Difficulty with response, following commands, and other developmental skills', NULL, NULL, 'Significant improvement in name response and command following', 'https://youtube.com/shorts/eUyFc-3ECVA?si=Z3H3Dr8s2WmssM8P', NULL, 3, 1),
+('review', 'What parents say about THERAKids', NULL, NULL, NULL, NULL, 'https://share.google/P5Js4P6puAJpwlEo2', 4, 1),
+('review', 'What parents say about THERAKids', NULL, NULL, NULL, NULL, 'https://share.google/menz1oDIvSdsppG7D', 5, 1);

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { NavLink, Routes, Route, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Stethoscope, Image as ImageIcon, FileText, Star, HelpCircle,
+  LayoutDashboard, Stethoscope, Image as ImageIcon, FileText, Star, HelpCircle, Quote,
   ListOrdered, Puzzle, Users, FolderOpen, FileStack, GraduationCap, BadgeCheck,
   PlayCircle, CalendarDays, Mail, Briefcase, Settings, KeyRound, ExternalLink,
   Menu, X, LogOut,
@@ -100,6 +100,24 @@ const RESOURCES = {
       { key: 'display_order', label: 'Display Order', type: 'number' },
       { key: 'is_active', label: 'Active', type: 'checkbox' },
       { key: 'testimonial', label: 'Testimonial', type: 'textarea', full: true, rows: 4 }
+    ]
+  },
+  // Story cards in the "Parent & Child Testimonials" section (Services +
+  // Conditions pages). video cards play in-page; review cards open link_url.
+  'case-stories': {
+    title: 'Manage Parent & Child Testimonials',
+    note: 'Story cards shown in the "Parent & Child Testimonials" section on the Services and Conditions pages. Video cards play in-page through the site\u2019s media viewer; Parents Review cards open their link in a new tab.',
+    columns: ['id', 'card_type', 'concern', 'progress', 'is_active'],
+    fields: [
+      { key: 'card_type', label: 'Card Type', type: 'select', options: ['video', 'review'] },
+      { key: 'concern', label: 'Concern / Headline' },
+      { key: 'child_name', label: 'Child Name (video cards)' },
+      { key: 'parent_name', label: 'Parent Name (video cards)' },
+      { key: 'display_order', label: 'Display Order', type: 'number' },
+      { key: 'is_active', label: 'Active', type: 'checkbox' },
+      { key: 'progress', label: 'Progress Line (video cards)', full: true },
+      { key: 'video_url', label: 'Video URL — YouTube link (video cards)', full: true, hint: 'Any YouTube link shape works: watch?v=…, youtu.be/…, shorts/…' },
+      { key: 'link_url', label: 'Review Link URL (review cards)', full: true }
     ]
   },
   // Per-route meta for the pages without a resource of their own: the SEO tab.
@@ -1545,6 +1563,7 @@ const AdminDashboard = () => {
         { to: '/admin/dashboard/gallery', icon: ImageIcon, label: 'Gallery' },
         { to: '/admin/dashboard/blogs', icon: FileText, label: 'Blogs' },
         { to: '/admin/dashboard/testimonials', icon: Star, label: 'Testimonials' },
+        { to: '/admin/dashboard/case-stories', icon: Quote, label: 'Parent Testimonials' },
         { to: '/admin/dashboard/faqs', icon: HelpCircle, label: 'FAQs' },
         { to: '/admin/dashboard/process-steps', icon: ListOrdered, label: 'Process Steps' },
         { to: '/admin/dashboard/conditions', icon: Puzzle, label: 'Conditions' },
@@ -1652,6 +1671,7 @@ const AdminDashboard = () => {
           <Route path="blogs" element={<CrudManager key="blogs" resource="blogs" />} />
           <Route path="seo" element={<CrudManager key="page_seo" resource="page_seo" />} />
           <Route path="testimonials" element={<CrudManager key="testimonials" resource="testimonials" />} />
+          <Route path="case-stories" element={<CrudManager key="case-stories" resource="case-stories" />} />
           <Route path="faqs" element={<CrudManager key="faqs" resource="faqs" />} />
           <Route path="process-steps" element={<CrudManager key="process_steps" resource="process_steps" />} />
           <Route path="conditions" element={<CrudManager key="conditions" resource="conditions" />} />
